@@ -1,0 +1,250 @@
+#!/bin/bash
+
+#
+# Gets a site's domain name from the Nginx config.
+#
+# @param 1: The name of the site's directory.
+#
+# @echo The domain name if found, blank otherwise.
+#
+getDomainFromNginxConfig() {
+	DIRECTORYNAME=$1
+	if [ -z "$DIRECTORYNAME" ]; then
+		return
+	fi
+
+	if [ ! -e config/nginx/${DIRECTORYNAME}.conf ]; then
+		return
+	fi
+
+	DOMAINNAME=$(sed -n 's|.*server_name \(.*\);|\1|p' config/nginx/${DIRECTORYNAME}.conf)
+
+	echo ${DOMAINNAME}
+}
+
+#
+# Adds a new entry to the hosts file.
+#
+# @param 1: The domain name to add.
+#
+hostsAddEntry() {
+	NEWENTTRY=$1
+	if [ -z "$NEWENTTRY" ]; then
+		return
+	fi
+
+	INVALIDCHARS=$(echo ${NEWENTTRY} | grep -o "[^0-9a-zA-Z.]")
+	if [ ! -z "$INVALIDCHARS" ]; then
+		echo 'Could not add hosts entry: invalid characters in domain.'
+		return
+	fi
+
+	CURRENTENTRIES=$(hostsGetCurrentEntries)
+	echo 'Adding hosts file entry.'
+	sudo sed -i '' "s/#wpdocker/$NEWENTTRY &/" /etc/hosts
+}
+
+#
+# Removes an entry from the hosts file.
+#
+# @param 1: The domain name to remove.
+#
+hostsRemoveEntry() {
+	ENTRYTOREMOVE=$1
+	if [ -z "$ENTRYTOREMOVE" ]; then
+		return
+	fi
+
+	CURRENTENTRIES=$(hostsGetCurrentEntries)
+
+	# Escape periods to avoid screwing up sed.
+	ENTRYTOREMOVE=$(echo ${ENTRYTOREMOVE} | sed 's/\./\\./g')
+
+	NEWENTRIES=$(echo ${CURRENTENTRIES} | sed "s/ $ENTRYTOREMOVE//")
+
+	echo 'Removing hosts file entry.'
+	sudo sed -i '' "s/$CURRENTENTRIES/$NEWENTRIES/" /etc/hosts
+}
+
+#
+# Gets the complete hosts file entry with all domains.
+#
+# @echo The complete hosts file entry.
+#
+hostsGetCurrentEntries() {
+	CURRENTENTRIES=$(grep -e "127\.0\.0\.1 .*#wpdocker" /etc/hosts)
+
+	# Create the initial entry if it does not already exist.
+	if [ -z "$CURRENTENTRIES" ]; then
+		echo -e "\n\n127.0.0.1 #wpdocker" | sudo tee -a /etc/hosts > /dev/null
+	fi
+
+	echo ${CURRENTENTRIES}
+}
+
+#
+# Runs a MySQL command in the mysql container.
+#
+# @param 1: The command to run.
+#
+mysqlCommand() {
+	docker-compose run --rm php mysql --host=mysql -u root -proot -e "$1"
+}
+
+#
+# Creates a new site.
+#
+# Will prompt the user for the site to create.
+#
+siteCreate() {
+
+	if [ ! -e docker-compose.yml ]; then
+		echo "This operation must be run from the wpdocker root directory."
+		exit 1
+	fi
+
+	read -p "Enter the name of the new site directory: " DIRECTORYNAME
+	if [ -z "$DIRECTORYNAME" ]; then
+		echo 'Site name cannot be empty.'
+		exit 1
+	fi
+
+	read -p "Domain to use (leave blank for $DIRECTORYNAME.dev): " DOMAINNAME
+	if [ -z "$DOMAINNAME" ]; then
+		DOMAINNAME="$DIRECTORYNAME.dev"
+	fi
+
+	echo "Creating site $DOMAINNAME."
+
+	systemUpIfDown
+
+	# Create directory.
+	if [ ! -e sites/${DIRECTORYNAME}/htdocs ]; then
+		mkdir -p sites/${DIRECTORYNAME}/htdocs
+	fi
+
+	# Create database.
+	mysqlCommand "CREATE DATABASE IF NOT EXISTS $DIRECTORYNAME; CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON $DIRECTORYNAME.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
+
+	# Install WordPress.
+	wpCommand ${DIRECTORYNAME} "core download"
+	wpCommand ${DIRECTORYNAME} "core config --dbhost=mysql --dbname=$DIRECTORYNAME --dbuser=wordpress --dbpass=wordpress"
+	wpCommand ${DIRECTORYNAME} "core install --url=$DOMAINNAME --title=$DIRECTORYNAME --admin_user=admin --admin_password=password --admin_email=wordpress@$DOMAINNAME --skip-email"
+
+	# Add object cache.
+	MEMCACHED_PHP="\$memcached_servers = array([ 'memcached', 11211 ]);\\"$'\n'"define( 'WP_CACHE', true );\\"$'\n'"define( 'WP_CACHE_KEY_SALT', '${DIRECTORYNAME}01' );\\"$'\n'"\\"$'\n'"\\"$'\n'""
+	sed -i "" -e "s/\/\* That/$MEMCACHED_PHP&/" sites/${DIRECTORYNAME}/htdocs/wp-config.php
+	curl -sS https://raw.githubusercontent.com/tollmanz/wordpress-pecl-memcached-object-cache/master/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
+
+	# Create nginx config.
+	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;\n\n\tinclude /etc/nginx/conf.d/partials/shared.conf.inc;\n}"
+	echo -e ${NGINX_CONFIG} > config/nginx/${DIRECTORYNAME}.conf
+	docker-compose restart nginx
+
+	# Create wp-cli.yml
+
+	# Add hosts entry.
+	hostsAddEntry ${DOMAINNAME}
+
+	echo "$DOMAINNAME successfully created."
+}
+
+#
+# Deletes an existing site.
+#
+# Will prompt the user for the site to delete.
+#
+siteDelete() {
+
+	if [ ! -e docker-compose.yml ]; then
+		echo "This operation must be run from the wpdocker root directory."
+		exit 1
+	fi
+
+	read -p "Enter the name of the directory to delete: " DIRECTORYNAME
+	if [ -z "$DIRECTORYNAME" ]; then
+		echo 'Directory name cannot be empty.'
+		exit 1
+	fi
+
+	DOMAINNAME=$(getDomainFromNginxConfig ${DIRECTORYNAME})
+	if [ -z ${DOMAINNAME} ]; then
+		echo 'Could not determine domain name. Moving on...'
+		DOMAINNAME=${DIRECTORYNAME}
+	fi
+
+	echo "Deleting site $DOMAINNAME."
+
+	systemUpIfDown
+
+	# Delete directory.
+	if [ -e sites/${DIRECTORYNAME} ]; then
+		rm -rf sites/${DIRECTORYNAME}
+	fi
+
+	# Delete database.
+	mysqlCommand "DROP DATABASE IF EXISTS $DIRECTORYNAME;"
+
+	# Delete Nginx config.
+	if [ -e config/nginx/${DIRECTORYNAME}.conf ]; then
+		rm config/nginx/${DIRECTORYNAME}.conf
+		docker-compose restart nginx
+	fi
+
+	# Remove hosts entry.
+	hostsRemoveEntry ${DOMAINNAME}
+
+	echo "Site $DOMAINNAME successfully deleted."
+}
+
+#
+# Shuts the system down.
+#
+systemDown() {
+	docker-compose down
+}
+
+#
+# Brings the system up.
+#
+systemUp() {
+	docker-compose up -d
+}
+
+#
+# Brings the system up if it is not already running.
+#
+systemUpIfDown() {
+	if [ ! $(docker-compose ps -q php) ]; then
+		systemUp
+	fi
+}
+
+#
+# Runs a WP-CLI command in the wpcli container.
+#
+# @param 1: The directory of the site in which to run the command.
+# @param 2: The command to run.
+#
+wpCommand() {
+	docker-compose run --rm -w /var/www/html/$1/htdocs --user=www-data php wp $2
+}
+
+
+case $1 in
+	create)
+		siteCreate
+		;;
+	delete)
+		siteDelete
+		;;
+	up)
+		systemUp
+		;;
+	down)
+		systemDown
+		;;
+	*)
+		echo "Unknown operation $1."
+		;;
+esac

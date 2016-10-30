@@ -1,0 +1,3 @@
+#!/bin/bash
+DIRECTORY=${PWD##*/}
+docker-compose run --rm -w /var/www/html/${DIRECTORY} --user=www-data php wp --path=/var/www/html/${DIRECTORY}/htdocs $@

@@ -1,0 +1,6 @@
+/config/nginx/*.conf
+!/config/nginx/default.conf
+/db/
+!/db/.gitkeep
+/sites/
+!/sites/.gitkeep

@@ -1,0 +1,28 @@
+version: '2'
+services:
+
+  memcached:
+    image: memcached:1.4-alpine
+
+  mysql:
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    image: mariadb:10.1
+    ports:
+      - 3306:3306
+    volumes:
+      - "./db:/var/lib/mysql"
+
+  nginx:
+    image: nginx:1.11-alpine
+    ports:
+      - 80:80
+    volumes:
+      - "./sites:/var/www/html"
+      - "./config/nginx/:/etc/nginx/conf.d"
+
+  php:
+    build:
+      context: ./build/php/
+    volumes:
+      - "./sites:/var/www/html"
