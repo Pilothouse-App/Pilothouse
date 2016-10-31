@@ -33,7 +33,7 @@ hostsAddEntry() {
 		return
 	fi
 
-	INVALIDCHARS=$(echo ${NEWENTTRY} | grep -o "[^0-9a-zA-Z.]")
+	INVALIDCHARS=$(echo ${NEWENTTRY} | grep -o "[^0-9a-zA-Z.-]")
 	if [ ! -z "$INVALIDCHARS" ]; then
 		echo 'Could not add hosts entry: invalid characters in domain.'
 		return
@@ -124,7 +124,7 @@ siteCreate() {
 	fi
 
 	# Create database.
-	mysqlCommand "CREATE DATABASE IF NOT EXISTS $DIRECTORYNAME; CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON $DIRECTORYNAME.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
+	mysqlCommand "CREATE DATABASE IF NOT EXISTS \`${DIRECTORYNAME}\`; CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON \`${DIRECTORYNAME}\`.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
 
 	# Install WordPress.
 	wpCommand ${DIRECTORYNAME} "core download"
@@ -183,7 +183,7 @@ siteDelete() {
 	fi
 
 	# Delete database.
-	mysqlCommand "DROP DATABASE IF EXISTS $DIRECTORYNAME;"
+	mysqlCommand "DROP DATABASE IF EXISTS \`${DIRECTORYNAME}\`;"
 
 	# Delete Nginx config.
 	if [ -e config/nginx/${DIRECTORYNAME}.conf ]; then
