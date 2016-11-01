@@ -24,5 +24,10 @@ services:
   php:
     build:
       context: ./build/php/
+    extra_hosts:
+      # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
+      # Xdebug to connect back to the host machine due to limitations in Docker.
+      - "dockerhost:100.0.0.0"
     volumes:
+      - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
       - "./sites:/var/www/html"

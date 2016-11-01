@@ -29,6 +29,7 @@ It is somewhat opinionated, as I built it to fit my own specific needs. It is al
 - Local WordPress sites are located in the `sites` directory.
 - The default WordPress username and password is `admin`/`12345`.
 - To run WP-CLI commands, change to the site directory, and run the `wp` command as normal. Make sure you have added the `bin` directory to your OS's include path.
+- To use Xdebug, use the IDE key `wpdocker` with the host `9000`. Make sure path mappings are configured correctly in your IDE. 
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
 - The first time you boot the system, the PHP container will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
