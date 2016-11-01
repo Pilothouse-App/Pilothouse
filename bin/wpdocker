@@ -202,7 +202,7 @@ siteDelete() {
 #
 systemDown() {
     sudo ifconfig lo0 -alias 100.0.0.0
-	docker-compose down
+	docker-compose stop
 }
 
 #
