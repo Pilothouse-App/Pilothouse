@@ -11,7 +11,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "./db:/var/lib/mysql"
+      - "/var/lib/mysql"
 
   nginx:
     image: nginx:1.11-alpine
