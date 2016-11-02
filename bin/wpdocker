@@ -231,7 +231,7 @@ systemUpIfDown() {
 # @param 2: The command to run.
 #
 wpCommand() {
-	docker-compose run --rm -w /var/www/html/$1/htdocs --user=www-data php wp $2
+	docker-compose exec --user=www-data php wp --path=/var/www/html/$1/htdocs $2
 }
 
 
