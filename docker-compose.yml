@@ -31,4 +31,5 @@ services:
     volumes:
       - "./config/php-fpm/php.ini:/usr/local/etc/php/php.ini"
       - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
+      - "/home/www-data/.wp-cli/cache"
       - "./sites:/var/www/html"

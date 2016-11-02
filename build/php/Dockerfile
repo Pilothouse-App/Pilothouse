@@ -24,3 +24,5 @@ RUN apk add --no-cache --virtual .build-deps \
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
 	&& chmod +x wp-cli.phar \
 	&& mv wp-cli.phar /usr/local/bin/wp
+
+RUN mkdir -p /home/www-data/.wp-cli/cache && chown -R www-data:www-data /home/www-data/.wp-cli/cache
