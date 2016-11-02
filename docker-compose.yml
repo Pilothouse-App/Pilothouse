@@ -17,6 +17,7 @@ services:
     image: nginx:1.11-alpine
     ports:
       - 80:80
+      - 443:443
     volumes:
       - "./sites:/var/www/html"
       - "./config/nginx/:/etc/nginx/conf.d"
