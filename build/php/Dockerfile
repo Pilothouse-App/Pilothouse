@@ -14,12 +14,13 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& pecl install xdebug \
 	&& docker-php-ext-enable xdebug \
 
+	&& docker-php-ext-install gd mysqli opcache zip \
+	&& docker-php-ext-enable gd zip \
+	&& apk add --no-cache imagemagick libmemcached mysql-client \
+
 	&& rm -rf /usr/src/php/ext/memcached \
 	&& docker-php-source delete \
-	&& apk del .build-deps \
-
-	&& docker-php-ext-install gd mysqli opcache zip \
-	&& apk add --no-cache imagemagick libmemcached mysql-client
+	&& apk del .build-deps
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
 	&& chmod +x wp-cli.phar \
