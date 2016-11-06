@@ -248,6 +248,9 @@ case $1 in
 	down)
 		systemDown
 		;;
+    mysql)
+        mysqlCommand "$2"
+        ;;
 	*)
 		echo "Unknown operation $1."
 		;;
