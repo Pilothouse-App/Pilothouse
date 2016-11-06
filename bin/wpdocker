@@ -248,6 +248,10 @@ case $1 in
 	down)
 		systemDown
 		;;
+	restart)
+	    systemDown
+	    systemUp
+	    ;;
     mysql)
         mysqlCommand "$2"
         ;;
