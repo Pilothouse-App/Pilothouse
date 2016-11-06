@@ -88,7 +88,7 @@ hostsGetCurrentEntries() {
 # @param 1: The command to run.
 #
 mysqlCommand() {
-	docker-compose run --rm php mysql --host=mysql -u root -proot -e "$1"
+	docker-compose exec php mysql --host=mysql -u root -proot -e "$1"
 }
 
 #
