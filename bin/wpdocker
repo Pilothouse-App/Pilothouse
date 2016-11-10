@@ -23,25 +23,31 @@ getDomainFromNginxConfig() {
 }
 
 #
-# Adds a new entry to the hosts file.
+# Adds a new entry to the hosts file, if it does not already exist.
 #
 # @param 1: The domain name to add.
 #
 hostsAddEntry() {
-	NEWENTTRY=$1
-	if [ -z "$NEWENTTRY" ]; then
+	DOMAIN=$1
+	if [ -z "$DOMAIN" ]; then
 		return
 	fi
 
-	INVALIDCHARS=$(echo ${NEWENTTRY} | grep -o "[^0-9a-zA-Z.-]")
+	INVALIDCHARS=$(echo ${DOMAIN} | grep -o "[^ 0-9a-zA-Z.-]")
 	if [ ! -z "$INVALIDCHARS" ]; then
 		echo 'Could not add hosts entry: invalid characters in domain.'
 		return
 	fi
 
-	CURRENTENTRIES=$(hostsGetCurrentEntries)
-	echo 'Adding hosts file entry.'
-	sudo sed -i '' "s/#wpdocker/$NEWENTTRY &/" /etc/hosts
+    NEWENTRY="127.0.0.1 ${DOMAIN} #wpdocker"
+    if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
+        echo 'Adding hosts file entry.'
+        # Add a newline to the end of /etc/hosts if it doesn't already exist.
+        sudo sed -i '' '$a\' /etc/hosts
+        sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
+    else
+        echo 'Hosts file entry exists; skipping.'
+    fi
 }
 
 #
@@ -50,36 +56,28 @@ hostsAddEntry() {
 # @param 1: The domain name to remove.
 #
 hostsRemoveEntry() {
-	ENTRYTOREMOVE=$1
-	if [ -z "$ENTRYTOREMOVE" ]; then
+	DOMAIN=$1
+	if [ -z "$DOMAIN" ]; then
 		return
 	fi
 
-	CURRENTENTRIES=$(hostsGetCurrentEntries)
-
-	# Escape periods to avoid screwing up sed.
-	ENTRYTOREMOVE=$(echo ${ENTRYTOREMOVE} | sed 's/\./\\./g')
-
-	NEWENTRIES=$(echo ${CURRENTENTRIES} | sed "s/ $ENTRYTOREMOVE//")
-
-	echo 'Removing hosts file entry.'
-	sudo sed -i '' "s/$CURRENTENTRIES/$NEWENTRIES/" /etc/hosts
-}
-
-#
-# Gets the complete hosts file entry with all domains.
-#
-# @echo The complete hosts file entry.
-#
-hostsGetCurrentEntries() {
-	CURRENTENTRIES=$(grep -e "127\.0\.0\.1 .*#wpdocker" /etc/hosts)
-
-	# Create the initial entry if it does not already exist.
-	if [ -z "$CURRENTENTRIES" ]; then
-		echo -e "\n\n127.0.0.1 #wpdocker" | sudo tee -a /etc/hosts > /dev/null
+	INVALIDCHARS=$(echo ${DOMAIN} | grep -o "[^ 0-9a-zA-Z.-]")
+	if [ ! -z "$INVALIDCHARS" ]; then
+		echo 'Could not remove hosts entry: invalid characters in domain.'
+		return
 	fi
 
-	echo ${CURRENTENTRIES}
+	# Escape periods to avoid screwing up sed.
+	DOMAIN=$(echo ${DOMAIN} | sed 's/\./\\./g')
+
+    ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN} #wpdocker")
+
+	if [ ! -z "$(grep "$ENTRYTOREMOVE" /etc/hosts)" ]; then
+        echo 'Removing hosts file entry.'
+        sudo sed -i '' -n "/$ENTRYTOREMOVE/!p" /etc/hosts
+    else
+        echo 'Hosts file entry does not exist; skipping.'
+    fi
 }
 
 #
