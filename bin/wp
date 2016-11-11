@@ -1,3 +1,20 @@
 #!/bin/bash
-DIRECTORY=${PWD##*/}
-docker-compose run --rm -w /var/www/html/${DIRECTORY} --user=www-data php wp --path=/var/www/html/${DIRECTORY}/htdocs $@
+
+CURRENTDIRECTORY=$PWD
+while [[ "$CURRENTDIRECTORY" != "" && ! -e "$CURRENTDIRECTORY/htdocs" ]]; do
+    CURRENTDIRECTORY=${CURRENTDIRECTORY%/*}
+done
+
+if [ -z "$CURRENTDIRECTORY" ]; then
+    echo 'This command must be run from within a site directory.'
+    exit 1
+fi
+
+SITEDIRECTORY=$(basename ${CURRENTDIRECTORY})
+CURRENTDIRECTORY_ESCAPED=$(echo ${CURRENTDIRECTORY} | sed 's#/#\\/#g')
+HTDOCS_PATH=$(echo $PWD | sed "s/${CURRENTDIRECTORY_ESCAPED}//")
+if [ -z $HTDOCS_PATH ]; then
+    HTDOCS_PATH='/'
+fi
+
+docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data php wp --path=/var/www/html/${SITEDIRECTORY}/htdocs $@
