@@ -1,11 +1,9 @@
 # WPDocker
-*A local WordPress development stack in Docker*
+*A lightweight local WordPress development stack in Docker*
 
 ### What Is It?
 
-This is a WordPress-centric local development environment using Docker. In addition to the Docker stack, this package contains a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, updating the hosts file, and running WP-CLI commands.
-
-It is somewhat opinionated, as I built it to fit my own specific needs. It is also pretty minimal and lightweight. That said, while I hope others will find it useful, I am not really interested in maintaining it as a more general tool for the masses. Feel free to report bugs and contribute, but be aware that I built this primarily for my own use, and will probably not be interested in adding a feature that I will not use myself, as I have limited spare time in which to build and maintain such things.
+This is a WordPress-centric local development environment using Docker. In addition to the Docker stack, this package contains a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands.
 
 ### What's Inside
 
@@ -28,22 +26,23 @@ It is somewhat opinionated, as I built it to fit my own specific needs. It is al
 
 - Local WordPress sites are located in the `sites` directory.
 - The default WordPress username and password is `admin`/`12345`.
-- To run WP-CLI commands, change to the site directory, and run the `wp` command as normal. Make sure you have added the `bin` directory to your OS's include path.
-- To use Xdebug, use the IDE key `wpdocker` with the host `9000`. Make sure path mappings are configured correctly in your IDE. 
+- To run WP-CLI commands, change to a location in the site directory you wish to run the command against, and run the `wp` command as normal. Make sure you have added the `bin` directory to your OS's include path.
+- To use Xdebug, use the IDE key `wpdocker` with the port `9000`. Make sure path mappings are configured correctly in your IDE. 
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
 - The first time you boot the system, the PHP container will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
 
 ### Commands
 
-- `wpdocker up`: Boots up the Docker containers.
-- `wpdocker down`: Halts the Docker containers.
+- `wpdocker up`: Boots up the Docker containers, and adds all necessary site entries to the host's hosts file.
+- `wpdocker down`: Halts the Docker containers, removing all site entries from the host's hosts file.
+- `wpdocker restart`: Restarts the Docker containers.
 - `wpdocker create`: Creates a new local site.
 - `wpdocker delete`: Deletes an existing local site.
+- `wpdocker mysql`: Runs a provided MySQL query, i.e. `wpdocker mysql "USE exampledb; SELECT * FROM table"`
 
 ### ToDo
 
 1. Add the ability to toggle Xdebug off/on.
 2. Clean up some of the remaining rough edges.
 3. Add something like MailCatcher to intercept mail sent from the local sites.
-4. Remove entries from the hosts file when the system is halted, and replace them when restarted.
