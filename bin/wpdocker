@@ -31,7 +31,7 @@ hostsAddAll() {
 	for CURRENTCONFIG in ${CONFIGS}; do
 		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
 		if [ '_' != "$CURRENTDOMAIN" ]; then
-			hostsAddEntry ${CURRENTDOMAIN}
+			hostsAddEntry "$CURRENTDOMAIN"
 		fi
 	done
 }
@@ -73,7 +73,7 @@ hostsRemoveAll() {
 	for CURRENTCONFIG in ${CONFIGS}; do
 		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
 		if [ '_' != "$CURRENTDOMAIN" ]; then
-			hostsRemoveEntry ${CURRENTDOMAIN}
+			hostsRemoveEntry "$CURRENTDOMAIN"
 		fi
 	done
 }
