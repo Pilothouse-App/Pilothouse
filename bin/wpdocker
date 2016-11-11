@@ -8,18 +8,32 @@
 # @echo The domain name if found, blank otherwise.
 #
 getDomainFromNginxConfig() {
-	DIRECTORYNAME=$1
-	if [ -z "$DIRECTORYNAME" ]; then
+	CONFIGFILE=$1
+	if [ -z "$CONFIGFILE" ]; then
 		return
 	fi
 
-	if [ ! -e config/nginx/${DIRECTORYNAME}.conf ]; then
+	if [ ! -e ${CONFIGFILE} ]; then
 		return
 	fi
 
-	DOMAINNAME=$(sed -n 's|.*server_name \(.*\);|\1|p' config/nginx/${DIRECTORYNAME}.conf)
+	DOMAINNAME=$(sed -n 's|.*server_name \(.*\);|\1|p' ${CONFIGFILE})
 
 	echo ${DOMAINNAME}
+}
+
+#
+# Adds all entries to the hosts file.
+#
+hostsAddAll() {
+	CONFIGS=config/nginx/*.conf
+
+	for CURRENTCONFIG in ${CONFIGS}; do
+		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
+		if [ '_' != "$CURRENTDOMAIN" ]; then
+			hostsAddEntry ${CURRENTDOMAIN}
+		fi
+	done
 }
 
 #
@@ -35,19 +49,33 @@ hostsAddEntry() {
 
 	INVALIDCHARS=$(echo ${DOMAIN} | grep -o "[^ 0-9a-zA-Z.-]")
 	if [ ! -z "$INVALIDCHARS" ]; then
-		echo 'Could not add hosts entry: invalid characters in domain.'
+		echo "Could not add hosts entry for ${DOMAIN}: invalid characters in domain."
 		return
 	fi
 
-    NEWENTRY="127.0.0.1 ${DOMAIN} #wpdocker"
-    if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
-        echo 'Adding hosts file entry.'
-        # Add a newline to the end of /etc/hosts if it doesn't already exist.
-        sudo sed -i '' '$a\' /etc/hosts
-        sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
-    else
-        echo 'Hosts file entry exists; skipping.'
-    fi
+	NEWENTRY="127.0.0.1 ${DOMAIN} #wpdocker"
+	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
+		echo "Adding hosts file entry for ${DOMAIN}."
+		# Add a newline to the end of /etc/hosts if it doesn't already exist.
+		sudo sed -i '' '$a\' /etc/hosts
+		sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
+	else
+		echo "Hosts file entry for ${DOMAIN} exists; skipping."
+	fi
+}
+
+#
+# Removes all entries from the hosts file.
+#
+hostsRemoveAll() {
+	CONFIGS=config/nginx/*.conf
+
+	for CURRENTCONFIG in ${CONFIGS}; do
+		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
+		if [ '_' != "$CURRENTDOMAIN" ]; then
+			hostsRemoveEntry ${CURRENTDOMAIN}
+		fi
+	done
 }
 
 #
@@ -63,21 +91,21 @@ hostsRemoveEntry() {
 
 	INVALIDCHARS=$(echo ${DOMAIN} | grep -o "[^ 0-9a-zA-Z.-]")
 	if [ ! -z "$INVALIDCHARS" ]; then
-		echo 'Could not remove hosts entry: invalid characters in domain.'
+		echo "Could not remove hosts entry for ${DOMAIN}: invalid characters in domain."
 		return
 	fi
 
 	# Escape periods to avoid screwing up sed.
-	DOMAIN=$(echo ${DOMAIN} | sed 's/\./\\./g')
+	DOMAIN_ESCAPED=$(echo ${DOMAIN} | sed 's/\./\\./g')
 
-    ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN} #wpdocker")
+	ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN_ESCAPED} #wpdocker")
 
 	if [ ! -z "$(grep "$ENTRYTOREMOVE" /etc/hosts)" ]; then
-        echo 'Removing hosts file entry.'
-        sudo sed -i '' -n "/$ENTRYTOREMOVE/!p" /etc/hosts
-    else
-        echo 'Hosts file entry does not exist; skipping.'
-    fi
+		echo "Removing hosts file entry for ${DOMAIN}."
+		sudo sed -i '' -n "/$ENTRYTOREMOVE/!p" /etc/hosts
+	else
+		echo "Hosts file entry for ${DOMAIN} does not exist; skipping."
+	fi
 }
 
 #
@@ -95,11 +123,6 @@ mysqlCommand() {
 # Will prompt the user for the site to create.
 #
 siteCreate() {
-
-	if [ ! -e docker-compose.yml ]; then
-		echo "This operation must be run from the wpdocker root directory."
-		exit 1
-	fi
 
 	read -p "Enter the name of the new site directory: " DIRECTORYNAME
 	if [ -z "$DIRECTORYNAME" ]; then
@@ -139,8 +162,6 @@ siteCreate() {
 	echo -e ${NGINX_CONFIG} > config/nginx/${DIRECTORYNAME}.conf
 	docker-compose restart nginx
 
-	# Create wp-cli.yml
-
 	# Add hosts entry.
 	hostsAddEntry ${DOMAINNAME}
 
@@ -154,18 +175,13 @@ siteCreate() {
 #
 siteDelete() {
 
-	if [ ! -e docker-compose.yml ]; then
-		echo "This operation must be run from the wpdocker root directory."
-		exit 1
-	fi
-
 	read -p "Enter the name of the directory to delete: " DIRECTORYNAME
 	if [ -z "$DIRECTORYNAME" ]; then
 		echo 'Directory name cannot be empty.'
 		exit 1
 	fi
 
-	DOMAINNAME=$(getDomainFromNginxConfig ${DIRECTORYNAME})
+	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/${DIRECTORYNAME}.conf")
 	if [ -z ${DOMAINNAME} ]; then
 		echo 'Could not determine domain name. Moving on...'
 		DOMAINNAME=${DIRECTORYNAME}
@@ -232,6 +248,9 @@ wpCommand() {
 	docker-compose exec --user=www-data php wp --path=/var/www/html/$1/htdocs $2
 }
 
+# Change to the wpdocker root directory for all commands. The root directory is the parent directory of the the current
+# script's directory.
+cd $(dirname $(dirname $0))
 
 case $1 in
 	create)
@@ -242,9 +261,11 @@ case $1 in
 		;;
 	up)
 		systemUp
+		hostsAddAll
 		;;
 	down)
 		systemDown
+		hostsRemoveAll
 		;;
 	restart)
 	    systemDown
