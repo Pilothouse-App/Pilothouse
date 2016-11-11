@@ -233,7 +233,7 @@ systemUp() {
 # Brings the system up if it is not already running.
 #
 systemUpIfDown() {
-	if [ ! $(docker-compose ps -q php) ]; then
+	if [ 'Running' != "$(docker-compose exec php "echo 'Running'")" ]; then
 		systemUp
 	fi
 }
