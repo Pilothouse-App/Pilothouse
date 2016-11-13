@@ -19,8 +19,9 @@ services:
       - 80:80
       - 443:443
     volumes:
+      - "./config/nginx/partials/:/etc/nginx/partials/"
+      - "./config/nginx/sites:/etc/nginx/conf.d"
       - "./sites:/var/www/html"
-      - "./config/nginx/:/etc/nginx/conf.d"
 
   php:
     build:

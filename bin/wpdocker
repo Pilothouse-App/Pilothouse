@@ -26,7 +26,7 @@ getDomainFromNginxConfig() {
 # Adds all entries to the hosts file.
 #
 hostsAddAll() {
-	CONFIGS=config/nginx/*.conf
+	CONFIGS=config/nginx/sites/*.conf
 
 	for CURRENTCONFIG in ${CONFIGS}; do
 		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
@@ -68,7 +68,7 @@ hostsAddEntry() {
 # Removes all entries from the hosts file.
 #
 hostsRemoveAll() {
-	CONFIGS=config/nginx/*.conf
+	CONFIGS=config/nginx/sites/*.conf
 
 	for CURRENTCONFIG in ${CONFIGS}; do
 		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
@@ -158,8 +158,8 @@ siteCreate() {
 	curl -sS https://raw.githubusercontent.com/tollmanz/wordpress-pecl-memcached-object-cache/master/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
 
 	# Create nginx config.
-	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;\n\n\tinclude /etc/nginx/conf.d/partials/shared.conf.inc;\n}"
-	echo -e ${NGINX_CONFIG} > config/nginx/${DIRECTORYNAME}.conf
+	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
+	echo -e ${NGINX_CONFIG} > config/nginx/sites/${DIRECTORYNAME}.conf
 	docker-compose restart nginx
 
 	# Add hosts entry.
@@ -181,7 +181,7 @@ siteDelete() {
 		exit 1
 	fi
 
-	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/${DIRECTORYNAME}.conf")
+	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/sites/${DIRECTORYNAME}.conf")
 	if [ -z ${DOMAINNAME} ]; then
 		echo 'Could not determine domain name. Moving on...'
 		DOMAINNAME=${DIRECTORYNAME}
@@ -200,8 +200,8 @@ siteDelete() {
 	mysqlCommand "DROP DATABASE IF EXISTS \`${DIRECTORYNAME}\`;"
 
 	# Delete Nginx config.
-	if [ -e config/nginx/${DIRECTORYNAME}.conf ]; then
-		rm config/nginx/${DIRECTORYNAME}.conf
+	if [ -e config/nginx/sites/${DIRECTORYNAME}.conf ]; then
+		rm config/nginx/sites/${DIRECTORYNAME}.conf
 		docker-compose restart nginx
 	fi
 
