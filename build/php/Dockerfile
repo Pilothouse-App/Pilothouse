@@ -15,6 +15,8 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& docker-php-ext-enable gd zip \
 	&& apk add --no-cache imagemagick libmemcached mysql-client \
 
+	&& apk add --no-cache ssmtp \
+
 	&& rm -rf /usr/src/php/ext/memcached \
 	&& docker-php-source delete \
 	&& apk del .build-deps

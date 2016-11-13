@@ -13,6 +13,7 @@ This is a WordPress-centric local development environment using Docker. In addit
 - Memcached
 - Xdebug
 - WP-CLI
+- MailCatcher
 
 ### Quick Start
 
@@ -29,6 +30,10 @@ This is a WordPress-centric local development environment using Docker. In addit
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
 - The first time you boot the system, the PHP containers will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
+
+### Using MailCatcher
+
+Any emails sent out from local sites will be sent to MailCatcher, accessible at [http://localhost:1080](http://localhost:1080).
 
 ### Using WP-CLI
 
@@ -69,8 +74,3 @@ See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 - `wpdocker create`: Creates a new local site.
 - `wpdocker delete`: Deletes an existing local site.
 - `wpdocker mysql`: Runs a provided MySQL query, i.e. `wpdocker mysql "USE exampledb; SELECT * FROM table"`
-
-### ToDo
-
-1. Clean up some of the remaining rough edges.
-2. Add something like MailCatcher to intercept mail sent from the local sites.
