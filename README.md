@@ -62,6 +62,7 @@ See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 
 ### Commands
 
+- `wp`: Runs a WP-CLI command in the Docker container against the current site.
 - `wpdocker up`: Boots up the Docker containers, and adds all necessary site entries to the host's hosts file.
 - `wpdocker down`: Halts the Docker containers, removing all site entries from the host's hosts file.
 - `wpdocker restart`: Restarts the Docker containers.
