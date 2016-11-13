@@ -39,6 +39,7 @@ services:
       - "dockerhost:100.0.0.0"
     volumes:
       - "./config/php-fpm/php.ini:/usr/local/etc/php/php.ini"
+      - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli/cache"
       - "./sites:/var/www/html"
 
@@ -52,5 +53,6 @@ services:
     volumes:
       - "./config/php-fpm/php.ini:/usr/local/etc/php/php.ini"
       - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
+      - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli/cache"
       - "./sites:/var/www/html"
