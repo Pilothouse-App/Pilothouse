@@ -23,4 +23,4 @@ else
     CONTAINER='php'
 fi
 
-docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data ${CONTAINER} wp --path=/var/www/html/${SITEDIRECTORY}/htdocs $@
+docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data ${CONTAINER} wp --path=/var/www/html/${SITEDIRECTORY}/htdocs "$@"
