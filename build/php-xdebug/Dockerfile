@@ -11,6 +11,9 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& pecl install imagick \
 	&& docker-php-ext-enable imagick \
 
+    && pecl install xdebug \
+    && docker-php-ext-enable xdebug \
+
 	&& docker-php-ext-install gd mysqli opcache zip \
 	&& docker-php-ext-enable gd zip \
 	&& apk add --no-cache imagemagick libmemcached mysql-client \
