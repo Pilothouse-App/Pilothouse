@@ -4,6 +4,12 @@ services:
   memcached:
     image: memcached:1.4-alpine
 
+  mailcatcher:
+    build:
+      context: ./build/mailcatcher
+    ports:
+      - 1080:1080
+
   mysql:
     environment:
       MYSQL_ROOT_PASSWORD: root
