@@ -48,8 +48,15 @@ Xdebug is not enabled by default, for performance reasons. However, you can easi
 
 The following bookmarklets can be added to your favorites bar to quickly add and remove the Xdebug cookie:
 
-<a href="javascript:(function(){document.cookie='xdebug=on;path=/;';})()">Toggle Xdebug On</a>  
-<a href="javascript:(function(){document.cookie='xdebug=;path=/;';})()">Toggle Xdebug Off</a>
+Toggle Xdebug On
+```
+javascript:(function(){document.cookie='xdebug=on;path=/;';})()
+```
+
+Toggle Xdebug Off
+```
+javascript:(function(){document.cookie='xdebug=;path=/;';})()
+```
 
 See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 
