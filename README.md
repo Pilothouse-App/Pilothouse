@@ -26,11 +26,32 @@ This is a WordPress-centric local development environment using Docker. In addit
 
 - Local WordPress sites are located in the `sites` directory.
 - The default WordPress username and password is `admin`/`12345`.
-- To run WP-CLI commands, change to a location in the site directory you wish to run the command against, and run the `wp` command as normal. Make sure you have added the `bin` directory to your OS's include path.
-- To use Xdebug, use the IDE key `wpdocker` with the port `9000`. Make sure path mappings are configured correctly in your IDE. 
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
-- The first time you boot the system, the PHP container will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
+- The first time you boot the system, the PHP containers will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
+
+### Using WP-CLI
+
+To run WP-CLI commands, change to a location in the site directory you wish to run the command against, and run the `wp` command as normal. (For this to work, you will need to have added the WPDocker `bin` directory to your OS's include path as described above.)
+
+To run a WP-CLI command with Xdebug enabled, set an environment variable `xdebug` on your host to `on` before running the command:
+```
+$xdebug=on
+wp command-to-run
+```
+
+### Using Xdebug
+
+Configure your IDE with the IDE key `wpdocker` and the port `9000`. Make sure path mappings are configured in your IDE to map the site's local path to the path in the Docker container, which is `/var/www/html/{sitename}/`.
+
+Xdebug is not enabled by default, for performance reasons. However, you can easily toggle Xdebug on for a specific domain by setting a cookie named `xdebug` with a value of `on` in your browser. Whenever this cookie is present in the request, Xdebug will be enabled.
+
+The following bookmarklets can be added to your favorites bar to quickly add and remove the Xdebug cookie:
+
+<a href="javascript:(function(){document.cookie='xdebug=on;path=/;';})()">Toggle Xdebug On</a>  
+<a href="javascript:(function(){document.cookie='xdebug=;path=/;';})()">Toggle Xdebug Off</a>
+
+See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 
 ### Commands
 
@@ -43,6 +64,5 @@ This is a WordPress-centric local development environment using Docker. In addit
 
 ### ToDo
 
-1. Add the ability to toggle Xdebug off/on.
-2. Clean up some of the remaining rough edges.
-3. Add something like MailCatcher to intercept mail sent from the local sites.
+1. Clean up some of the remaining rough edges.
+2. Add something like MailCatcher to intercept mail sent from the local sites.

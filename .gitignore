@@ -1,5 +1,5 @@
-/config/nginx/*.conf
-!/config/nginx/default.conf
+/config/nginx/sites/*.conf
+!/config/nginx/sites/default.conf
 /db/
 !/db/.gitkeep
 /sites/

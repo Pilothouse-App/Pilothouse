@@ -17,4 +17,10 @@ if [ -z $HTDOCS_PATH ]; then
     HTDOCS_PATH='/'
 fi
 
-docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data php wp --path=/var/www/html/${SITEDIRECTORY}/htdocs $@
+if [ "$xdebug" = 'on' ]; then
+    CONTAINER='php-xdebug'
+else
+    CONTAINER='php'
+fi
+
+docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data ${CONTAINER} wp --path=/var/www/html/${SITEDIRECTORY}/htdocs $@

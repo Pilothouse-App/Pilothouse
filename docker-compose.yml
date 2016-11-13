@@ -19,12 +19,26 @@ services:
       - 80:80
       - 443:443
     volumes:
+      - "./config/nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./config/nginx/partials/:/etc/nginx/partials/"
+      - "./config/nginx/sites:/etc/nginx/conf.d"
       - "./sites:/var/www/html"
-      - "./config/nginx/:/etc/nginx/conf.d"
 
   php:
     build:
       context: ./build/php/
+    extra_hosts:
+      # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
+      # Xdebug to connect back to the host machine due to limitations in Docker.
+      - "dockerhost:100.0.0.0"
+    volumes:
+      - "./config/php-fpm/php.ini:/usr/local/etc/php/php.ini"
+      - "/home/www-data/.wp-cli/cache"
+      - "./sites:/var/www/html"
+
+  php-xdebug:
+    build:
+      context: ./build/php-xdebug/
     extra_hosts:
       # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
       # Xdebug to connect back to the host machine due to limitations in Docker.
