@@ -53,12 +53,16 @@ hostsAddEntry() {
 		return
 	fi
 
+	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker-compose ps -q nginx))
+
 	NEWENTRY="127.0.0.1 ${DOMAIN} #wpdocker"
 	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
 		echo "Adding hosts file entry for ${DOMAIN}."
 		# Add a newline to the end of /etc/hosts if it doesn't already exist.
 		sudo sed -i '' '$a\' /etc/hosts
 		sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
+	    docker-compose exec php        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
+	    docker-compose exec php-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
 	else
 		echo "Hosts file entry for ${DOMAIN} exists; skipping."
 	fi
