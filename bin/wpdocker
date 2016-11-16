@@ -156,10 +156,13 @@ siteCreate() {
 	wpCommand ${DIRECTORYNAME} "core config --dbhost=mysql --dbname=$DIRECTORYNAME --dbuser=wordpress --dbpass=wordpress"
 	wpCommand ${DIRECTORYNAME} "core install --url=$DOMAINNAME --title=$DIRECTORYNAME --admin_user=admin --admin_password=password --admin_email=wordpress@$DOMAINNAME --skip-email"
 
-	# Add object cache.
-	MEMCACHED_PHP="\$memcached_servers = array([ 'memcached', 11211 ]);\\"$'\n'"define( 'WP_CACHE', true );\\"$'\n'"define( 'WP_CACHE_KEY_SALT', '${DIRECTORYNAME}01' );\\"$'\n'"\\"$'\n'"\\"$'\n'""
-	sed -i "" -e "s/\/\* That/$MEMCACHED_PHP&/" sites/${DIRECTORYNAME}/htdocs/wp-config.php
+	# Add object cache dropin.
 	curl -sS https://raw.githubusercontent.com/tollmanz/wordpress-pecl-memcached-object-cache/master/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
+
+	# Add additional PHP to wp-config.php.
+	ADDITIONAL_PHP=$(cat config/wordpress/wp-config.php.inc | awk 1 ORS="\\\\\n")
+    ADDITIONAL_PHP="$ADDITIONAL_PHP"$'\n'"\\"$'\n'"\\"$'\n'
+	sed -i '' -e "s|\/\* That's all|${ADDITIONAL_PHP}&|g" sites/${DIRECTORYNAME}/htdocs/wp-config.php
 
 	# Create nginx config.
 	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
