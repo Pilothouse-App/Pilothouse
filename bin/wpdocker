@@ -149,7 +149,7 @@ siteCreate() {
 	fi
 
 	# Create database.
-	mysqlCommand "CREATE DATABASE IF NOT EXISTS \`${DIRECTORYNAME}\`; CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON \`${DIRECTORYNAME}\`.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
+	mysqlCommand "CREATE DATABASE IF NOT EXISTS \`${DIRECTORYNAME}\`;"
 
 	# Install WordPress.
 	wpCommand ${DIRECTORYNAME} "core download"
@@ -234,6 +234,8 @@ systemUp() {
     sudo ifconfig lo0 alias 100.0.0.0
 
 	docker-compose up -d
+
+	mysqlCommand "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON *.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
 }
 
 #
