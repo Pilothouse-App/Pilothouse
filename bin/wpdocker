@@ -235,6 +235,7 @@ systemUp() {
 
 	docker-compose up -d
 
+	waitForMySQL
 	mysqlCommand "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON *.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
 }
 
@@ -244,6 +245,31 @@ systemUp() {
 systemUpIfDown() {
 	if [ 'Running' != "$(docker-compose exec php "echo 'Running'")" ]; then
 		systemUp
+	fi
+}
+
+#
+# Checks whether the mysql container is accepting connections, and if not, waits until it is.
+#
+waitForMySQL() {
+	ITERATION=0
+	while : ; do
+		((ITERATION++))
+		(docker-compose exec php mysqladmin ping --no-beep --host=mysql --user=root --password=root) > /dev/null
+
+		if [ $? -eq 0 ]; then
+			break
+		fi
+
+		if [ ${ITERATION} -eq 2 ]; then
+			echo -n "Waiting for MySQL to become ready... "
+		fi
+
+		sleep 1
+	done
+
+	if [ ${ITERATION} -ge 3 ]; then
+		echo "done."
 	fi
 }
 
