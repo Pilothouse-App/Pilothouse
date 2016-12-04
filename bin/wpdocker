@@ -1,6 +1,48 @@
 #!/bin/bash
 
 #
+# Generates an SSL certificate and configures Nginx for SSL support.
+#
+generateSSL() {
+
+    # Get the site directory.
+    read -p "Enter the name of the site directory in which to enable SSL support: " DIRECTORYNAME
+	if [ -z "$DIRECTORYNAME" ]; then
+		echo 'Directory name cannot be empty.'
+		exit 1
+	fi
+
+	# Check that the directory is valid.
+	NGINX_CONFIG_FILE="./config/nginx/sites/$DIRECTORYNAME.conf"
+	SITE_DIR="./sites/$DIRECTORYNAME"
+	if [ ! -e ${NGINX_CONFIG_FILE} ] || [ ! -e ${SITE_DIR} ]; then
+	    echo 'Invalid site name.'
+	    exit 1
+	fi
+
+	# Get the domain name from the Nginx config.
+	DOMAIN_NAME=$(getDomainFromNginxConfig ${NGINX_CONFIG_FILE})
+	if [ -z ${DOMAIN_NAME} ]; then
+	    echo 'Could not determine domain name.'
+	    exit 1;
+	fi
+
+	# Generate the certificate and key.
+	openssl genrsa -out "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.key" 2048
+	openssl req -new -x509 -key "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.key" -out "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
+
+	# Trust the certificate and key.
+	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.cert"
+
+	# Add the certificate and key to the Nginx config.
+    NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.key;""\\"$'\n'
+    sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
+
+	# Restart Nginx.
+	docker-compose restart nginx
+}
+
+#
 # Gets a site's domain name from the Nginx config.
 #
 # @param 1: The name of the site's directory.
@@ -306,6 +348,9 @@ case $1 in
 	    systemDown
 	    systemUp
 	    ;;
+    generate-ssl)
+        generateSSL
+        ;;
     mysql)
         mysqlCommand "$2"
         ;;

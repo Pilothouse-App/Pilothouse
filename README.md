@@ -74,4 +74,5 @@ See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 - `wpdocker restart`: Restarts the Docker containers.
 - `wpdocker create`: Creates a new local site.
 - `wpdocker delete`: Deletes an existing local site.
+- `wpdocker generate-ssl`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
 - `wpdocker mysql`: Runs a provided MySQL query, i.e. `wpdocker mysql "USE exampledb; SELECT * FROM table"`
