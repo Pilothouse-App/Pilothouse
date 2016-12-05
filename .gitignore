@@ -4,3 +4,4 @@
 !/db/.gitkeep
 /sites/
 !/sites/.gitkeep
+/vendor/

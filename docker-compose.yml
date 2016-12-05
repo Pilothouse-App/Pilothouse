@@ -42,6 +42,7 @@ services:
       - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli/cache"
       - "./sites:/var/www/html"
+      - "./vendor:/usr/local/vendor"
 
   php-xdebug:
     build:
@@ -56,3 +57,4 @@ services:
       - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli/cache"
       - "./sites:/var/www/html"
+      - "./vendor:/usr/local/vendor"
