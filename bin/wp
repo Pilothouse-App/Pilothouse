@@ -17,10 +17,17 @@ if [ -z $HTDOCS_PATH ]; then
     HTDOCS_PATH='/'
 fi
 
-if [ "$xdebug" = 'on' ]; then
-    CONTAINER='php-xdebug'
-else
-    CONTAINER='php'
-fi
+CONTAINER='php'
+WPCLI_ARGS=''
+for arg in "$@"; do
+    if [ '--xdebug' = ${arg} ]; then
+        CONTAINER='php-xdebug'
+    else
+        WPCLI_ARGS="$WPCLI_ARGS $arg"
+    fi
+done
 
-docker-compose run --rm -w /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} --user=www-data ${CONTAINER} wp --path=/var/www/html/${SITEDIRECTORY}/htdocs "$@"
+# Trim whitespace
+WPCLI_ARGS=$(echo ${WPCLI_ARGS} | xargs)
+
+docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "cd /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} && wp --path=/var/www/html/${SITEDIRECTORY}/htdocs ${WPCLI_ARGS}"

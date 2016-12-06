@@ -40,10 +40,9 @@ Any emails sent out from local sites will be sent to MailCatcher, accessible at 
 
 To run WP-CLI commands, change to a location in the site directory you wish to run the command against, and run the `wp` command as normal. (For this to work, you will need to have added the WPDocker `bin` directory to your OS's include path as described above.)
 
-To run a WP-CLI command with Xdebug enabled, set an environment variable `xdebug` on your host to `on` before running the command:
+To run a WP-CLI command with Xdebug enabled, add the `--xdebug` flag to your command:
 ```
-$xdebug=on
-wp command-to-run
+wp command-to-run --xdebug
 ```
 
 ### Using Xdebug
