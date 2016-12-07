@@ -20,14 +20,13 @@ fi
 CONTAINER='php'
 WPCLI_ARGS=''
 for arg in "$@"; do
-    if [ '--xdebug' = ${arg} ]; then
+    if [ '--xdebug' = "$arg" ]; then
         CONTAINER='php-xdebug'
     else
-        WPCLI_ARGS="$WPCLI_ARGS $arg"
+        WPCLI_ARGS="$WPCLI_ARGS '$arg'"
     fi
 done
 
-# Trim whitespace
-WPCLI_ARGS=$(echo ${WPCLI_ARGS} | xargs)
+COMMAND="cd /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} && wp --path=/var/www/html/${SITEDIRECTORY}/htdocs${WPCLI_ARGS}"
 
-docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "cd /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} && wp --path=/var/www/html/${SITEDIRECTORY}/htdocs ${WPCLI_ARGS}"
+docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
