@@ -27,7 +27,7 @@ This is a WordPress-centric local development environment using Docker. In addit
 ### Notes
 
 - Local WordPress sites are located in the `sites` directory.
-- The default WordPress username and password is `admin`/`12345`.
+- The default WordPress username and password is `admin`/`password`.
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
 - The first time you boot the system, the PHP containers will need to be built, which will take quite a bit of time. Subsequent boots will use the cached container, and will not need to be built each time.
 - To flush Memcached, run `docker-compose restart memcached`; to restart Nginx, after changing one of the nginx configuration files, run `docker-compose restart nginx`.
