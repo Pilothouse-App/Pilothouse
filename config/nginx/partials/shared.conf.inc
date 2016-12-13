@@ -1,8 +1,7 @@
 listen 80;
 
-index index.html index.php;
-
 location / {
+	index index.php index.html;
 	try_files $uri $uri/ /index.php?$args;
 }
 
