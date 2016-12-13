@@ -21,5 +21,7 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& docker-php-source delete \
 	&& apk del .build-deps
 
+RUN apk add --no-cache less
+
 RUN ln -s /usr/local/vendor/wp-cli/wp-cli/bin/wp /usr/local/bin/wp
 RUN mkdir -p /home/www-data/.wp-cli/cache && chown -R www-data:www-data /home/www-data/.wp-cli/cache
