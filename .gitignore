@@ -5,3 +5,4 @@
 /sites/
 !/sites/.gitkeep
 /vendor/
+.DS_Store
