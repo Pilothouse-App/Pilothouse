@@ -29,4 +29,4 @@ done
 
 COMMAND="cd /var/www/html/${SITEDIRECTORY}${HTDOCS_PATH} && wp --path=/var/www/html/${SITEDIRECTORY}/htdocs${WPCLI_ARGS}"
 
-docker-compose exec -T --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
+docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"

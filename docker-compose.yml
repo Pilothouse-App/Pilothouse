@@ -33,6 +33,8 @@ services:
   php:
     build:
       context: ./build/php/
+    environment:
+      - TERM=xterm
     extra_hosts:
       # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
       # Xdebug to connect back to the host machine due to limitations in Docker.
@@ -47,6 +49,8 @@ services:
   php-xdebug:
     build:
       context: ./build/php-xdebug/
+    environment:
+      - TERM=xterm
     extra_hosts:
       # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
       # Xdebug to connect back to the host machine due to limitations in Docker.
