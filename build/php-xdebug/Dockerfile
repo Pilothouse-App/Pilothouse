@@ -14,8 +14,8 @@ RUN apk add --no-cache --virtual .build-deps \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
 
-	&& docker-php-ext-install gd mysqli opcache zip \
-	&& docker-php-ext-enable gd zip \
+	&& docker-php-ext-install calendar gd mysqli opcache zip \
+	&& docker-php-ext-enable calendar gd zip \
 	&& apk add --no-cache imagemagick libmemcached mysql-client \
 
 	&& rm -rf /usr/src/php/ext/memcached \

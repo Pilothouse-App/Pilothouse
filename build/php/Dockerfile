@@ -11,8 +11,8 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& pecl install imagick \
 	&& docker-php-ext-enable imagick \
 
-	&& docker-php-ext-install gd mysqli opcache zip \
-	&& docker-php-ext-enable gd zip \
+	&& docker-php-ext-install calendar gd mysqli opcache zip \
+	&& docker-php-ext-enable calendar gd zip \
 	&& apk add --no-cache imagemagick libmemcached mysql-client \
 
 	&& apk add --no-cache ssmtp \
