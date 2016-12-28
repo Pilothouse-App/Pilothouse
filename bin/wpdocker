@@ -269,6 +269,20 @@ systemDown() {
 }
 
 #
+# Restarts the system.
+#
+# @param 1: The name of the container to restart.
+#
+systemRestart() {
+	if [ ! -z "$1" ]; then
+		docker-compose restart "$1"
+	else
+		systemDown
+		systemUp
+	fi
+}
+
+#
 # Brings the system up.
 #
 systemUp() {
@@ -345,8 +359,7 @@ case $1 in
 		hostsRemoveAll
 		;;
 	restart)
-	    systemDown
-	    systemUp
+	    systemRestart "$2"
 	    ;;
     generate-ssl)
         generateSSL

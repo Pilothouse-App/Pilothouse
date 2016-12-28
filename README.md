@@ -20,11 +20,8 @@ This is a WordPress-centric local development environment using Docker. In addit
 1. Install [Docker](https://www.docker.com/products/docker#/mac).
 2. Clone the repo to your computer.
 3. Run `composer install`.
-4. Add the `bin` path in the repo to your host operating system's include path.
-   *Unless you've installed an alternate shell, this means you would add the following to your `~/.bash_profile` file (create it if it does not already exist), adjusting the path to match where you have installed WPDocker:*
-   ```PATH="${HOME}/wpdocker/bin:$PATH"```
-5. Run `wpdocker up` to build the containers and boot up the system.
-   *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
+4. Add the `bin` path in the repo to your host operating system's include path. *Unless you've installed an alternate shell, this means you would add the following to your `~/.bash_profile` file (create it if it does not already exist), adjusting the path to match where you have installed WPDocker:* `PATH="${HOME}/wpdocker/bin:$PATH"`
+5. Run `wpdocker up` to build the containers and boot up the system. *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
 6. Create a new site by running `wpdocker create`.
 
 ### Notes
@@ -32,7 +29,6 @@ This is a WordPress-centric local development environment using Docker. In addit
 - Local WordPress sites are located in the `sites` directory.
 - The default WordPress username and password is `admin`/`password`.
 - To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
-- To flush Memcached, run `docker-compose restart memcached`; to restart Nginx, after changing one of the nginx configuration files, run `docker-compose restart nginx`.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
 
 ### Using MailCatcher
@@ -73,7 +69,7 @@ See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 - `wp`: Runs a WP-CLI command in the Docker container against the current site.
 - `wpdocker up`: Boots up the Docker containers, and adds all necessary site entries to the host's hosts file.
 - `wpdocker down`: Halts the Docker containers, removing all site entries from the host's hosts file.
-- `wpdocker restart`: Restarts the Docker containers.
+- `wpdocker restart [container-name]`: Restarts the specified Docker container (`nginx`, `memcached`, etc.), or the entire system if no container is specified.
 - `wpdocker create`: Creates a new local site.
 - `wpdocker delete`: Deletes an existing local site.
 - `wpdocker generate-ssl`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
