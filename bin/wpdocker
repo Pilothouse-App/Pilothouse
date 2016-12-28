@@ -1,15 +1,49 @@
 #!/bin/bash
 
 #
+# Displays the available commands.
+#
+commandInfo() {
+echo "NAME
+
+      WPDocker: A lightweight local WordPress development stack in Docker
+
+SYNOPSIS
+
+      wpdocker [command] [arguments]
+
+COMMANDS
+
+      up                    Boots up the Docker containers, and adds all necessary site entries to the host's hosts
+                            file.
+      down                  Halts the Docker containers, removing all site entries from the host's hosts file.
+      restart [container]   Restarts the specified Docker container (\`nginx\`, \`memcached\`, etc.), or the entire system
+                            if no container is specified.
+      create [site]         Creates a new local site.
+      delete [site]         Deletes an existing local site.
+      generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
+      mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
+                            site, or with no database selected if not run from within a site directory.
+      
+      Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
+"
+}
+
+#
 # Generates an SSL certificate and configures Nginx for SSL support.
+#
+# @param 1: The name of the site to which to add SSL support.
 #
 generateSSL() {
 
-    # Get the site directory.
-    read -p "Enter the name of the site directory in which to enable SSL support: " DIRECTORYNAME
+	# Get the site directory.
+	DIRECTORYNAME="$1"
 	if [ -z "$DIRECTORYNAME" ]; then
-		echo 'Directory name cannot be empty.'
-		exit 1
+		read -p "Enter the name of the site directory in which to enable SSL support: " DIRECTORYNAME
+		if [ -z "$DIRECTORYNAME" ]; then
+			echo 'Directory name cannot be empty.'
+			exit 1
+		fi
 	fi
 
 	# Check that the directory is valid.
@@ -40,6 +74,27 @@ generateSSL() {
 
 	# Restart Nginx.
 	docker-compose restart nginx
+}
+
+#
+# Gets the name of the current site.
+#
+# @echo The site directory name if found, blank otherwise.
+#
+getCurrentSiteName() {
+	CURRENTDIRECTORY=$PWD
+
+	while [[ "$CURRENTDIRECTORY" != "" && ! -e "$CURRENTDIRECTORY/htdocs" ]]; do
+	    CURRENTDIRECTORY=${CURRENTDIRECTORY%/*}
+	done
+
+	if [ ! -z "$CURRENTDIRECTORY" ]; then
+		SITENAME=$(basename ${CURRENTDIRECTORY})
+	else
+		SITENAME=""
+	fi
+
+	echo "$SITENAME"
 }
 
 #
@@ -157,10 +212,24 @@ hostsRemoveEntry() {
 #
 # Runs a MySQL command in the mysql container.
 #
+# Runs the provided MySQL command. The command will be run on the database of the current site, or with no database
+# selected if not run from within a site directory.
+#
 # @param 1: The command to run.
 #
 mysqlCommand() {
-	docker-compose exec php mysql --host=mysql -u root -proot -e "$1"
+
+	COMMAND="$1"
+	if [ -z "$COMMAND" ]; then
+		echo 'Please provide a command to run.'
+		exit 1
+	fi
+
+	if [ ! -z "$CURRENT_SITE_NAME" ]; then
+		COMMAND="USE '$CURRENT_SITE_NAME'; $COMMAND"
+	fi
+
+	docker-compose exec php mysql --host=mysql -u root -proot -e "$COMMAND"
 }
 
 #
@@ -168,12 +237,17 @@ mysqlCommand() {
 #
 # Will prompt the user for the site to create.
 #
+# @param 1: The name of the site to create.
+#
 siteCreate() {
 
-	read -p "Enter the name of the new site directory: " DIRECTORYNAME
+	DIRECTORYNAME="$1"
 	if [ -z "$DIRECTORYNAME" ]; then
-		echo 'Site name cannot be empty.'
-		exit 1
+		read -p "Enter the name of the new site directory: " DIRECTORYNAME
+		if [ -z "$DIRECTORYNAME" ]; then
+			echo 'Site name cannot be empty.'
+			exit 1
+		fi
 	fi
 
 	read -p "Domain to use (leave blank for $DIRECTORYNAME.dev): " DOMAINNAME
@@ -228,12 +302,17 @@ siteCreate() {
 #
 # Will prompt the user for the site to delete.
 #
+# @param 1: The name of the site to delete.
+#
 siteDelete() {
 
-	read -p "Enter the name of the directory to delete: " DIRECTORYNAME
+	DIRECTORYNAME="$1"
 	if [ -z "$DIRECTORYNAME" ]; then
-		echo 'Directory name cannot be empty.'
-		exit 1
+		read -p "Enter the name of the directory to delete: " DIRECTORYNAME
+		if [ -z "$DIRECTORYNAME" ]; then
+			echo 'Directory name cannot be empty.'
+			exit 1
+		fi
 	fi
 
 	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/sites/${DIRECTORYNAME}.conf")
@@ -335,26 +414,16 @@ waitForMySQL() {
 	fi
 }
 
-#
-# Runs a WP-CLI command in the wpcli container.
-#
-# @param 1: The directory of the site in which to run the command.
-# @param 2: The command to run.
-#
-wpCommand() {
-	docker-compose exec --user=www-data php wp --path=/var/www/html/$1/htdocs $2
-}
 
-# Change to the wpdocker root directory for all commands. The root directory is the parent directory of the the current
-# script's directory.
+CURRENT_SITE_NAME=$(getCurrentSiteName)
 cd $(dirname $(dirname $0))
 
 case $1 in
 	create)
-		siteCreate
+		siteCreate "$2"
 		;;
 	delete)
-		siteDelete
+		siteDelete "$2"
 		;;
 	up)
 		systemUp
@@ -368,12 +437,12 @@ case $1 in
 	    systemRestart "$2"
 	    ;;
     generate-ssl)
-        generateSSL
+        generateSSL "$2"
         ;;
     mysql)
         mysqlCommand "$2"
         ;;
 	*)
-		echo "Unknown operation $1."
+		commandInfo
 		;;
 esac
