@@ -17,6 +17,7 @@ services:
     ports:
       - 3306:3306
     volumes:
+      - "./config/mysql/mysql.conf:/etc/mysql/conf.d/wpdocker.cnf"
       - "/var/lib/mysql"
 
   nginx:
