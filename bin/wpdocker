@@ -414,6 +414,17 @@ waitForMySQL() {
 	fi
 }
 
+#
+# Runs a WP-CLI command in the php container.
+#
+# @param 1: The directory of the site in which to run the command.
+# @param 2: The command to run.
+#
+wpCommand() {
+	docker-compose exec --user=www-data php /bin/sh -c "wp --path=/var/www/html/$1/htdocs $2"
+}
+
+
 
 CURRENT_SITE_NAME=$(getCurrentSiteName)
 cd $(dirname $(dirname $0))
