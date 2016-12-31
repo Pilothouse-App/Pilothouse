@@ -18,6 +18,9 @@ RUN apk add --no-cache --virtual .build-deps \
 	&& docker-php-ext-enable calendar gd zip \
 	&& apk add --no-cache imagemagick libmemcached mysql-client \
 
+	&& docker-php-ext-install pdo_mysql \
+  && docker-php-ext-enable pdo_mysql \
+
 	&& rm -rf /usr/src/php/ext/memcached \
 	&& docker-php-source delete \
 	&& apk del .build-deps
