@@ -18,11 +18,12 @@ This is a WordPress-centric local development environment using Docker. In addit
 ### Quick Start
 
 1. Install [Docker](https://www.docker.com/products/docker#/mac).
-2. Clone the repo to your computer.
-3. Run `composer install`.
-4. Add the `bin` path in the repo to your host operating system's include path. *Unless you've installed an alternate shell, this means you would add the following to your `~/.bash_profile` file (create it if it does not already exist), adjusting the path to match where you have installed WPDocker:* `PATH="${HOME}/wpdocker/bin:$PATH"`
-5. Run `wpdocker up` to build the containers and boot up the system. *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
-6. Create a new site by running `wpdocker create`.
+2. Once installed, open Docker on your computer and run through the intial configuration settings.
+3. Clone the repo to your computer.
+4. Run `composer install`.
+5. Add the `bin` path in the repo to your host operating system's include path. *Unless you've installed an alternate shell, this means you would add the following to your `~/.bash_profile` file (create it if it does not already exist), adjusting the path to match where you have installed WPDocker:* `PATH="${HOME}/wpdocker/bin:$PATH"`
+6. Run `wpdocker up` to build the containers and boot up the system. *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
+7. Create a new site by running `wpdocker create`.
 
 ### Notes
 
