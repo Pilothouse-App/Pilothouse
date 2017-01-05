@@ -275,7 +275,7 @@ siteCreate() {
 	wpCommand ${DIRECTORYNAME} "core install --url=$DOMAINNAME --title=$DIRECTORYNAME --admin_user=admin --admin_password=password --admin_email=wordpress@$DOMAINNAME --skip-email"
 
 	# Add object cache dropin.
-	curl -sS https://raw.githubusercontent.com/tollmanz/wordpress-pecl-memcached-object-cache/master/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
+	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
 
 	# Add additional PHP to wp-config.php.
 	ADDITIONAL_PHP=$(cat config/wordpress/wp-config.php.inc | awk 1 ORS="\\\\\n")

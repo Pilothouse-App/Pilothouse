@@ -4,6 +4,10 @@ RUN apk add --no-cache --virtual .build-deps \
         git autoconf g++ libtool make imagemagick-dev libmemcached-dev libjpeg-turbo-dev libpng-dev zlib-dev cyrus-sasl-dev \
 	&& docker-php-source extract \
 
+	&& git clone https://github.com/websupport-sk/pecl-memcache.git /usr/src/php/ext/memcache/ \
+	&& docker-php-ext-configure memcache \
+	&& docker-php-ext-install memcache \
+
 	&& git clone --branch php7 https://github.com/php-memcached-dev/php-memcached /usr/src/php/ext/memcached/ \
 	&& docker-php-ext-configure memcached \
 	&& docker-php-ext-install memcached \
