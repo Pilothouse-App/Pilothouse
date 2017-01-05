@@ -6,11 +6,11 @@
 commandInfo() {
 echo "NAME
 
-      WPDocker: A lightweight local WordPress development stack in Docker
+      DockerBox: A lightweight local WordPress development stack in Docker
 
 SYNOPSIS
 
-      wpdocker [command] [arguments]
+      dockerbox [command] [arguments]
 
 COMMANDS
 
@@ -152,7 +152,7 @@ hostsAddEntry() {
 
 	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker-compose ps -q nginx))
 
-	NEWENTRY="127.0.0.1 ${DOMAIN} #wpdocker"
+	NEWENTRY="127.0.0.1 ${DOMAIN} #dockerbox"
 	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
 		echo "Adding hosts file entry for ${DOMAIN}."
 		# Add a newline to the end of /etc/hosts if it doesn't already exist.
@@ -199,7 +199,7 @@ hostsRemoveEntry() {
 	# Escape periods to avoid screwing up sed.
 	DOMAIN_ESCAPED=$(echo ${DOMAIN} | sed 's/\./\\./g')
 
-	ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN_ESCAPED} #wpdocker")
+	ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN_ESCAPED} #dockerbox")
 
 	if [ ! -z "$(grep "$ENTRYTOREMOVE" /etc/hosts)" ]; then
 		echo "Removing hosts file entry for ${DOMAIN}."
