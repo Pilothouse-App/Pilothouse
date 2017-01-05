@@ -10,7 +10,7 @@ echo "NAME
 
 SYNOPSIS
 
-      dockerbox [command] [arguments]
+      DockerBox [command] [arguments]
 
 COMMANDS
 
