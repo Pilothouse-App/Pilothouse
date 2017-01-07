@@ -1,5 +1,5 @@
 # DockerBox
-*A lightweight local development stack using Docker*
+*A lightweight PHP, MySQL and NGINX development stack using Docker*
 
 ### What Is It?
 
