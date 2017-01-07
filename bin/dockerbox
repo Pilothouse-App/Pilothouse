@@ -285,8 +285,17 @@ siteCreate() {
 	# Create nginx config.
 	NGINX_PROXY_CONFIG=''
 	if [ ! -z "$PROXYURL" ]; then
-	    NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* \.(js|css|png|jpg|jpeg|gif|ico|mp3|mov|tif|tiff|swf|txt|html|svg)$ {\n\t\texpires 24h;\n\t\tlog_not_found off;\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL/\$uri;\n\t}"
+			NGINX_PROXY_PROTOCOL="$(echo $PROXYURL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+
+			if [ -z "$NGINX_PROXY_PROTOCOL" ]; then
+				PROXYURL_PARSED="http://$PROXYURL"
+			else
+				PROXYURL_PARSED=$PROXYURL
+			fi
+
+	    NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* \.(js|css|png|jpg|jpeg|gif|ico|mp3|mov|tif|tiff|swf|txt|html|svg)$ {\n\t\texpires 24h;\n\t\tlog_not_found off;\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL_PARSED/\$uri;\n\t}"
 	fi
+
 	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;$NGINX_PROXY_CONFIG\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
 	echo -e ${NGINX_CONFIG} > config/nginx/sites/${DIRECTORYNAME}.conf
 	docker-compose restart nginx
