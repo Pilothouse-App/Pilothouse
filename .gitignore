@@ -2,6 +2,7 @@
 !/config/nginx/sites/default.conf
 /db/
 !/db/.gitkeep
+dockerbox.ini
 /sites/
 !/sites/.gitkeep
 /vendor/

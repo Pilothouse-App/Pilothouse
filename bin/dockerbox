@@ -24,7 +24,7 @@ COMMANDS
       generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
       mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
                             site, or with no database selected if not run from within a site directory.
-      
+
       Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
 "
 }
@@ -48,7 +48,7 @@ generateSSL() {
 
 	# Check that the directory is valid.
 	NGINX_CONFIG_FILE="./config/nginx/sites/$DIRECTORYNAME.conf"
-	SITE_DIR="./sites/$DIRECTORYNAME"
+	SITE_DIR="$SITES_DIR/$DIRECTORYNAME"
 	if [ ! -e ${NGINX_CONFIG_FILE} ] || [ ! -e ${SITE_DIR} ]; then
 	    echo 'Invalid site name.'
 	    exit 1
@@ -62,11 +62,11 @@ generateSSL() {
 	fi
 
 	# Generate the certificate and key.
-	openssl genrsa -out "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.key" 2048
-	openssl req -new -x509 -key "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.key" -out "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
+	openssl genrsa -out "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.key" 2048
+	openssl req -new -x509 -key "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.key" -out "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
 
 	# Trust the certificate and key.
-	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "./sites/${DIRECTORYNAME}/$DIRECTORYNAME.cert"
+	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.cert"
 
 	# Add the certificate and key to the Nginx config.
     NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.key;""\\"$'\n'
@@ -77,24 +77,51 @@ generateSSL() {
 }
 
 #
-# Gets the name of the current site.
+# Gets the current path relative to the site directory.
 #
-# @echo The site directory name if found, blank otherwise.
+# @echo The relative path, or blank if not in a site.
 #
-getCurrentSiteName() {
-	CURRENTDIRECTORY=$PWD
+getCurrentPathInSite() {
+	if [ -z "$CURRENT_SITE_DIRECTORY" ]; then
+		return
+	fi
+
+	CURRENT_SITE_DIRECTORY_ESCAPED=$(echo ${CURRENT_SITE_DIRECTORY} | sed 's#/#\\/#g')
+
+	HTDOCS_PATH=$(echo $PWD | sed "s/${CURRENT_SITE_DIRECTORY_ESCAPED}//")
+	if [ -z "$HTDOCS_PATH" ]; then
+	    HTDOCS_PATH='/'
+	fi
+
+	echo $HTDOCS_PATH
+}
+
+#
+# Gets the path of the current site's root directory.
+#
+# @echo The site path if found, blank otherwise.
+#
+getCurrentSiteDirectory() {
+	CURRENTDIRECTORY="$PWD"
 
 	while [[ "$CURRENTDIRECTORY" != "" && ! -e "$CURRENTDIRECTORY/htdocs" ]]; do
 	    CURRENTDIRECTORY=${CURRENTDIRECTORY%/*}
 	done
 
-	if [ ! -z "$CURRENTDIRECTORY" ]; then
-		SITENAME=$(basename ${CURRENTDIRECTORY})
-	else
-		SITENAME=""
+	echo $CURRENTDIRECTORY
+}
+
+#
+# Gets the name of the current site.
+#
+# @echo The site directory name if found, blank otherwise.
+#
+getCurrentSiteName() {
+	if [ -z "$CURRENT_SITE_DIRECTORY" ]; then
+		return
 	fi
 
-	echo "$SITENAME"
+	echo $(basename ${CURRENT_SITE_DIRECTORY})
 }
 
 #
@@ -262,25 +289,30 @@ siteCreate() {
 	systemUpIfDown
 
 	# Create directory.
-	if [ ! -e sites/${DIRECTORYNAME}/htdocs ]; then
-		mkdir -p sites/${DIRECTORYNAME}/htdocs
+	if [ ! -e ${SITES_DIR}/${DIRECTORYNAME}/htdocs ]; then
+		mkdir -p ${SITES_DIR}/${DIRECTORYNAME}/htdocs
 	fi
 
 	# Create database.
 	mysqlCommand "CREATE DATABASE IF NOT EXISTS \`${DIRECTORYNAME}\`;"
 
+	# Set site variables.
+	CURRENT_SITE_NAME=$DIRECTORYNAME
+	CURRENT_SITE_DIRECTORY=${SITES_DIR}/${DIRECTORYNAME}
+	CURRENT_PATH_IN_SITE="/htdocs"
+
 	# Install WordPress.
-	wpCommand ${DIRECTORYNAME} "core download"
-	wpCommand ${DIRECTORYNAME} "core config --dbhost=mysql --dbname=$DIRECTORYNAME --dbuser=wordpress --dbpass=wordpress"
-	wpCommand ${DIRECTORYNAME} "core install --url=$DOMAINNAME --title=$DIRECTORYNAME --admin_user=admin --admin_password=password --admin_email=wordpress@$DOMAINNAME --skip-email"
+	wpCommand core download
+	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=wordpress --dbpass=wordpress
+	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=admin --admin_password=password --admin_email=wordpress@${DOMAINNAME} --skip-email
 
 	# Add object cache dropin.
-	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o sites/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
+	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
 
 	# Add additional PHP to wp-config.php.
 	ADDITIONAL_PHP=$(cat config/wordpress/wp-config.php.inc | awk 1 ORS="\\\\\n")
     ADDITIONAL_PHP="$ADDITIONAL_PHP"$'\n'"\\"$'\n'"\\"$'\n'
-	sed -i '' -e "s|\/\* That's all|${ADDITIONAL_PHP}&|g" sites/${DIRECTORYNAME}/htdocs/wp-config.php
+	sed -i '' -e "s|\/\* That's all|${ADDITIONAL_PHP}&|g" ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-config.php
 
 	# Create nginx config.
 	NGINX_PROXY_CONFIG=''
@@ -335,8 +367,8 @@ siteDelete() {
 	systemUpIfDown
 
 	# Delete directory.
-	if [ -e sites/${DIRECTORYNAME} ]; then
-		rm -rf sites/${DIRECTORYNAME}
+	if [ -e ${SITES_DIR}/${DIRECTORYNAME} ]; then
+		rm -rf ${SITES_DIR}/${DIRECTORYNAME}
 	fi
 
 	# Delete database.
@@ -426,18 +458,48 @@ waitForMySQL() {
 #
 # Runs a WP-CLI command in the php container.
 #
-# @param 1: The directory of the site in which to run the command.
-# @param 2: The command to run.
+# @params: Aguments to be passed to WP-CLI
 #
 wpCommand() {
-	docker-compose exec --user=www-data php /bin/sh -c "wp --path=/var/www/html/$1/htdocs $2"
+
+	if [ -z "$CURRENT_SITE_NAME" ]; then
+	    echo 'This command must be run from within a site directory.'
+	    exit 1
+	fi
+
+	CONTAINER='php'
+	WPCLI_ARGS=''
+	for arg in "$@"; do
+	    if [ '--xdebug' = "$arg" ]; then
+	        CONTAINER='php-xdebug'
+	    else
+	        WPCLI_ARGS="$WPCLI_ARGS '$arg'"
+	    fi
+	done
+
+	COMMAND="cd /var/www/html/${CURRENT_SITE_NAME}${CURRENT_PATH_IN_SITE} && wp --path=/var/www/html/${CURRENT_SITE_NAME}/htdocs${WPCLI_ARGS}"
+
+	docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
 }
 
-
-
+# Set current site info.
+CURRENT_SITE_DIRECTORY=$(getCurrentSiteDirectory)
 CURRENT_SITE_NAME=$(getCurrentSiteName)
+CURRENT_PATH_IN_SITE=$(getCurrentPathInSite)
 cd $(dirname $(dirname $0))
 
+# Set default environment variables.
+export SITES_DIR="./sites"
+
+# Override the defaults with user-configurable settings.
+if [ -e dockerbox.ini ]; then
+	source dockerbox.ini
+fi
+
+# Expand home directory in $SITES_DIR
+SITES_DIR=$(eval echo ${SITES_DIR})
+
+# Run the command.
 case $1 in
 	create)
 		siteCreate "$2"
@@ -462,6 +524,10 @@ case $1 in
     mysql)
         mysqlCommand "$2"
         ;;
+    wp-cli)
+		shift
+		wpCommand $@
+		;;
 	*)
 		commandInfo
 		;;
