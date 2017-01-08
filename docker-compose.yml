@@ -48,18 +48,9 @@ services:
       - "./vendor:/usr/local/vendor"
 
   php-xdebug:
+    extends:
+      service: php
     build:
       context: ./build/php-xdebug/
-    environment:
-      - TERM=xterm
-    extra_hosts:
-      # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
-      # Xdebug to connect back to the host machine due to limitations in Docker.
-      - "dockerhost:100.0.0.0"
     volumes:
-      - "./config/php-fpm/php.ini:/usr/local/etc/php/php.ini"
       - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
-      - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
-      - "/home/www-data/.wp-cli/cache"
-      - "${SITES_DIR}:/var/www/html"
-      - "./vendor:/usr/local/vendor"
