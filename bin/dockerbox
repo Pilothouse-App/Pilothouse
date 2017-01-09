@@ -526,7 +526,7 @@ case $1 in
         ;;
     wp-cli)
 		shift
-		wpCommand $@
+		wpCommand "$@"
 		;;
 	*)
 		commandInfo
