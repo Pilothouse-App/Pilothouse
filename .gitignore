@@ -6,3 +6,4 @@ dockerbox.ini
 /sites/
 !/sites/.gitkeep
 /vendor/
+.DS_Store
