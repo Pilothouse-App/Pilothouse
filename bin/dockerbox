@@ -304,7 +304,7 @@ siteCreate() {
 	# Install WordPress.
 	wpCommand core download
 	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=wordpress --dbpass=wordpress
-	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=admin --admin_password=password --admin_email=wordpress@${DOMAINNAME} --skip-email
+	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=${WP_DEFAULT_USERNAME} --admin_password=${WP_DEFAULT_PASSWORD} --admin_email=${WP_DEFAULT_USERNAME}@${DOMAINNAME} --skip-email
 
 	# Add object cache dropin.
 	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
@@ -490,6 +490,8 @@ cd $(dirname $(dirname $0))
 
 # Set default environment variables.
 export SITES_DIR="./sites"
+export WP_DEFAULT_USERNAME="admin"
+export WP_DEFAULT_PASSWORD="password"
 
 # Override the defaults with user-configurable settings.
 if [ -e dockerbox.ini ]; then
