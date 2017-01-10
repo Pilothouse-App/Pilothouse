@@ -77,3 +77,4 @@ See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 - `dockerbox delete [site]`: Deletes an existing local site.
 - `dockerbox generate-ssl [site]`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
 - `dockerbox mysql [command]`: Runs the provided MySQL command. The command will be run on the database of the current site, or with no database selected if not run from within a site directory.
+- `dockerbox compose [command]`: Runs a `docker-compose` command after setting required environment variables.

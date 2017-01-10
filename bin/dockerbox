@@ -24,6 +24,7 @@ COMMANDS
       generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
       mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
                             site, or with no database selected if not run from within a site directory.
+      compose [command]     Runs a \`docker-compose\` command after setting required environment variables.
 
       Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
 "
@@ -529,6 +530,10 @@ case $1 in
     wp-cli)
 		shift
 		wpCommand "$@"
+		;;
+	compose)
+		shift
+		docker-compose "$@"
 		;;
 	*)
 		commandInfo
