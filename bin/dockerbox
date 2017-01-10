@@ -311,7 +311,7 @@ siteCreate() {
 	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
 
 	# Add additional PHP to wp-config.php.
-	ADDITIONAL_PHP=$(cat config/wordpress/wp-config.php.inc | awk 1 ORS="\\\\\n")
+	ADDITIONAL_PHP=$(cat config/wordpress/wp-config.php.inc | sed "s|define( 'WP_CACHE_KEY_SALT', '|&${DIRECTORYNAME}|" | awk 1 ORS="\\\\\n")
     ADDITIONAL_PHP="$ADDITIONAL_PHP"$'\n'"\\"$'\n'"\\"$'\n'
 	sed -i '' -e "s|\/\* That's all|${ADDITIONAL_PHP}&|g" ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-config.php
 

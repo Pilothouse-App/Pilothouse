@@ -5,4 +5,4 @@ define( 'JETPACK_STAGING_MODE', true );
 
 global $memcached_servers;
 $memcached_servers = [ 'default' => [ 'memcached:11211' ] ];
-define( 'WP_CACHE_KEY_SALT', 'sitename01' );
+define( 'WP_CACHE_KEY_SALT', '' );
