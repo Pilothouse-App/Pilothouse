@@ -23,7 +23,7 @@ In addition to the Docker stack, this package contains a set of Bash scripts for
 2. Once installed, open Docker on your computer and run through the intial configuration settings.
 3. Clone the repo to your computer.
 4. Run `composer install`.
-5. Add the `bin` path in the repo to your host operating system's include path. *Unless you've installed an alternate shell, this means you would add the following to your `~/.bash_profile` file (create it if it does not already exist), adjusting the path to match where you have installed DockerBox:* `PATH="${HOME}/dockerbox/bin:$PATH"`
+5. Add the `bin` path in the repo to your shell include path ([more info](https://github.com/DockerBox/dockerbox/wiki/Shell-Include-Path-Configuration)).
 6. Run `dockerbox up` to build the containers and boot up the system. *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
 7. Create a new site by running `dockerbox create`.
 
