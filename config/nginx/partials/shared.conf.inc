@@ -5,6 +5,16 @@ location / {
 	try_files $uri $uri/ /index.php?$args;
 }
 
+location = /favicon.ico {
+    access_log off;
+    log_not_found off;
+}
+
+location = /robots.txt {
+    access_log off;
+    log_not_found off;
+}
+
 location ~* \.(css|eot|gif|html|ico|jpe?g|js|mov|mp3|png|svg|ttf|txt|woff)$ {
 	access_log off;
 	expires 0;
