@@ -535,6 +535,9 @@ case $1 in
 		shift
 		docker-compose "$@"
 		;;
+	logs)
+		docker-compose logs -f
+		;;
 	*)
 		commandInfo
 		;;
