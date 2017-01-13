@@ -536,7 +536,7 @@ case $1 in
 		docker-compose "$@"
 		;;
 	logs)
-		docker-compose logs -f
+		docker-compose logs -f --tail=10 $2
 		;;
 	*)
 		commandInfo
