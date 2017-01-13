@@ -326,7 +326,7 @@ siteCreate() {
 				PROXYURL_PARSED=$PROXYURL
 			fi
 
-	    NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* \.(css|eot|gif|html|ico|jpe?g|js|mov|mp3|png|svg|ttf|txt|woff)$ {\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL_PARSED/\$uri;\n\t}"
+	    NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* uploads\/.*\.(gif|jpe?g|png)$ {\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL_PARSED\$uri;\n\t}"
 	fi
 
 	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;$NGINX_PROXY_CONFIG\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
