@@ -20,7 +20,7 @@ location ~* \.(css|eot|gif|html|ico|jpe?g|js|mov|mp3|png|svg|ttf|txt|woff)$ {
 	expires 0;
 }
 
-location ~ .php$ {
+location ~ \.php$ {
     try_files $uri =404;
 	include fastcgi_params;
 	fastcgi_index index.php;
