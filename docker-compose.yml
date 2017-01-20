@@ -41,7 +41,7 @@ services:
       # Xdebug to connect back to the host machine due to limitations in Docker.
       - "dockerhost:100.0.0.0"
     volumes:
-      - "./config/php-fpm/php.ini:/usr/local/etc/php/dockerbox.ini"
+      - "./config/php-fpm/php.ini:/usr/local/etc/php/conf.d/dockerbox.ini"
       - "./config/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.d/dockerbox.conf"
       - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli"
