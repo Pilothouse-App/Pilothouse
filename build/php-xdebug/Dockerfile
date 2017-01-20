@@ -28,4 +28,4 @@ RUN rm -rf /usr/src/php/ext/memcache \
 RUN apk add --no-cache less ssmtp
 
 RUN ln -s /usr/local/vendor/wp-cli/wp-cli/bin/wp /usr/local/bin/wp
-RUN mkdir -p /home/www-data/.wp-cli/cache && chown -R www-data:www-data /home/www-data/.wp-cli/cache
+RUN mkdir -p /home/www-data/.wp-cli && chown -R www-data:www-data /home/www-data/.wp-cli

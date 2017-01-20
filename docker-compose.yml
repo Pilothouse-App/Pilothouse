@@ -44,7 +44,7 @@ services:
       - "./config/php-fpm/php.ini:/usr/local/etc/php/dockerbox.ini"
       - "./config/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.d/dockerbox.conf"
       - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
-      - "/home/www-data/.wp-cli/cache"
+      - "/home/www-data/.wp-cli"
       - "${SITES_DIR}:/var/www/html"
       - "./vendor:/usr/local/vendor"
 
