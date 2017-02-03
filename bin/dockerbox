@@ -476,15 +476,16 @@ waitForMySQL() {
 # @params: Aguments to be passed to WP-CLI
 #
 wpCommand() {
+	ARGS="$@"
 
-	if [ -z "$CURRENT_SITE_NAME" ]; then
+	if [ -z "$CURRENT_SITE_NAME" ] && [ '--info' != "$ARGS" ]; then
 	    echo 'This command must be run from within a site directory.'
 	    exit 1
 	fi
 
 	CONTAINER='php'
 	WPCLI_ARGS=''
-	for arg in "$@"; do
+	for arg in "$ARGS"; do
 	    if [ '--xdebug' = "$arg" ]; then
 	        CONTAINER='php-xdebug'
 	    else
