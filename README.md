@@ -1,6 +1,6 @@
 # DockerBox
 
-A local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
+An open-source local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
 
 DockerBox supports multiple local sites, Xdebug, and running WP-CLI commands directly from the host. DockerBox is tailored to WordPress projects, but can be used for general PHP projects as well.
 
@@ -42,3 +42,7 @@ DockerBox supports multiple local sites, Xdebug, and running WP-CLI commands dir
 - `dockerbox generate-ssl [site]`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
 - `dockerbox mysql [command]`: Runs the provided MySQL command. The command will be run on the database of the current site, or with no database selected if not run from within a site directory.
 - `dockerbox compose [command]`: Runs a `docker-compose` command with required environment variables set.
+
+### License
+
+DockerBox is open source software licensed under the GPLv2. DockerBox is authored by [Philip Newcomer](https://github.com/philipnewcomer), along with help from [these awesome contributors](https://github.com/DockerBox/dockerbox/graphs/contributors).
