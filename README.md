@@ -1,11 +1,8 @@
 # DockerBox
-*A lightweight PHP, MySQL and NGINX development stack using Docker*
 
-### What Is It?
+A local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
 
-This is a local development stack which uses Docker for all services. The project is tailored to WordPress projects, but can be used for general PHP projects as well.
-
-In addition to the Docker stack, this package contains a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
+DockerBox supports multiple local sites, Xdebug, and running WP-CLI commands directly from the host. DockerBox is tailored to WordPress projects, but can be used for general PHP projects as well.
 
 ### What's Inside
 
@@ -29,43 +26,10 @@ In addition to the Docker stack, this package contains a set of Bash scripts for
 
 ### Notes
 
-- Local WordPress sites are located in the `sites` directory.
+- See the [Wiki](https://github.com/DockerBox/dockerbox/wiki) for instructions on using [WP-CLI](https://github.com/DockerBox/dockerbox/wiki/Using-WP-CLI), [Xdebug](https://github.com/DockerBox/dockerbox/wiki/Using-Xdebug), [Mailcatcher](https://github.com/DockerBox/dockerbox/wiki/Using-Mailcatcher), etc.
+- Local WordPress sites are located in the `sites` directory. [This can be changed](https://github.com/DockerBox/dockerbox/wiki/Changing-the-Location-of-the-%22sites%22-Directory).
 - The default WordPress username and password is `admin`/`password`.
-- To connect to a site's database using something like Sequel Pro, connect to `localhost` on the default MySQL port with the username `wordpress`, the password `wordpress`, and the directory of the local site you wish to connect to as the database name.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
-
-### Using MailCatcher
-
-Any emails sent out from local sites will be sent to MailCatcher, accessible at [http://localhost:1080](http://localhost:1080).
-
-### Using WP-CLI
-
-To run WP-CLI commands, change to a location in the site directory you wish to run the command against, and run the `wp` command as normal. (For this to work, you will need to have added the DockerBox `bin` directory to your OS's include path as described above.)
-
-To run a WP-CLI command with Xdebug enabled, add the `--xdebug` flag to your command:
-```
-wp command-to-run --xdebug
-```
-
-### Using Xdebug
-
-Configure your IDE with the IDE key `dockerbox` and the port `9000`. Make sure path mappings are configured in your IDE to map the site's local path to the path in the Docker container, which is `/var/www/html/{sitename}/`.
-
-Xdebug is not enabled by default, for performance reasons. However, you can easily toggle Xdebug on for a specific domain by setting a cookie named `xdebug` with a value of `on` in your browser. Whenever this cookie is present in the request, Xdebug will be enabled.
-
-The following bookmarklets can be added to your favorites bar to quickly add and remove the Xdebug cookie:
-
-Toggle Xdebug On
-```
-javascript:(function(){document.cookie='xdebug=on;path=/;';})()
-```
-
-Toggle Xdebug Off
-```
-javascript:(function(){document.cookie='xdebug=;path=/;';})()
-```
-
-See the *Using WP-CLI* section above for enabling Xdebug in WP-CLI commands.
 
 ### Commands
 
