@@ -24,10 +24,24 @@ COMMANDS
       generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
       mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
                             site, or with no database selected if not run from within a site directory.
-      compose [command]     Runs a \`docker-compose\` command after setting required environment variables.
+      compose [command]     Runs a \`docker-compose\` command with required environment variables set.
 
       Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
 "
+}
+
+#
+# Runs a docker-compose command with required environment variables set.
+#
+# @param 1: The command string.
+composeCommand() {
+
+	COMPOSE_FILES="-f docker-compose.yml"
+	if [ -e docker-compose.custom.yml ]; then
+		COMPOSE_FILES="$COMPOSE_FILES -f docker-compose.custom.yml"
+	fi
+
+	docker-compose ${COMPOSE_FILES} "$@"
 }
 
 #
@@ -74,7 +88,7 @@ generateSSL() {
     sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
 
 	# Restart Nginx.
-	docker-compose restart nginx
+	composeCommand restart nginx
 }
 
 #
@@ -178,7 +192,7 @@ hostsAddEntry() {
 		return
 	fi
 
-	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker-compose ps -q nginx))
+	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(composeCommand ps -q nginx))
 
 	NEWENTRY="127.0.0.1 ${DOMAIN} #dockerbox"
 	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
@@ -186,8 +200,8 @@ hostsAddEntry() {
 		# Add a newline to the end of /etc/hosts if it doesn't already exist.
 		sudo sed -i '' '$a\' /etc/hosts
 		sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
-	    docker-compose exec php        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
-	    docker-compose exec php-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
+	    composeCommand exec php        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
+	    composeCommand exec php-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
 	else
 		echo "Hosts file entry for ${DOMAIN} exists; skipping."
 	fi
@@ -257,7 +271,7 @@ mysqlCommand() {
 		COMMAND="USE '$CURRENT_SITE_NAME'; $COMMAND"
 	fi
 
-	docker-compose exec php mysql --host=mysql -u root -proot -e "$COMMAND"
+	composeCommand exec php mysql --host=mysql -u root -proot -e "$COMMAND"
 }
 
 #
@@ -331,7 +345,7 @@ siteCreate() {
 
 	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;$NGINX_PROXY_CONFIG\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
 	echo -e ${NGINX_CONFIG} > config/nginx/sites/${DIRECTORYNAME}.conf
-	docker-compose restart nginx
+	composeCommand restart nginx
 
 	# Add hosts entry.
 	hostsAddEntry ${DOMAINNAME}
@@ -378,7 +392,7 @@ siteDelete() {
 	# Delete Nginx config.
 	if [ -e config/nginx/sites/${DIRECTORYNAME}.conf ]; then
 		rm config/nginx/sites/${DIRECTORYNAME}.conf
-		docker-compose restart nginx
+		composeCommand restart nginx
 	fi
 
 	# Remove hosts entry.
@@ -392,7 +406,7 @@ siteDelete() {
 #
 systemDown() {
     sudo ifconfig lo0 -alias 100.0.0.0
-	docker-compose stop
+	composeCommand stop
 }
 
 #
@@ -402,7 +416,7 @@ systemDown() {
 #
 systemRestart() {
 	if [ ! -z "$1" ]; then
-		docker-compose restart "$1"
+		composeCommand restart "$1"
 	else
 		systemDown
 		systemUp
@@ -416,7 +430,7 @@ systemUp() {
     # This is an ugly hack to create a loopback interface to allow Xdebug to connect back to the host machine.
     sudo ifconfig lo0 alias 100.0.0.0
 
-	docker-compose up -d
+	composeCommand up -d
 
 	waitForMySQL
 	mysqlCommand "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON *.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
@@ -426,7 +440,7 @@ systemUp() {
 # Brings the system up if it is not already running.
 #
 systemUpIfDown() {
-	if [ 'Running' != "$(docker-compose exec php "echo 'Running'")" ]; then
+	if [ 'Running' != "$(composeCommand exec php "echo 'Running'")" ]; then
 		systemUp
 	fi
 }
@@ -438,7 +452,7 @@ waitForMySQL() {
 	ITERATION=0
 	while : ; do
 		((ITERATION++))
-		(docker-compose exec php mysqladmin ping --no-beep --host=mysql --user=root --password=root) > /dev/null
+		(composeCommand exec php mysqladmin ping --no-beep --host=mysql --user=root --password=root) > /dev/null
 
 		if [ $? -eq 0 ]; then
 			break
@@ -480,7 +494,7 @@ wpCommand() {
 
 	COMMAND="cd /var/www/html/${CURRENT_SITE_NAME}${CURRENT_PATH_IN_SITE} && wp --path=/var/www/html/${CURRENT_SITE_NAME}/htdocs${WPCLI_ARGS}"
 
-	docker-compose exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
+	composeCommand exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
 }
 
 # Set current site info.
@@ -533,10 +547,10 @@ case $1 in
 		;;
 	compose)
 		shift
-		docker-compose "$@"
+		composeCommand "$@"
 		;;
 	logs)
-		docker-compose logs -f --tail=10 $2
+		composeCommand logs -f --tail=10 $2
 		;;
 	*)
 		commandInfo

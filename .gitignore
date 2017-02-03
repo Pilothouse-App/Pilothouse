@@ -2,6 +2,7 @@
 !/config/nginx/sites/default.conf
 /db/
 !/db/.gitkeep
+docker-compose.custom.yml
 dockerbox.ini
 /sites/
 !/sites/.gitkeep
