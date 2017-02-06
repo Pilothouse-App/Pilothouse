@@ -485,7 +485,7 @@ wpCommand() {
 
 	CONTAINER='php'
 	WPCLI_ARGS=''
-	for arg in "$ARGS"; do
+	for arg in ${ARGS}; do
 	    if [ '--xdebug' = "$arg" ]; then
 	        CONTAINER='php-xdebug'
 	    else
