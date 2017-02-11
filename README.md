@@ -1,4 +1,5 @@
-# DockerBox
+# Pilothouse App
+_Previously "DockerBox"_
 
 An open-source local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
 
