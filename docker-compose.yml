@@ -18,7 +18,7 @@ services:
       - 3306:3306
     volumes:
       - "./config/mysql/mysql.conf:/etc/mysql/conf.d/pilothouse.cnf"
-      - "/var/lib/mysql"
+      - "mysqldata:/var/lib/mysql"
 
   nginx:
     image: nginx:1.11-alpine
@@ -55,3 +55,6 @@ services:
       context: ./build/php-xdebug/
     volumes:
       - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
+
+volumes:
+  mysqldata:
