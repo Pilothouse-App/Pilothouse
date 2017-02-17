@@ -17,7 +17,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "./config/mysql/mysql.conf:/etc/mysql/conf.d/dockerbox.cnf"
+      - "./config/mysql/mysql.conf:/etc/mysql/conf.d/pilothouse.cnf"
       - "/var/lib/mysql"
 
   nginx:
@@ -41,8 +41,8 @@ services:
       # Xdebug to connect back to the host machine due to limitations in Docker.
       - "dockerhost:100.0.0.0"
     volumes:
-      - "./config/php-fpm/php.ini:/usr/local/etc/php/conf.d/dockerbox.ini"
-      - "./config/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.d/dockerbox.conf"
+      - "./config/php-fpm/php.ini:/usr/local/etc/php/conf.d/pilothouse.ini"
+      - "./config/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.d/pilothouse.conf"
       - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli"
       - "${SITES_DIR}:/var/www/html"

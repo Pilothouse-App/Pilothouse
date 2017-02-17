@@ -6,11 +6,11 @@
 commandInfo() {
 echo "NAME
 
-      DockerBox: A lightweight local WordPress development stack in Docker
+      Pilothouse: A lightweight command-line app for managing a Docker-based local dev environment
 
 SYNOPSIS
 
-      DockerBox [command] [arguments]
+      pilothouse [command] [arguments]
 
 COMMANDS
 
@@ -194,7 +194,7 @@ hostsAddEntry() {
 
 	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(composeCommand ps -q nginx))
 
-	NEWENTRY="127.0.0.1 ${DOMAIN} #dockerbox"
+	NEWENTRY="127.0.0.1 ${DOMAIN} #pilothouse"
 	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
 		echo "Adding hosts file entry for ${DOMAIN}."
 		# Add a newline to the end of /etc/hosts if it doesn't already exist.
@@ -241,7 +241,7 @@ hostsRemoveEntry() {
 	# Escape periods to avoid screwing up sed.
 	DOMAIN_ESCAPED=$(echo ${DOMAIN} | sed 's/\./\\./g')
 
-	ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN_ESCAPED} #dockerbox")
+	ENTRYTOREMOVE=$(echo -e "127.0.0.1 ${DOMAIN_ESCAPED} #pilothouse")
 
 	if [ ! -z "$(grep "$ENTRYTOREMOVE" /etc/hosts)" ]; then
 		echo "Removing hosts file entry for ${DOMAIN}."
@@ -510,8 +510,8 @@ export WP_DEFAULT_USERNAME="admin"
 export WP_DEFAULT_PASSWORD="password"
 
 # Override the defaults with user-configurable settings.
-if [ -e dockerbox.ini ]; then
-	source dockerbox.ini
+if [ -e pilothouse.ini ]; then
+	source pilothouse.ini
 fi
 
 # Expand home directory in $SITES_DIR

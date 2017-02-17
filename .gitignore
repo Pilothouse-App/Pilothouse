@@ -3,7 +3,7 @@
 /db/
 !/db/.gitkeep
 docker-compose.custom.yml
-dockerbox.ini
+pilothouse.ini
 /sites/
 !/sites/.gitkeep
 /vendor/
