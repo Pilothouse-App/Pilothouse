@@ -5,8 +5,7 @@ services:
     image: memcached:1.4-alpine
 
   mailcatcher:
-    build:
-      context: ./build/mailcatcher
+    image: pilothouseapp/mailcatcher:latest
     ports:
       - 1080:1080
 
@@ -32,8 +31,7 @@ services:
       - "${SITES_DIR}:/var/www/html"
 
   php:
-    build:
-      context: ./build/php/
+    image: pilothouseapp/php:7.0
     environment:
       - TERM=xterm
     extra_hosts:
@@ -49,10 +47,9 @@ services:
       - "./vendor:/usr/local/vendor"
 
   php-xdebug:
+    image: pilothouseapp/php:7.0-xdebug
     extends:
       service: php
-    build:
-      context: ./build/php-xdebug/
     volumes:
       - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
 
