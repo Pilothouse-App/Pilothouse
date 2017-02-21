@@ -1,6 +1,7 @@
 /build/
 /config/nginx/sites/*.conf
 !/config/nginx/sites/default.conf
+/config/wordpress/wp-config.custom.php.inc
 /db/
 !/db/.gitkeep
 docker-compose.custom.yml
