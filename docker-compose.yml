@@ -16,7 +16,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "./config/mysql/mysql.conf:/etc/mysql/conf.d/pilothouse.cnf"
+      - "${MYSQL_CONFIG_FILE}:/etc/mysql/conf.d/pilothouse.cnf"
       - "mysqldata:/var/lib/mysql"
 
   nginx:
@@ -25,8 +25,8 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - "./config/nginx/nginx.conf:/etc/nginx/nginx.conf"
-      - "./config/nginx/partials/:/etc/nginx/partials/"
+      - "${NGINX_CONFIG_FILE}:/etc/nginx/nginx.conf"
+      - "${NGINX_SHARED_CONFIG_FILE}:/etc/nginx/partials/shared.conf.inc"
       - "./config/nginx/sites:/etc/nginx/conf.d"
       - "${SITES_DIR}:/var/www/html"
 
@@ -39,9 +39,9 @@ services:
       # Xdebug to connect back to the host machine due to limitations in Docker.
       - "dockerhost:100.0.0.0"
     volumes:
-      - "./config/php-fpm/php.ini:/usr/local/etc/php/conf.d/pilothouse.ini"
-      - "./config/php-fpm/php-fpm.conf:/usr/local/etc/php-fpm.d/pilothouse.conf"
-      - "./config/ssmtp/ssmtp.conf:/etc/ssmtp/ssmtp.conf"
+      - "${PHP_CONFIG_FILE}:/usr/local/etc/php/conf.d/pilothouse.ini"
+      - "${PHP_FPM_CONFIG_FILE}:/usr/local/etc/php-fpm.d/pilothouse.conf"
+      - "${SSMTP_CONFIG_FILE}:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.wp-cli"
       - "${SITES_DIR}:/var/www/html"
       - "./vendor:/usr/local/vendor"
@@ -51,7 +51,7 @@ services:
     extends:
       service: php
     volumes:
-      - "./config/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini"
+      - "${PHP_XDEBUG_CONFIG_FILE}:/usr/local/etc/php/conf.d/xdebug.ini"
 
 volumes:
   mysqldata:

@@ -521,6 +521,43 @@ fi
 # Expand home directory in $SITES_DIR
 SITES_DIR=$(eval echo ${SITES_DIR})
 
+# Define config file locations.
+
+export MYSQL_CONFIG_FILE='./config/mysql/mysql.conf'
+if [ -e ./config/mysql/mysql.custom.conf ]; then
+	MYSQL_CONFIG_FILE='./config/mysql/mysql.custom.conf'
+fi
+
+export NGINX_CONFIG_FILE='./config/nginx/nginx.conf'
+if [ -e ./config/nginx/nginx.custom.conf ]; then
+	NGINX_CONFIG_FILE='./config/nginx/nginx.custom.conf'
+fi
+
+export NGINX_SHARED_CONFIG_FILE='./config/nginx/partials/shared.conf.inc'
+if [ -e ./config/nginx/partials/shared.custom.conf.inc ]; then
+	NGINX_SHARED_CONFIG_FILE='./config/nginx/partials/shared.custom.conf.inc'
+fi
+
+export PHP_CONFIG_FILE='./config/php-fpm/php.ini'
+if [ -e ./config/php-fpm/php.custom.ini ]; then
+	PHP_CONFIG_FILE='./config/php-fpm/php.custom.ini'
+fi
+
+export PHP_FPM_CONFIG_FILE='./config/php-fpm/php-fpm.conf'
+if [ -e ./config/php-fpm/php-fpm.custom.conf ]; then
+	PHP_FPM_CONFIG_FILE='./config/php-fpm/php-fpm.custom.conf'
+fi
+
+export PHP_XDEBUG_CONFIG_FILE='./config/php-fpm/xdebug.ini'
+if [ -e ./config/php-fpm/xdebug.custom.ini ]; then
+	PHP_XDEBUG_CONFIG_FILE='./config/php-fpm/xdebug.custom.ini'
+fi
+
+export SSMTP_CONFIG_FILE=./config/ssmtp/ssmtp.conf
+if [ -e ./config/ssmtp/ssmtp.custom.conf ]; then
+	SSMTP_CONFIG_FILE=./config/ssmtp/ssmtp.custom.conf
+fi
+
 # Run the command.
 case $1 in
 	create)
