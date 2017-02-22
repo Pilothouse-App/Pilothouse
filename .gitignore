@@ -9,6 +9,7 @@
 /config/php-fpm/xdebug.custom.ini
 /config/ssmtp/ssmtp.custom.conf
 /config/wordpress/wp-config.custom.php.inc
+/config/wp-cli/wp-cli.custom.yml
 /db/
 !/db/.gitkeep
 docker-compose.custom.yml

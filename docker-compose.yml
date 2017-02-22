@@ -45,6 +45,7 @@ services:
       - "/home/www-data/.wp-cli"
       - "${SITES_DIR}:/var/www/html"
       - "./vendor:/usr/local/vendor"
+      - "${WPCLI_CONFIG_FILE}:/var/www/html/wp-cli.yml"
 
   php-xdebug:
     image: pilothouseapp/php:7.0-xdebug

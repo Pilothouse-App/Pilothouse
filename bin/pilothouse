@@ -558,6 +558,11 @@ if [ -e ./config/ssmtp/ssmtp.custom.conf ]; then
 	SSMTP_CONFIG_FILE=./config/ssmtp/ssmtp.custom.conf
 fi
 
+export WPCLI_CONFIG_FILE='./config/wp-cli/wp-cli.yml'
+if [ -e ./config/wp-cli/wp-cli.custom.yml ]; then
+	WPCLI_CONFIG_FILE='./config/wp-cli/wp-cli.custom.yml'
+fi
+
 # Run the command.
 case $1 in
 	create)
