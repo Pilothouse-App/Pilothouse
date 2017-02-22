@@ -51,19 +51,19 @@ composeCommand() {
 #
 generateSSL() {
 
-	# Get the site directory.
-	DIRECTORYNAME="$1"
-	if [ -z "$DIRECTORYNAME" ]; then
-		read -p "Enter the name of the site directory in which to enable SSL support: " DIRECTORYNAME
-		if [ -z "$DIRECTORYNAME" ]; then
+	if [ ! -z "$1" ]; then
+		CURRENT_SITE_NAME="$1"
+	elif [ -z "$CURRENT_SITE_NAME" ]; then
+		read -p "Enter the name of the site directory in which to enable SSL support: " CURRENT_SITE_NAME
+		if [ -z "$CURRENT_SITE_NAME" ]; then
 			echo 'Directory name cannot be empty.'
 			exit 1
 		fi
 	fi
 
 	# Check that the directory is valid.
-	NGINX_CONFIG_FILE="./config/nginx/sites/$DIRECTORYNAME.conf"
-	SITE_DIR="$SITES_DIR/$DIRECTORYNAME"
+	NGINX_CONFIG_FILE="./config/nginx/sites/$CURRENT_SITE_NAME.conf"
+	SITE_DIR="$SITES_DIR/$CURRENT_SITE_NAME"
 	if [ ! -e ${NGINX_CONFIG_FILE} ] || [ ! -e ${SITE_DIR} ]; then
 	    echo 'Invalid site name.'
 	    exit 1
@@ -77,14 +77,14 @@ generateSSL() {
 	fi
 
 	# Generate the certificate and key.
-	openssl genrsa -out "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.key" 2048
-	openssl req -new -x509 -key "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.key" -out "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
+	openssl genrsa -out "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.key" 2048
+	openssl req -new -x509 -key "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.key" -out "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
 
 	# Trust the certificate and key.
-	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${DIRECTORYNAME}/$DIRECTORYNAME.cert"
+	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert"
 
 	# Add the certificate and key to the Nginx config.
-    NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${DIRECTORYNAME}/${DIRECTORYNAME}.key;""\\"$'\n'
+    NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.key;""\\"$'\n'
     sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
 
 	# Restart Nginx.
