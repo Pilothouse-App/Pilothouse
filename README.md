@@ -2,12 +2,12 @@
 
 An open-source local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
 
-Pilothouse supports multiple local sites, Xdebug, and running WP-CLI commands directly from the host. Pilothouse is tailored to WordPress projects, but can be used for general PHP projects as well.
+Pilothouse supports multiple local sites, Xdebug, multiple versions of PHP, and running WP-CLI commands directly from the host. Pilothouse is tailored to WordPress projects, but can be used for general PHP projects as well.
 
 ### What's Inside
 
 - Nginx
-- PHP 7
+- PHP 5.6, 7.0, and 7.1
 - MariaDB
 - Memcached
 - Xdebug
