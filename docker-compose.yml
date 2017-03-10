@@ -30,8 +30,8 @@ services:
       - "./config/nginx/sites:/etc/nginx/conf.d"
       - "${SITES_DIR}:/var/www/html"
 
-  php:
-    image: pilothouseapp/php:7.0
+  php56:
+    image: pilothouseapp/php:5.6
     environment:
       - TERM=xterm
     extra_hosts:
@@ -41,18 +41,37 @@ services:
     volumes:
       - "${PHP_CONFIG_FILE}:/usr/local/etc/php/conf.d/pilothouse.ini"
       - "${PHP_FPM_CONFIG_FILE}:/usr/local/etc/php-fpm.d/pilothouse.conf"
-      - "${SSMTP_CONFIG_FILE}:/etc/ssmtp/ssmtp.conf"
-      - "/home/www-data/.wp-cli"
+      - "${PHP_XDEBUG_CONFIG_FILE}:/usr/local/etc/php/conf.d/xdebug.ini"
       - "${SITES_DIR}:/var/www/html"
+      - "${SSMTP_CONFIG_FILE}:/etc/ssmtp/ssmtp.conf"
       - "./vendor:/usr/local/vendor"
       - "${WPCLI_CONFIG_FILE}:/var/www/html/wp-cli.yml"
+      - "/home/www-data/.wp-cli"
 
-  php-xdebug:
+  php56-xdebug:
+    image: pilothouseapp/php:5.6-xdebug
+    extends:
+      service: php56
+
+  php70:
+    image: pilothouseapp/php:7.0
+    extends:
+      service: php56
+
+  php70-xdebug:
     image: pilothouseapp/php:7.0-xdebug
     extends:
-      service: php
-    volumes:
-      - "${PHP_XDEBUG_CONFIG_FILE}:/usr/local/etc/php/conf.d/xdebug.ini"
+      service: php56
+
+  php71:
+    image: pilothouseapp/php:7.1
+    extends:
+      service: php56
+
+  php71-xdebug:
+    image: pilothouseapp/php:7.1-xdebug
+    extends:
+      service: php56
 
 volumes:
   mysqldata:

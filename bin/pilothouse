@@ -6,27 +6,27 @@
 commandInfo() {
 echo "NAME
 
-      Pilothouse: A lightweight command-line app for managing a Docker-based local dev environment
+	  Pilothouse: A lightweight command-line app for managing a Docker-based local dev environment
 
 SYNOPSIS
 
-      pilothouse [command] [arguments]
+	  pilothouse [command] [arguments]
 
 COMMANDS
 
-      up                    Boots up the Docker containers, and adds all necessary site entries to the host's hosts
-                            file.
-      down                  Halts the Docker containers, removing all site entries from the host's hosts file.
-      restart [container]   Restarts the specified Docker container (\`nginx\`, \`memcached\`, etc.), or the entire system
-                            if no container is specified.
-      create [site]         Creates a new local site.
-      delete [site]         Deletes an existing local site.
-      generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
-      mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
-                            site, or with no database selected if not run from within a site directory.
-      compose [command]     Runs a \`docker-compose\` command with required environment variables set.
+	  up                    Boots up the Docker containers, and adds all necessary site entries to the host's hosts
+							file.
+	  down                  Halts the Docker containers, removing all site entries from the host's hosts file.
+	  restart [container]   Restarts the specified Docker container (\`nginx\`, \`memcached\`, etc.), or the entire system
+							if no container is specified.
+	  create [site]         Creates a new local site.
+	  delete [site]         Deletes an existing local site.
+	  generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
+	  mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
+							site, or with no database selected if not run from within a site directory.
+	  compose [command]     Runs a \`docker-compose\` command with required environment variables set.
 
-      Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
+	  Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
 "
 }
 
@@ -65,15 +65,15 @@ generateSSL() {
 	NGINX_CONFIG_FILE="./config/nginx/sites/$CURRENT_SITE_NAME.conf"
 	SITE_DIR="$SITES_DIR/$CURRENT_SITE_NAME"
 	if [ ! -e ${NGINX_CONFIG_FILE} ] || [ ! -e ${SITE_DIR} ]; then
-	    echo 'Invalid site name.'
-	    exit 1
+		echo 'Invalid site name.'
+		exit 1
 	fi
 
 	# Get the domain name from the Nginx config.
 	DOMAIN_NAME=$(getDomainFromNginxConfig ${NGINX_CONFIG_FILE})
 	if [ -z ${DOMAIN_NAME} ]; then
-	    echo 'Could not determine domain name.'
-	    exit 1;
+		echo 'Could not determine domain name.'
+		exit 1;
 	fi
 
 	# Generate the certificate and key.
@@ -84,8 +84,8 @@ generateSSL() {
 	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert"
 
 	# Add the certificate and key to the Nginx config.
-    NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.key;""\\"$'\n'
-    sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
+	NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.key;""\\"$'\n'
+	sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
 
 	# Restart Nginx.
 	composeCommand restart nginx
@@ -105,7 +105,7 @@ getCurrentPathInSite() {
 
 	HTDOCS_PATH=$(echo $PWD | sed "s/${CURRENT_SITE_DIRECTORY_ESCAPED}//")
 	if [ -z "$HTDOCS_PATH" ]; then
-	    HTDOCS_PATH='/'
+		HTDOCS_PATH='/'
 	fi
 
 	echo $HTDOCS_PATH
@@ -120,7 +120,7 @@ getCurrentSiteDirectory() {
 	CURRENTDIRECTORY="$PWD"
 
 	while [[ "$CURRENTDIRECTORY" != "" && ! -e "$CURRENTDIRECTORY/htdocs" ]]; do
-	    CURRENTDIRECTORY=${CURRENTDIRECTORY%/*}
+		CURRENTDIRECTORY=${CURRENTDIRECTORY%/*}
 	done
 
 	echo $CURRENTDIRECTORY
@@ -165,14 +165,21 @@ getDomainFromNginxConfig() {
 # Adds all entries to the hosts file.
 #
 hostsAddAll() {
-	CONFIGS=config/nginx/sites/*.conf
+	ALL_HOSTS=$(hostsGetAll)
 
-	for CURRENTCONFIG in ${CONFIGS}; do
-		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
-		if [ '_' != "$CURRENTDOMAIN" ]; then
-			hostsAddEntry "$CURRENTDOMAIN"
-		fi
+	for host in ${ALL_HOSTS}; do
+		hostsAddEntry "$host"
 	done
+
+	echo 'Updating hosts files in containers...'
+	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(composeCommand ps -q nginx))
+
+	composeCommand exec php56        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
+	composeCommand exec php56-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
+	composeCommand exec php70        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
+	composeCommand exec php70-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
+	composeCommand exec php71        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
+	composeCommand exec php71-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${ALL_HOSTS}' >> /etc/hosts"
 }
 
 #
@@ -192,32 +199,44 @@ hostsAddEntry() {
 		return
 	fi
 
-	NGINX_CONTAINER_IP=$(docker inspect --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(composeCommand ps -q nginx))
-
 	NEWENTRY="127.0.0.1 ${DOMAIN} #pilothouse"
 	if [ -z "$(grep "${NEWENTRY}" /etc/hosts)" ]; then
 		echo "Adding hosts file entry for ${DOMAIN}."
 		# Add a newline to the end of /etc/hosts if it doesn't already exist.
 		sudo sed -i '' '$a\' /etc/hosts
 		sudo sh -c "echo '${NEWENTRY}' >> /etc/hosts"
-	    composeCommand exec php        /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
-	    composeCommand exec php-xdebug /bin/sh -c "echo '${NGINX_CONTAINER_IP} ${DOMAIN}' >> /etc/hosts"
 	else
 		echo "Hosts file entry for ${DOMAIN} exists; skipping."
 	fi
 }
 
 #
-# Removes all entries from the hosts file.
+# Gets all entries from the hosts file.
 #
-hostsRemoveAll() {
+# @echo The hosts file entries.
+#
+hostsGetAll() {
+	ALL_HOSTS=''
 	CONFIGS=config/nginx/sites/*.conf
 
 	for CURRENTCONFIG in ${CONFIGS}; do
 		CURRENTDOMAIN=$(getDomainFromNginxConfig ${CURRENTCONFIG})
 		if [ '_' != "$CURRENTDOMAIN" ]; then
-			hostsRemoveEntry "$CURRENTDOMAIN"
+			ALL_HOSTS="$ALL_HOSTS $CURRENTDOMAIN"
 		fi
+	done
+
+	echo "$ALL_HOSTS"
+}
+
+#
+# Removes all entries from the hosts file.
+#
+hostsRemoveAll() {
+	ALL_HOSTS=$(hostsGetAll)
+
+	for host in ${ALL_HOSTS}; do
+		hostsRemoveEntry "$host"
 	done
 }
 
@@ -271,7 +290,7 @@ mysqlCommand() {
 		COMMAND="USE '$CURRENT_SITE_NAME'; $COMMAND"
 	fi
 
-	composeCommand exec php mysql --host=mysql -u root -proot -e "$COMMAND"
+	composeCommand exec "$DEFAULT_PHP_CONTAINER" mysql --host=mysql -u root -proot -e "$COMMAND"
 }
 
 #
@@ -330,7 +349,7 @@ siteCreate() {
 		WPCONFIG_CUSTOM_PHP_FILE='config/wordpress/wp-config.custom.php.inc'
 	fi
 	ADDITIONAL_PHP=$(cat ${WPCONFIG_CUSTOM_PHP_FILE} | sed "s|define( 'WP_CACHE_KEY_SALT', '|&${DIRECTORYNAME}|" | awk 1 ORS="\\\\\n")
-    ADDITIONAL_PHP="$ADDITIONAL_PHP"$'\n'"\\"$'\n'"\\"$'\n'
+	ADDITIONAL_PHP="$ADDITIONAL_PHP"$'\n'"\\"$'\n'"\\"$'\n'
 	sed -i '' -e "s|\/\* That's all|${ADDITIONAL_PHP}&|g" ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-config.php
 
 	# Create nginx config.
@@ -344,7 +363,7 @@ siteCreate() {
 				PROXYURL_PARSED=$PROXYURL
 			fi
 
-	    NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* uploads\/.*\.(gif|jpe?g|png)$ {\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL_PARSED\$uri;\n\t}"
+		NGINX_PROXY_CONFIG="\n\n\t# Proxy uploads from production\n\tlocation ~* uploads\/.*\.(gif|jpe?g|png)$ {\n\t\ttry_files \$uri \$uri/ @production;\n\t}\n\tlocation @production {\n\t\tresolver 8.8.8.8;\n\t\tproxy_pass $PROXYURL_PARSED\$uri;\n\t}"
 	fi
 
 	NGINX_CONFIG="server {\n\tserver_name $DOMAINNAME;\n\troot /var/www/html/$DIRECTORYNAME/htdocs;$NGINX_PROXY_CONFIG\n\n\tinclude /etc/nginx/partials/shared.conf.inc;\n}"
@@ -409,7 +428,7 @@ siteDelete() {
 # Shuts the system down.
 #
 systemDown() {
-    sudo ifconfig lo0 -alias 100.0.0.0
+	sudo ifconfig lo0 -alias 100.0.0.0
 	composeCommand stop
 }
 
@@ -431,8 +450,8 @@ systemRestart() {
 # Brings the system up.
 #
 systemUp() {
-    # This is an ugly hack to create a loopback interface to allow Xdebug to connect back to the host machine.
-    sudo ifconfig lo0 alias 100.0.0.0
+	# This is an ugly hack to create a loopback interface to allow Xdebug to connect back to the host machine.
+	sudo ifconfig lo0 alias 100.0.0.0
 
 	composeCommand up -d
 
@@ -444,7 +463,7 @@ systemUp() {
 # Brings the system up if it is not already running.
 #
 systemUpIfDown() {
-	if [ 'Running' != "$(composeCommand exec php "echo 'Running'")" ]; then
+	if [ 'Running' != "$(composeCommand exec "$DEFAULT_PHP_CONTAINER" "echo 'Running'")" ]; then
 		systemUp
 	fi
 }
@@ -456,7 +475,7 @@ waitForMySQL() {
 	ITERATION=0
 	while : ; do
 		((ITERATION++))
-		(composeCommand exec php mysqladmin ping --no-beep --host=mysql --user=root --password=root) > /dev/null
+		(composeCommand exec "$DEFAULT_PHP_CONTAINER" mysqladmin ping --no-beep --host=mysql --user=root --password=root) > /dev/null
 
 		if [ $? -eq 0 ]; then
 			break
@@ -480,26 +499,34 @@ waitForMySQL() {
 # @params: Aguments to be passed to WP-CLI
 #
 wpCommand() {
-	ARGS="$@"
+	ARGS=("$@")
 
 	if [ -z "$CURRENT_SITE_NAME" ] && [ '--info' != "$ARGS" ]; then
-	    echo 'This command must be run from within a site directory.'
-	    exit 1
+		echo 'This command must be run from within a site directory.'
+		exit 1
 	fi
 
-	CONTAINER='php'
+	CONTAINER="$DEFAULT_PHP_CONTAINER"
+	XDEBUG_SUFFIX=''
 	WPCLI_ARGS=''
-	for arg in ${ARGS}; do
-	    if [ '--xdebug' = "$arg" ]; then
-	        CONTAINER='php-xdebug'
-	    else
-	        WPCLI_ARGS="$WPCLI_ARGS '$arg'"
-	    fi
+
+	for arg in "${ARGS[@]}"; do
+		case "$arg" in
+			--php=*)
+				CONTAINER="php${arg#*=}"
+				;;
+			--xdebug)
+				XDEBUG_SUFFIX='-xdebug'
+				;;
+			*)
+				WPCLI_ARGS="$WPCLI_ARGS '$arg'"
+		esac
 	done
 
+	CONTAINER=$(echo "$CONTAINER" | sed "s/\.//")"$XDEBUG_SUFFIX"
 	COMMAND="cd /var/www/html/${CURRENT_SITE_NAME}${CURRENT_PATH_IN_SITE} && wp --path=/var/www/html/${CURRENT_SITE_NAME}/htdocs${WPCLI_ARGS}"
 
-	composeCommand exec --user=www-data ${CONTAINER} /bin/sh -c "$COMMAND"
+	composeCommand exec --user=www-data "$CONTAINER" /bin/sh -c "$COMMAND"
 }
 
 # Set current site info.
@@ -563,6 +590,9 @@ if [ -e ./config/wp-cli/wp-cli.custom.yml ]; then
 	WPCLI_CONFIG_FILE='./config/wp-cli/wp-cli.custom.yml'
 fi
 
+# Define other variables.
+DEFAULT_PHP_CONTAINER='php70'
+
 # Run the command.
 case $1 in
 	create)
@@ -580,15 +610,15 @@ case $1 in
 		hostsRemoveAll
 		;;
 	restart)
-	    systemRestart "$2"
-	    ;;
-    generate-ssl)
-        generateSSL "$2"
-        ;;
-    mysql)
-        mysqlCommand "$2"
-        ;;
-    wp-cli)
+		systemRestart "$2"
+		;;
+	generate-ssl)
+		generateSSL "$2"
+		;;
+	mysql)
+		mysqlCommand "$2"
+		;;
+	wp-cli)
 		shift
 		wpCommand "$@"
 		;;
