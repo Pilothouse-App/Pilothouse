@@ -94,9 +94,11 @@ generateSSL() {
 	# Trust the certificate and key.
 	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert"
 
-	# Add the certificate and key to the Nginx config.
-	NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.key;""\\"$'\n'
-	sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
+	# Add the certificate and key to the Nginx config, if it does not already exist.
+	if ! grep -q 'ssl_certificate' ${NGINX_CONFIG_FILE}; then
+		NGINX_SSL_CONFIG="\\"$'\n'"\\"$'\t'"listen 443 ssl;""\\"$'\n'"\\"$'\t'"ssl on;""\\"$'\n'"\\"$'\t'"ssl_certificate /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.cert;""\\"$'\n'"\\"$'\t'"ssl_certificate_key /var/www/html/${CURRENT_SITE_NAME}/${CURRENT_SITE_NAME}.key;""\\"$'\n'
+		sed -i '' -e "s|server {|&${NGINX_SSL_CONFIG}|g" ${NGINX_CONFIG_FILE}
+	fi
 
 	# Restart Nginx.
 	composeCommand restart nginx
