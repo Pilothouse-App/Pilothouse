@@ -77,8 +77,19 @@ generateSSL() {
 	fi
 
 	# Generate the certificate and key.
-	openssl genrsa -out "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.key" 2048
-	openssl req -new -x509 -key "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.key" -out "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert" -days 3650 -subj /CN="$DOMAIN_NAME"
+	openssl req \
+		-newkey rsa:2048 \
+		-x509 \
+		-nodes \
+		-keyout "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.key" \
+		-new \
+		-out "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert" \
+		-subj /CN="$DOMAIN_NAME" \
+		-reqexts SAN \
+		-extensions SAN \
+		-config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN_NAME")) \
+		-sha256 \
+		-days 3650
 
 	# Trust the certificate and key.
 	sudo security add-trusted-cert -d -r trustRoot -k "/Library/Keychains/System.keychain" "${SITES_DIR}/${CURRENT_SITE_NAME}/$CURRENT_SITE_NAME.cert"
