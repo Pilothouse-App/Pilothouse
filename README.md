@@ -33,7 +33,6 @@ Pilothouse supports multiple local sites, Xdebug, multiple versions of PHP, and 
 
 ### Commands
 
-- `wp [command]`: Runs a WP-CLI command in the Docker container against the current site.
 - `pilothouse up`: Boots up the Docker containers, and adds all necessary site entries to the host's hosts file.
 - `pilothouse down`: Halts the Docker containers, removing all site entries from the host's hosts file.
 - `pilothouse restart [container]`: Restarts the specified Docker container (`nginx`, `memcached`, etc.), or the entire system if no container is specified.
@@ -41,6 +40,7 @@ Pilothouse supports multiple local sites, Xdebug, multiple versions of PHP, and 
 - `pilothouse delete [site]`: Deletes an existing local site.
 - `pilothouse generate-ssl [site]`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
 - `pilothouse mysql [command]`: Runs the provided MySQL command. The command will be run on the database of the current site, or with no database selected if not run from within a site directory.
+- `pilothouse wp [command]`: Runs a WP-CLI command in the Docker container against the current site.
 - `pilothouse compose [command]`: Runs a `docker-compose` command with required environment variables set.
 
 ### License
