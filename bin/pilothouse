@@ -441,7 +441,6 @@ siteDelete() {
 # Shuts the system down.
 #
 systemDown() {
-	sudo ifconfig lo0 -alias 100.0.0.0
 	composeCommand stop
 }
 
@@ -463,9 +462,6 @@ systemRestart() {
 # Brings the system up.
 #
 systemUp() {
-	# This is an ugly hack to create a loopback interface to allow Xdebug to connect back to the host machine.
-	sudo ifconfig lo0 alias 100.0.0.0
-
 	composeCommand up -d
 
 	waitForMySQL
