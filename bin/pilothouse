@@ -350,7 +350,7 @@ siteCreate() {
 
 	# Install WordPress.
 	wpCommand core download
-	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=wordpress --dbpass=wordpress
+	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=pilothouse --dbpass=pilothouse
 	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=${WP_DEFAULT_USERNAME} --admin_password=${WP_DEFAULT_PASSWORD} --admin_email=${WP_DEFAULT_USERNAME}@${DOMAINNAME} --skip-email
 
 	# Add object cache dropin.
@@ -465,7 +465,7 @@ systemUp() {
 	composeCommand up -d
 
 	waitForMySQL
-	mysqlCommand "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON *.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
+	mysqlCommand "CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse'; GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%'; FLUSH PRIVILEGES;"
 }
 
 #
