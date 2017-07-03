@@ -3,6 +3,5 @@ define( 'SCRIPT_DEBUG', true );
 define( 'JETPACK_DEV_DEBUG', true );
 define( 'JETPACK_STAGING_MODE', true );
 
-global $memcached_servers;
-$memcached_servers = [ 'default' => [ 'memcached:11211' ] ];
+$redis_server = [ 'host' => 'redis' ];
 define( 'WP_CACHE_KEY_SALT', '' );

@@ -1,9 +1,6 @@
 version: '2'
 services:
 
-  memcached:
-    image: memcached:1.4-alpine
-
   mailcatcher:
     image: pilothouseapp/mailcatcher:latest
     ports:
@@ -31,7 +28,7 @@ services:
       - "${SITES_DIR}:/var/www/html"
 
   php56:
-    image: pilothouseapp/php:5.6
+    image: pilothouseapp/php:5.6-dev
     environment:
       - TERM=xterm
     extra_hosts:
@@ -49,29 +46,34 @@ services:
       - "/home/www-data/.wp-cli"
 
   php56-xdebug:
-    image: pilothouseapp/php:5.6-xdebug
+    image: pilothouseapp/php:5.6-xdebug-dev
     extends:
       service: php56
 
   php70:
-    image: pilothouseapp/php:7.0
+    image: pilothouseapp/php:7.0-dev
     extends:
       service: php56
 
   php70-xdebug:
-    image: pilothouseapp/php:7.0-xdebug
+    image: pilothouseapp/php:7.0-xdebug-dev
     extends:
       service: php56
 
   php71:
-    image: pilothouseapp/php:7.1
+    image: pilothouseapp/php:7.1-dev
     extends:
       service: php56
 
   php71-xdebug:
-    image: pilothouseapp/php:7.1-xdebug
+    image: pilothouseapp/php:7.1-xdebug-dev
     extends:
       service: php56
+
+  redis:
+    image: redis:3-alpine
+    ports:
+      - 6379:6379
 
 volumes:
   mysqldata:

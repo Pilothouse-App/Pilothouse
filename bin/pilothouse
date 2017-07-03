@@ -355,7 +355,7 @@ siteCreate() {
 	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=${WP_DEFAULT_USERNAME} --admin_password=${WP_DEFAULT_PASSWORD} --admin_email=${WP_DEFAULT_USERNAME}@${DOMAINNAME} --skip-email
 
 	# Add object cache dropin.
-	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
+	curl -sS https://raw.githubusercontent.com/pantheon-systems/wp-redis/master/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
 
 	# Add additional PHP to wp-config.php.
 	WPCONFIG_CUSTOM_PHP_FILE='config/wordpress/wp-config.php.inc'
