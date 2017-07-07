@@ -31,10 +31,6 @@ services:
     image: pilothouseapp/php:5.6-dev
     environment:
       - TERM=xterm
-    extra_hosts:
-      # Point `dockerhost` to a loopback interface on the host machine. This is an ugly hack, but it's required to allow
-      # Xdebug to connect back to the host machine due to limitations in Docker.
-      - "dockerhost:100.0.0.0"
     volumes:
       - "${PHP_CONFIG_FILE}:/usr/local/etc/php/conf.d/pilothouse.ini"
       - "${PHP_FPM_CONFIG_FILE}:/usr/local/etc/php-fpm.d/pilothouse.conf"

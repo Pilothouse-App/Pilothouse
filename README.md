@@ -30,6 +30,7 @@ Pilothouse supports multiple local sites, Xdebug, multiple versions of PHP, and 
 - Local WordPress sites are located in the `sites` directory. [This can be changed](https://github.com/Pilothouse-App/pilothouse/wiki/Changing-the-Location-of-the-%22sites%22-Directory).
 - The default WordPress username and password is `admin`/`password`.
 - The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
+- The master branch should be relatively stable, except for major releases. The develop branch should be considered "beta" and is subject to non-backwards-compatible changes.
 
 ### Commands
 

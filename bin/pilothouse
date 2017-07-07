@@ -71,12 +71,15 @@ generateSSL() {
 		exit 1
 	fi
 
-	# Get the domain name from the Nginx config.
+	# Get the domain names from the Nginx config.
 	DOMAIN_NAME=$(getDomainFromNginxConfig ${NGINX_CONFIG_FILE})
-	if [ -z ${DOMAIN_NAME} ]; then
-		echo 'Could not determine domain name.'
-		exit 1;
-	fi
+
+	DOMAIN_NAME_DELIMITER=""
+	DOMAIN_NAME_STRING=""
+	for DOMAIN in ${DOMAIN_NAME}; do
+		DOMAIN_NAME_STRING="${DOMAIN_NAME_STRING}${DOMAIN_NAME_DELIMITER}DNS:${DOMAIN}"
+		DOMAIN_NAME_DELIMITER=", "
+	done
 
 	# Generate the certificate and key.
 	openssl req \
@@ -89,7 +92,7 @@ generateSSL() {
 		-subj /CN="$DOMAIN_NAME" \
 		-reqexts SAN \
 		-extensions SAN \
-		-config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN_NAME")) \
+		-config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=$DOMAIN_NAME_STRING")) \
 		-sha256 \
 		-days 3650
 
@@ -333,6 +336,8 @@ siteCreate() {
 
 	read -p "URL to proxy images from (leave blank to disable): " PROXYURL
 
+	read -p "Git repository to clone for wp-content (leave blank to use the default wp-content directory): " WP_CONTENT_REPO
+
 	echo "Creating site $DOMAINNAME."
 
 	systemUpIfDown
@@ -352,8 +357,21 @@ siteCreate() {
 
 	# Install WordPress.
 	wpCommand core download
-	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=wordpress --dbpass=wordpress
+	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=pilothouse --dbpass=pilothouse
 	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=${WP_DEFAULT_USERNAME} --admin_password=${WP_DEFAULT_PASSWORD} --admin_email=${WP_DEFAULT_USERNAME}@${DOMAINNAME} --skip-email
+
+	if [ ! -z ${WP_CONTENT_REPO} ]; then
+		mv ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old
+		git clone ${WP_CONTENT_REPO} ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content
+
+		# Restore the old wp-content directory if the repo could not be cloned.
+		if [ ! -e ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content ]; then
+			echo "Error cloning repo to wp-content."
+			mv ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content
+		else
+			rm -rf ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old
+		fi
+	fi
 
 	# Add object cache dropin.
 	curl -sS https://raw.githubusercontent.com/pantheon-systems/wp-redis/master/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
@@ -410,7 +428,7 @@ siteDelete() {
 	fi
 
 	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/sites/${DIRECTORYNAME}.conf")
-	if [ -z ${DOMAINNAME} ]; then
+	if [ -z "$DOMAINNAME" ]; then
 		echo 'Could not determine domain name. Moving on...'
 		DOMAINNAME=${DIRECTORYNAME}
 	fi
@@ -443,7 +461,6 @@ siteDelete() {
 # Shuts the system down.
 #
 systemDown() {
-	sudo ifconfig lo0 -alias 100.0.0.0
 	composeCommand stop
 }
 
@@ -465,13 +482,10 @@ systemRestart() {
 # Brings the system up.
 #
 systemUp() {
-	# This is an ugly hack to create a loopback interface to allow Xdebug to connect back to the host machine.
-	sudo ifconfig lo0 alias 100.0.0.0
-
 	composeCommand up -d
 
 	waitForMySQL
-	mysqlCommand "CREATE USER IF NOT EXISTS 'wordpress'@'%' IDENTIFIED BY 'wordpress'; GRANT ALL PRIVILEGES ON *.* to 'wordpress'@'%'; FLUSH PRIVILEGES;"
+	mysqlCommand "CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse'; GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%'; FLUSH PRIVILEGES;"
 }
 
 #
