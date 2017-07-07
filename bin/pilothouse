@@ -69,12 +69,15 @@ generateSSL() {
 		exit 1
 	fi
 
-	# Get the domain name from the Nginx config.
+	# Get the domain names from the Nginx config.
 	DOMAIN_NAME=$(getDomainFromNginxConfig ${NGINX_CONFIG_FILE})
-	if [ -z ${DOMAIN_NAME} ]; then
-		echo 'Could not determine domain name.'
-		exit 1;
-	fi
+
+	DOMAIN_NAME_DELIMITER=""
+	DOMAIN_NAME_STRING=""
+	for DOMAIN in ${DOMAIN_NAME}; do
+		DOMAIN_NAME_STRING="${DOMAIN_NAME_STRING}${DOMAIN_NAME_DELIMITER}DNS:${DOMAIN}"
+		DOMAIN_NAME_DELIMITER=", "
+	done
 
 	# Generate the certificate and key.
 	openssl req \
@@ -87,7 +90,7 @@ generateSSL() {
 		-subj /CN="$DOMAIN_NAME" \
 		-reqexts SAN \
 		-extensions SAN \
-		-config <(cat /System/Library/OpenSSL/openssl.cnf <(printf "[SAN]\nsubjectAltName=DNS:$DOMAIN_NAME")) \
+		-config <(cat /etc/ssl/openssl.cnf <(printf "[SAN]\nsubjectAltName=$DOMAIN_NAME_STRING")) \
 		-sha256 \
 		-days 3650
 
