@@ -334,6 +334,8 @@ siteCreate() {
 
 	read -p "URL to proxy images from (leave blank to disable): " PROXYURL
 
+	read -p "Git repository to clone for wp-content (leave blank to use the default wp-content directory): " WP_CONTENT_REPO
+
 	echo "Creating site $DOMAINNAME."
 
 	systemUpIfDown
@@ -355,6 +357,19 @@ siteCreate() {
 	wpCommand core download
 	wpCommand core config --dbhost=mysql --dbname=${DIRECTORYNAME} --dbuser=pilothouse --dbpass=pilothouse
 	wpCommand core install --url=${DOMAINNAME} --title=${DIRECTORYNAME} --admin_user=${WP_DEFAULT_USERNAME} --admin_password=${WP_DEFAULT_PASSWORD} --admin_email=${WP_DEFAULT_USERNAME}@${DOMAINNAME} --skip-email
+
+	if [ ! -z ${WP_CONTENT_REPO} ]; then
+		mv ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old
+		git clone ${WP_CONTENT_REPO} ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content
+
+		# Restore the old wp-content directory if the repo could not be cloned.
+		if [ ! -e ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content ]; then
+			echo "Error cloning repo to wp-content."
+			mv ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content
+		else
+			rm -rf ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content.old
+		fi
+	fi
 
 	# Add object cache dropin.
 	curl -sS https://plugins.svn.wordpress.org/memcached/trunk/object-cache.php -o ${SITES_DIR}/${DIRECTORYNAME}/htdocs/wp-content/object-cache.php
