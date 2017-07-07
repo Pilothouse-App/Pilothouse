@@ -1,5 +1,5 @@
 {
 	"require": {
-		"wp-cli/wp-cli": "^1.0"
+		"wp-cli/wp-cli": "^1.2"
 	}
 }
