@@ -411,7 +411,7 @@ siteDelete() {
 	fi
 
 	DOMAINNAME=$(getDomainFromNginxConfig "config/nginx/sites/${DIRECTORYNAME}.conf")
-	if [ -z ${DOMAINNAME} ]; then
+	if [ -z "$DOMAINNAME" ]; then
 		echo 'Could not determine domain name. Moving on...'
 		DOMAINNAME=${DIRECTORYNAME}
 	fi
