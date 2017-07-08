@@ -13,7 +13,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - "${MYSQL_CONFIG_FILE}:/etc/mysql/conf.d/pilothouse.cnf"
+      - "{{MYSQL_CONFIG_FILE}}:/etc/mysql/conf.d/pilothouse.cnf"
       - "mysqldata:/var/lib/mysql"
 
   nginx:
@@ -22,22 +22,22 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - "${NGINX_CONFIG_FILE}:/etc/nginx/nginx.conf"
-      - "${NGINX_SHARED_CONFIG_FILE}:/etc/nginx/partials/shared.conf.inc"
-      - "./config/nginx/sites:/etc/nginx/conf.d"
-      - "${SITES_DIR}:/var/www/html"
+      - "{{NGINX_CONFIG_FILE}}:/etc/nginx/nginx.conf"
+      - "{{NGINX_SHARED_CONFIG_FILE}}:/etc/nginx/partials/shared.conf.inc"
+      - "{{NGINX_DEFAULT_SITE_CONFIG_FILE}}:/etc/nginx/conf.d/default.conf"
+      - "{{SITES_DIR}}:/var/www/html"
 
   php56:
     image: pilothouseapp/php:5.6-dev
     environment:
       - TERM=xterm
     volumes:
-      - "${PHP_CONFIG_FILE}:/usr/local/etc/php/conf.d/pilothouse.ini"
-      - "${PHP_FPM_CONFIG_FILE}:/usr/local/etc/php-fpm.d/pilothouse.conf"
-      - "${PHP_XDEBUG_CONFIG_FILE}:/usr/local/etc/php/conf.d/xdebug.ini"
-      - "${SITES_DIR}:/var/www/html"
-      - "${SSMTP_CONFIG_FILE}:/etc/ssmtp/ssmtp.conf"
-      - "${WPCLI_CONFIG_FILE}:/var/www/html/wp-cli.yml"
+      - "{{PHP_CONFIG_FILE}}:/usr/local/etc/php/conf.d/pilothouse.ini"
+      - "{{PHP_FPM_CONFIG_FILE}}:/usr/local/etc/php-fpm.d/pilothouse.conf"
+      - "{{PHP_XDEBUG_CONFIG_FILE}}:/usr/local/etc/php/conf.d/xdebug.ini"
+      - "{{SITES_DIR}}:/var/www/html"
+      - "{{SSMTP_CONFIG_FILE}}:/etc/ssmtp/ssmtp.conf"
+      - "{{WPCLI_CONFIG_FILE}}:/var/www/html/wp-cli.yml"
       - "/home/www-data/.wp-cli"
 
   php56-xdebug:
