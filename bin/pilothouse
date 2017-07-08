@@ -24,6 +24,8 @@ COMMANDS
 	  generate-ssl [site]   Generates, installs, and trusts a self-signed SSL certificate for the specified site.
 	  mysql [command]       Runs the provided MySQL command. The command will be run on the database of the current
 							site, or with no database selected if not run from within a site directory.
+	  composer [command]    Runs a Composer command in the Docker container against the current site.
+	  wp [command]          Runs a WP-CLI command in the Docker container against the current site.
 	  compose [command]     Runs a \`docker-compose\` command with required environment variables set.
 
 	  Where [site] appears above, it refers to the name of the site directory, not the URL that the site is accessed by.
@@ -521,6 +523,33 @@ waitForMySQL() {
 }
 
 #
+# Runs a Composer command in the php container.
+#
+# @params: Aguments to be passed to Composer
+#
+composerCommand() {
+	ARGS=("$@")
+	COMPOSER_ARGS=''
+	CONTAINER="$DEFAULT_PHP_CONTAINER"
+
+	for arg in "${ARGS[@]}"; do
+		case "$arg" in
+			--php=*)
+				CONTAINER="php${arg#*=}"
+				;;
+			*)
+				COMPOSER_ARGS="$COMPOSER_ARGS '$arg'"
+		esac
+	done
+
+	CONTAINER=$(echo "$CONTAINER" | sed "s/\.//")
+
+	COMMAND="cd /var/www/html/${CURRENT_SITE_NAME}${CURRENT_PATH_IN_SITE} && composer${COMPOSER_ARGS}"
+
+	composeCommand exec --user=www-data "$CONTAINER" /bin/sh -c "$COMMAND"
+}
+
+#
 # Runs a WP-CLI command in the php container.
 #
 # @params: Aguments to be passed to WP-CLI
@@ -648,6 +677,10 @@ case $1 in
 	wp-cli)
 		shift
 		wpCommand "$@"
+		;;
+	composer)
+		shift
+		composerCommand "$@"
 		;;
 	compose)
 		shift

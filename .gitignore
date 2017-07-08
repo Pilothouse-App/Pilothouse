@@ -16,4 +16,3 @@ docker-compose.custom.yml
 pilothouse.ini
 /sites/
 !/sites/.gitkeep
-/vendor/
