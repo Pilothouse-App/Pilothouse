@@ -38,6 +38,7 @@ services:
       - "${SITES_DIR}:/var/www/html"
       - "${SSMTP_CONFIG_FILE}:/etc/ssmtp/ssmtp.conf"
       - "${WPCLI_CONFIG_FILE}:/var/www/html/wp-cli.yml"
+      - "/home/www-data/.composer"
       - "/home/www-data/.wp-cli"
 
   php56-xdebug:
