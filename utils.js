@@ -3,8 +3,7 @@ const spawn = require('child_process').spawnSync,
 
 module.exports = {
     buildRunFiles: buildRunFiles,
-    composeCommand: composeCommand,
-    commandDescriptions: getCommandDescriptions()
+    composeCommand: composeCommand
 };
 
 /**
@@ -49,19 +48,6 @@ function getAppDirectory() {
  */
 function getAppHomeDirectory() {
     return getHomeDirectory() + '/.pilothouse';
-}
-
-/**
- * Returns the registered command description strings.
- *
- * @returns Object
- */
-function getCommandDescriptions() {
-    return {
-        up: 'Boots up the Docker containers, and adds all necessary site entries to the host\'s hosts file.',
-        down: 'Halts the Docker containers, removing all site entries from the host\'s hosts file.',
-        restart: 'Restarts the specified Docker container (nginx, memcached, etc.), or the entire system if no container is specified.'
-    }
 }
 
 /**

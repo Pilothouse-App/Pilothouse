@@ -9,7 +9,7 @@
     "pilothouse": "./bin/pilothouse.js"
   },
   "dependencies": {
-    "commander": "^2.11.0",
-    "fs-extra": "^3.0.1"
+    "fs-extra": "^3.0.1",
+    "yargs": "^8.0.2"
   }
 }

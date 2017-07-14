@@ -1,16 +1,12 @@
 #!/usr/bin/env node
 
-const program = require('commander'),
-      packageInfo = require('../package.json'),
-      utils = require('../utils');
+const utils = require('../utils'),
+      yargs = require('yargs');
 
-program
-    .description(packageInfo.description)
-    .version(packageInfo.version)
-
-    .command('up', utils.commandDescriptions.up)
-    .command('down', utils.commandDescriptions.down)
-    .command('restart [container]', utils.commandDescriptions.restart)
-
-    //.arguments('<command> [arguments...]')
-    .parse(process.argv);
+const program = yargs
+	.commandDir('../commands/')
+	.help()
+	.usage('$0 <command> [args]')
+	.version()
+	.wrap(yargs.terminalWidth())
+	.argv;

@@ -1,5 +1,9 @@
 const utils = require('../utils');
 
-module.exports = function() {
-    utils.composeCommand(['stop']);
+const downCommand = function() {
+	utils.composeCommand(['stop']);
 };
+
+exports.command = 'down';
+exports.desc    = 'Halts the Docker containers, removing all site entries from the host\'s hosts file.';
+exports.handler = downCommand;
