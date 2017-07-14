@@ -1,15 +1,14 @@
 const utils = require('../utils');
 
 const wpCommand = function(argv) {
-	const command = argv.command,
-	      env = utils.environment;
+	const env = utils.environment;
     let shellCommand = null;
 
 	let phpVersion = utils.getConfig().php_version.toString();
 	if (argv.php) {
 		phpVersion = argv.php.toString();
 	}
-	const phpContainer = 'php' + phpVersion.replace(/\./g, '');
+	const phpContainer = 'php' + phpVersion.replace(/\./g, '') + (argv.xdebug ? '-xdebug' : '');
 
 	if (env.currentSiteName) {
 		shellCommand = 'cd /var/www/html/' + env.currentSiteName + '/' + env.currentPathInSite
