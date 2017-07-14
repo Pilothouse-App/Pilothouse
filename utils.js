@@ -15,7 +15,8 @@ module.exports = {
 	buildRunFiles: buildRunFiles,
 	composeCommand: composeCommand,
 	getConfig: getConfig,
-	mysqlCommand: mysqlCommand
+	mysqlCommand: mysqlCommand,
+	wpCommand: wpCommand
 };
 
 /**
@@ -144,10 +145,14 @@ function getCurrentSiteRootDirectory() {
  * @returns {Object}
  */
 function getDefaultConfig() {
-	return {
+	let config = {
 		php_version: '7.0',
 		sites_dir: getHomeDirectory() + '/sites'
 	};
+
+	config.default_php_container = 'php' + config.php_version.replace(/\./g, '');
+
+	return config;
 }
 
 /**
@@ -213,7 +218,7 @@ function mysqlCommand(sql) {
 
 	composeCommand([
 		'exec',
-		'php70', // @todo make the default PHP container configurable
+		getConfig().default_php_container,
 		'mysql',
 		'--host=mysql',
 		'--user=root',
@@ -258,4 +263,40 @@ function shellCommand(cwd, command, args, captureOutput = false) {
 
 	    return stdout.length ? stdout.trim() : stderr.trim();
     }
+}
+
+/**
+ * Runs a WP-CLI command in the specified container.
+ *
+ * @param {String} commandString The command to run.
+ * @param {String} container     The container in which to run the command. Will use the default PHP container if none is specified.
+ */
+function wpCommand(commandString, container = null) {
+	const currentSiteName = getCurrentSiteName();
+	if (!container) {
+		container = getConfig().default_php_container;
+	}
+
+	if (currentSiteName) {
+		shellCommandString = 'cd /var/www/html/' + currentSiteName + '/' + getCurrentPathInSite()
+			+ ' && wp --path=/var/www/html/' + currentSiteName + '/htdocs'
+			+ ' ' + commandString;
+
+	} else if ('--info' === commandString) {
+		shellCommandString = 'cd /var/www/html && wp --info';
+	} else {
+		console.error('This command must be run from within a site directory.');
+		process.exit(1);
+	}
+
+	const composeArgs = [
+		'exec',
+		'--user=www-data',
+		container,
+		'/bin/sh',
+		'-c',
+		shellCommandString
+	];
+
+	composeCommand(composeArgs);
 }

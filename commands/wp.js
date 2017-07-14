@@ -1,37 +1,20 @@
 const utils = require('../utils');
 
 const wpCommand = function(argv) {
-	const env = utils.environment;
-    let shellCommand = null;
+	const commandString = utils.environment.subCommandArgs.join(' ');
+    let   phpContainer;
 
-	let phpVersion = utils.getConfig().php_version.toString();
 	if (argv.php) {
-		phpVersion = argv.php.toString();
-	}
-	const phpContainer = 'php' + phpVersion.replace(/\./g, '') + (argv.xdebug ? '-xdebug' : '');
-
-	if (env.currentSiteName) {
-		shellCommand = 'cd /var/www/html/' + env.currentSiteName + '/' + env.currentPathInSite
-			+ ' && wp --path=/var/www/html/' + env.currentSiteName + '/htdocs'
-			+ ' ' + env.subCommandArgs.join(' ');
-
-	} else if ('--info' === env.subCommandArgs.join()) {
-		shellCommand = 'cd /var/www/html && wp --info';
+		phpContainer = 'php' + argv.php.toString().replace(/\./g, '');
 	} else {
-		console.error('This command must be run from within a site directory.');
-		process.exit(1);
+		phpContainer = utils.getConfig().default_php_container;
 	}
 
-	const composeArgs = [
-		'exec',
-		'--user=www-data',
-		phpContainer,
-		'/bin/sh',
-		'-c',
-		shellCommand
-	];
+	if (argv.xdebug) {
+		phpContainer += '-xdebug';
+	}
 
-	utils.composeCommand(composeArgs);
+	utils.wpCommand(commandString, phpContainer);
 };
 
 exports.command = 'wp [command]';
