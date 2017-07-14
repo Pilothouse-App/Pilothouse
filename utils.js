@@ -1,36 +1,36 @@
 const yaml = require('js-yaml'),
-      findUp = require('find-up'),
-      fs = require('fs-extra'),
-      spawn = require('child_process').spawnSync,
-      subCommandArgs = getSubCommandArgs();
+	  findUp = require('find-up'),
+	  fs = require('fs-extra'),
+	  spawn = require('child_process').spawnSync,
+	  subCommandArgs = getSubCommandArgs();
 
 module.exports = {
-    environment: {
-        currentPathInSite: getCurrentPathInSite(),
-        currentSiteRootDirectory: getCurrentSiteRootDirectory(),
-        currentSiteName: getCurrentSiteName(),
-        subCommandArgs: subCommandArgs
-    },
-    buildRunFiles: buildRunFiles,
-    composeCommand: composeCommand,
-    getConfig: getConfig
+	environment: {
+		currentPathInSite: getCurrentPathInSite(),
+		currentSiteRootDirectory: getCurrentSiteRootDirectory(),
+		currentSiteName: getCurrentSiteName(),
+		subCommandArgs: subCommandArgs
+	},
+	buildRunFiles: buildRunFiles,
+	composeCommand: composeCommand,
+	getConfig: getConfig
 };
 
 /**
  * Builds the files required for running docker-compose.
  */
 function buildRunFiles() {
-    fs.ensureDirSync( getAppHomeDirectory() );
-    fs.emptyDirSync( getAppHomeDirectory() + '/run' );
+	fs.ensureDirSync( getAppHomeDirectory() );
+	fs.emptyDirSync( getAppHomeDirectory() + '/run' );
 
-    // Copy .env
-    fs.copySync(getAppDirectory() + '/templates/run/.env', getAppHomeDirectory() + '/run/.env');
+	// Copy .env
+	fs.copySync(getAppDirectory() + '/templates/run/.env', getAppHomeDirectory() + '/run/.env');
 
-    // Generate docker-compose.yml
-    const composeTemplate = getAppDirectory() + '/templates/run/docker-compose.yml';
-    let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
-    composeData = populateTemplate(composeData, getComposeVariables());
-    fs.outputFileSync(getAppHomeDirectory() + '/run/docker-compose.yml', composeData);
+	// Generate docker-compose.yml
+	const composeTemplate = getAppDirectory() + '/templates/run/docker-compose.yml';
+	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
+	composeData = populateTemplate(composeData, getComposeVariables());
+	fs.outputFileSync(getAppHomeDirectory() + '/run/docker-compose.yml', composeData);
 }
 
 /**
@@ -39,7 +39,7 @@ function buildRunFiles() {
  * @param {Array} command
  */
 function composeCommand(command) {
-    shellCommand(getAppHomeDirectory() + '/run', 'docker-compose', command);
+	shellCommand(getAppHomeDirectory() + '/run', 'docker-compose', command);
 }
 
 /**
@@ -48,7 +48,7 @@ function composeCommand(command) {
  * @returns {String}
  */
 function getAppDirectory() {
-    return __dirname;
+	return __dirname;
 }
 
 /**
@@ -57,7 +57,7 @@ function getAppDirectory() {
  * @returns {String}
  */
 function getAppHomeDirectory() {
-    return getHomeDirectory() + '/.pilothouse';
+	return getHomeDirectory() + '/.pilothouse';
 }
 
 /**
@@ -66,18 +66,18 @@ function getAppHomeDirectory() {
  * @returns {Object}
  */
 function getComposeVariables() {
-    return {
-        'MYSQL_CONFIG_FILE': getAppDirectory() + '/config/mysql/mysql.conf',
-        'NGINX_CONFIG_FILE': getAppDirectory() + '/config/nginx/nginx.conf',
-        'NGINX_DEFAULT_SITE_CONFIG_FILE': getAppDirectory() + '/config/nginx/default-site.conf',
-        'NGINX_SHARED_CONFIG_FILE': getAppDirectory() + '/config/nginx/partials/shared.conf.inc',
-        'PHP_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php.ini',
-        'PHP_FPM_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php-fpm.conf',
-        'PHP_XDEBUG_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/xdebug.ini',
-        'SITES_DIR': getConfig().sites_dir,
-        'SSMTP_CONFIG_FILE': getAppDirectory() + '/config/ssmtp/ssmtp.conf',
-        'WPCLI_CONFIG_FILE': getAppDirectory() + '/config/wp-cli/wp-cli.yml',
-    }
+	return {
+		'MYSQL_CONFIG_FILE': getAppDirectory() + '/config/mysql/mysql.conf',
+		'NGINX_CONFIG_FILE': getAppDirectory() + '/config/nginx/nginx.conf',
+		'NGINX_DEFAULT_SITE_CONFIG_FILE': getAppDirectory() + '/config/nginx/default-site.conf',
+		'NGINX_SHARED_CONFIG_FILE': getAppDirectory() + '/config/nginx/partials/shared.conf.inc',
+		'PHP_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php.ini',
+		'PHP_FPM_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php-fpm.conf',
+		'PHP_XDEBUG_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/xdebug.ini',
+		'SITES_DIR': getConfig().sites_dir,
+		'SSMTP_CONFIG_FILE': getAppDirectory() + '/config/ssmtp/ssmtp.conf',
+		'WPCLI_CONFIG_FILE': getAppDirectory() + '/config/wp-cli/wp-cli.yml',
+	}
 }
 
 /**
@@ -86,19 +86,19 @@ function getComposeVariables() {
  * @returns {String}
  */
 function getCurrentPathInSite() {
-    const currentSiteRoot = getCurrentSiteRootDirectory();
+	const currentSiteRoot = getCurrentSiteRootDirectory();
 
-    if (null === currentSiteRoot) {
-        return;
-    }
+	if (null === currentSiteRoot) {
+		return;
+	}
 
-    let pathInSite = process.cwd().replace(currentSiteRoot + '/', '');
+	let pathInSite = process.cwd().replace(currentSiteRoot + '/', '');
 
-    if (currentSiteRoot === pathInSite) {
-        pathInSite = '';
-    }
+	if (currentSiteRoot === pathInSite) {
+		pathInSite = '';
+	}
 
-    return pathInSite;
+	return pathInSite;
 }
 
 /**
@@ -107,15 +107,15 @@ function getCurrentPathInSite() {
  * @returns {String}
  */
 function getCurrentSiteName() {
-    const currentSiteRoot = getCurrentSiteRootDirectory();
+	const currentSiteRoot = getCurrentSiteRootDirectory();
 
-    if (!currentSiteRoot) {
-        return null;
-    }
+	if (!currentSiteRoot) {
+		return null;
+	}
 
-    const pathParts = currentSiteRoot.split('/');
+	const pathParts = currentSiteRoot.split('/');
 
-    return pathParts[pathParts.length - 1];
+	return pathParts[pathParts.length - 1];
 }
 
 /**
@@ -124,13 +124,13 @@ function getCurrentSiteName() {
  * @returns {String}
  */
 function getCurrentSiteRootDirectory() {
-    const htdocsPath = findUp.sync('htdocs');
+	const htdocsPath = findUp.sync('htdocs');
 
-    if (!htdocsPath) {
-        return null;
-    }
+	if (!htdocsPath) {
+		return null;
+	}
 
-    return htdocsPath.replace('/htdocs', '');
+	return htdocsPath.replace('/htdocs', '');
 }
 
 /**
@@ -140,7 +140,7 @@ function getCurrentSiteRootDirectory() {
  */
 function getDefaultConfig() {
 	return {
-	    php_version: '7.0',
+		php_version: '7.0',
 		sites_dir: getHomeDirectory() + '/sites'
 	};
 }
@@ -151,16 +151,16 @@ function getDefaultConfig() {
  * @return {Object}
  */
 function getConfig() {
-    const configFile = getAppHomeDirectory() + '/config.yml';
-    let config;
+	const configFile = getAppHomeDirectory() + '/config.yml';
+	let config;
 
-    try {
-        config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
-    } catch (e) {
-        config = {};
-    }
+	try {
+		config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
+	} catch (e) {
+		config = {};
+	}
 
-    return Object.assign({}, getDefaultConfig(), config);
+	return Object.assign({}, getDefaultConfig(), config);
 }
 
 /**
@@ -169,7 +169,7 @@ function getConfig() {
  * @returns {String}
  */
 function getHomeDirectory() {
-    return homeDir = process.env.APPDATA || process.env.HOME;
+	return homeDir = process.env.APPDATA || process.env.HOME;
 }
 
 /**
@@ -205,11 +205,11 @@ function getSubCommandArgs() {
  * @returns {String} The populated template.
  */
 function populateTemplate(template, templateVars) {
-    for (let templateVar in templateVars) {
-        let regex = new RegExp('{{' + templateVar + '}}', 'gi');
-        template = template.replace(regex, templateVars[templateVar]);
-    }
-    return template;
+	for (let templateVar in templateVars) {
+		let regex = new RegExp('{{' + templateVar + '}}', 'gi');
+		template = template.replace(regex, templateVars[templateVar]);
+	}
+	return template;
 }
 
 /**
@@ -220,5 +220,5 @@ function populateTemplate(template, templateVars) {
  * @param {Array}  args    Arguments to be passed to the command.
  */
 function shellCommand(cwd, command, args) {
-    spawn(command, args, {cwd: cwd, stdio: 'inherit'});
+	spawn(command, args, {cwd: cwd, stdio: 'inherit'});
 }
