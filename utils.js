@@ -1,9 +1,19 @@
-const spawn = require('child_process').spawnSync,
-      fs = require('fs-extra');
+const yaml = require('js-yaml'),
+      findUp = require('find-up'),
+      fs = require('fs-extra'),
+      spawn = require('child_process').spawnSync,
+      subCommandArgs = getSubCommandArgs();
 
 module.exports = {
+    environment: {
+        currentPathInSite: getCurrentPathInSite(),
+        currentSiteRootDirectory: getCurrentSiteRootDirectory(),
+        currentSiteName: getCurrentSiteName(),
+        subCommandArgs: subCommandArgs
+    },
     buildRunFiles: buildRunFiles,
-    composeCommand: composeCommand
+    composeCommand: composeCommand,
+    getConfig: getConfig
 };
 
 /**
@@ -64,10 +74,93 @@ function getComposeVariables() {
         'PHP_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php.ini',
         'PHP_FPM_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/php-fpm.conf',
         'PHP_XDEBUG_CONFIG_FILE': getAppDirectory() + '/config/php-fpm/xdebug.ini',
-        'SITES_DIR': getHomeDirectory() + '/sites',
+        'SITES_DIR': getConfig().sites_dir,
         'SSMTP_CONFIG_FILE': getAppDirectory() + '/config/ssmtp/ssmtp.conf',
         'WPCLI_CONFIG_FILE': getAppDirectory() + '/config/wp-cli/wp-cli.yml',
     }
+}
+
+/**
+ * Returns the current path relative to the site directory.
+ *
+ * @returns {String}
+ */
+function getCurrentPathInSite() {
+    const currentSiteRoot = getCurrentSiteRootDirectory();
+
+    if (null === currentSiteRoot) {
+        return;
+    }
+
+    let pathInSite = process.cwd().replace(currentSiteRoot + '/', '');
+
+    if (currentSiteRoot === pathInSite) {
+        pathInSite = '';
+    }
+
+    return pathInSite;
+}
+
+/**
+ * Returns the name of the current site.
+ *
+ * @returns {String}
+ */
+function getCurrentSiteName() {
+    const currentSiteRoot = getCurrentSiteRootDirectory();
+
+    if (!currentSiteRoot) {
+        return null;
+    }
+
+    const pathParts = currentSiteRoot.split('/');
+
+    return pathParts[pathParts.length - 1];
+}
+
+/**
+ * Returns the path of the current site's root directory.
+ *
+ * @returns {String}
+ */
+function getCurrentSiteRootDirectory() {
+    const htdocsPath = findUp.sync('htdocs');
+
+    if (!htdocsPath) {
+        return null;
+    }
+
+    return htdocsPath.replace('/htdocs', '');
+}
+
+/**
+ * Returns the default configuration.
+ *
+ * @returns {Object}
+ */
+function getDefaultConfig() {
+	return {
+	    php_version: '7.0',
+		sites_dir: getHomeDirectory() + '/sites'
+	};
+}
+
+/**
+ * Returns the configuration variables.
+ *
+ * @return {Object}
+ */
+function getConfig() {
+    const configFile = getAppHomeDirectory() + '/config.yml';
+    let config;
+
+    try {
+        config = yaml.safeLoad(fs.readFileSync(configFile, 'utf8'));
+    } catch (e) {
+        config = {};
+    }
+
+    return Object.assign({}, getDefaultConfig(), config);
 }
 
 /**
@@ -77,6 +170,30 @@ function getComposeVariables() {
  */
 function getHomeDirectory() {
     return homeDir = process.env.APPDATA || process.env.HOME;
+}
+
+/**
+ * Gets arguments to be passed to subcommands.
+ *
+ * @returns {Array}
+ */
+function getSubCommandArgs() {
+	let commandArgs = [],
+		rawArgs = JSON.parse(JSON.stringify(process.argv));
+
+	rawArgs.shift();
+	rawArgs.shift();
+	rawArgs.shift();
+
+	rawArgs.forEach(function(arg){
+		if (0 === arg.indexOf('--php') || 0 === arg.indexOf('--xdebug')) {
+			return;
+		}
+
+		commandArgs.push(arg);
+	});
+
+	return commandArgs;
 }
 
 /**

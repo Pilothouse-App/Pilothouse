@@ -9,7 +9,9 @@
     "pilothouse": "./bin/pilothouse.js"
   },
   "dependencies": {
+    "find-up": "^2.1.0",
     "fs-extra": "^3.0.1",
+    "js-yaml": "^3.9.0",
     "yargs": "^8.0.2"
   }
 }
