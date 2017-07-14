@@ -6,6 +6,7 @@ const yaml = require('js-yaml'),
 
 module.exports = {
 	environment: {
+	    appDirectory: getAppDirectory(),
 		currentPathInSite: getCurrentPathInSite(),
 		currentSiteRootDirectory: getCurrentSiteRootDirectory(),
 		currentSiteName: getCurrentSiteName(),
@@ -13,7 +14,8 @@ module.exports = {
 	},
 	buildRunFiles: buildRunFiles,
 	composeCommand: composeCommand,
-	getConfig: getConfig
+	getConfig: getConfig,
+	mysqlCommand: mysqlCommand
 };
 
 /**
@@ -36,10 +38,13 @@ function buildRunFiles() {
 /**
  * Runs a docker-compose command
  *
- * @param {Array} command
+ * @param {Array}   command       The command to run.
+ * @param {Boolean} captureOutput Whether to capture and return the output, or pipe it to the console.
+ *
+ * @returns {Object} The command's result object.
  */
-function composeCommand(command) {
-	shellCommand(getAppHomeDirectory() + '/run', 'docker-compose', command);
+function composeCommand(command, captureOutput = false) {
+	return shellCommand(getAppHomeDirectory() + '/run', 'docker-compose', command, captureOutput);
 }
 
 /**
@@ -197,6 +202,28 @@ function getSubCommandArgs() {
 }
 
 /**
+ * Runs a MySQL command.
+ *
+ * @param {String} sql The SQL to run.
+ */
+function mysqlCommand(sql) {
+	if (getCurrentSiteName()) {
+		sql = 'USE "' + getCurrentSiteName() + '"; ' + sql;
+	}
+
+	composeCommand([
+		'exec',
+		'php70', // @todo make the default PHP container configurable
+		'mysql',
+		'--host=mysql',
+		'--user=root',
+		'--password=root',
+		'-e',
+		sql
+	]);
+}
+
+/**
  * Populates the provided template with the specified variables.
  *
  * @param {String} template
@@ -215,10 +242,20 @@ function populateTemplate(template, templateVars) {
 /**
  * Runs a shell command.
  *
- * @param {String} cwd     The working directory in which to run the command.
- * @param {String} command The command to run.
- * @param {Array}  args    Arguments to be passed to the command.
+ * @param {String}  cwd           The working directory in which to run the command.
+ * @param {String}  command       The command to run.
+ * @param {Array}   args          Arguments to be passed to the command.
+ * @param {Boolean} captureOutput Whether to capture and return the output, or pipe it to the console.
+ *
+ * @returns {Object} The command's result object.
  */
-function shellCommand(cwd, command, args) {
-	spawn(command, args, {cwd: cwd, stdio: 'inherit'});
+function shellCommand(cwd, command, args, captureOutput = false) {
+	const result = spawn(command, args, {cwd: cwd, stdio: captureOutput ? 'pipe' : 'inherit'});
+
+	if (captureOutput) {
+	    const stderr = result.stderr.toString();
+	    const stdout = result.stdout.toString();
+
+	    return stdout.length ? stdout.trim() : stderr.trim();
+    }
 }
