@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-const utils = require('../utils'),
-      yargs = require('yargs');
+const yargs = require('yargs');
 
 const program = yargs
 	.commandDir('../commands/')

@@ -1,4 +1,4 @@
-const utils = require('../utils');
+const utils = require('../utils/general');
 
 const downCommand = function() {
 	utils.composeCommand(['stop']);

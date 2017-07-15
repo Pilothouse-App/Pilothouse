@@ -1,13 +1,15 @@
-const utils = require('../utils');
+const config = require('../utils/config'),
+      environment = require('../utils/environment'),
+      utils = require('../utils/general');
 
 const wpCommand = function(argv) {
-	const commandString = utils.environment.subCommandArgs.join(' ');
+	const commandString = environment.subCommandArgs.join(' ');
     let   phpContainer;
 
 	if (argv.php) {
 		phpContainer = 'php' + argv.php.toString().replace(/\./g, '');
 	} else {
-		phpContainer = utils.getConfig().default_php_container;
+		phpContainer = config.default_php_container;
 	}
 
 	if (argv.xdebug) {
@@ -21,7 +23,7 @@ exports.command = 'wp [command]';
 exports.builder = function(yargs) {
 	return yargs
 		.option('php <version>', {
-			default: utils.getConfig().php_version,
+			default: config.default_php_version,
 			describe: 'The version of PHP which should be used to run the command.'
 		})
 		.option('xdebug', {

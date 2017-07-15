@@ -1,7 +1,7 @@
-const utils = require('../utils');
+const mysqlUtils = require('../utils/mysql');
 
 const mysqlCommand = function(argv) {
-	utils.mysqlCommand(argv.sql);
+	mysqlUtils.mysqlCommand(argv.sql);
 };
 
 exports.command = 'mysql <sql>';

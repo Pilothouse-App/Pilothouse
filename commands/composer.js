@@ -1,20 +1,21 @@
-const utils = require('../utils');
+const config = require('../utils/config'),
+      environment = require('../utils/environment'),
+      utils = require('../utils/general');
 
 const composerCommand = function(argv) {
-	const env = utils.environment;
 
-	let phpVersion = utils.getConfig().php_version.toString();
+	let phpVersion = config.default_php_version.toString();
 	if (argv.php) {
 		phpVersion = argv.php.toString();
 	}
 	const phpContainer = 'php' + phpVersion.replace(/\./g, '');
 
 	let workDir = '/var/www/html';
-	if (env.currentSiteName) {
-		workDir += '/' + env.currentSiteName + '/' + env.currentPathInSite;
+	if (environment.currentSiteName) {
+		workDir += '/' + environment.currentSiteName + '/' + environment.currentPathInSite;
 	}
 
-	const shellCommand = 'cd ' + workDir + ' && composer ' + env.subCommandArgs.join(' ');
+	const shellCommand = 'cd ' + workDir + ' && composer ' + environment.subCommandArgs.join(' ');
 
 	const composeArgs = [
 		'exec',
@@ -32,7 +33,7 @@ exports.command = 'composer [command]';
 exports.builder = function(yargs) {
 	return yargs
 		.option('php <version>', {
-			default: utils.getConfig().php_version,
+			default: config.default_php_version,
 			describe: 'The version of PHP which should be used to run the command.'
 		});
 };
