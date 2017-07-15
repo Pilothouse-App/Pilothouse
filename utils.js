@@ -23,17 +23,22 @@ module.exports = {
  * Builds the files required for running docker-compose.
  */
 function buildRunFiles() {
+    // Create directories if they do not already exist.
 	fs.ensureDirSync( getAppHomeDirectory() );
-	fs.emptyDirSync( getAppHomeDirectory() + '/run' );
+	fs.emptyDirSync( getRunDirectory() );
+
+	// Create readme.txt
+	fs.writeFileSync(getRunDirectory() + '/readme.txt', 'All files in this directory are programmatically generated on'
+	    + ' `pilothouse up`. Do not manually edit any of the files in this directory, as your changes will not persist.');
 
 	// Copy .env
-	fs.copySync(getAppDirectory() + '/templates/run/.env', getAppHomeDirectory() + '/run/.env');
+	fs.copySync(getAppDirectory() + '/templates/run/.env', getRunDirectory() + '/.env');
 
 	// Generate docker-compose.yml
 	const composeTemplate = getAppDirectory() + '/templates/run/docker-compose.yml';
 	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
 	composeData = populateTemplate(composeData, getComposeVariables());
-	fs.outputFileSync(getAppHomeDirectory() + '/run/docker-compose.yml', composeData);
+	fs.outputFileSync(getRunDirectory() + '/docker-compose.yml', composeData);
 }
 
 /**
@@ -45,7 +50,7 @@ function buildRunFiles() {
  * @returns {Object} The command's result object.
  */
 function composeCommand(command, captureOutput = false) {
-	return shellCommand(getAppHomeDirectory() + '/run', 'docker-compose', command, captureOutput);
+	return shellCommand(getRunDirectory(), 'docker-compose', command, captureOutput);
 }
 
 /**
@@ -180,6 +185,15 @@ function getConfig() {
  */
 function getHomeDirectory() {
 	return homeDir = process.env.APPDATA || process.env.HOME;
+}
+
+/**
+ * Returns the full path to the `run` directory.
+ *
+ * @returns {String}
+ */
+function getRunDirectory() {
+	return getAppHomeDirectory() + '/_run';
 }
 
 /**
