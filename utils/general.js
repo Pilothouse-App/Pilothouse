@@ -33,6 +33,12 @@ function buildRunFiles() {
 	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
 	composeData = populateTemplate(composeData, getComposeVariables());
 	fs.outputFileSync(runDirectory + '/docker-compose.yml', composeData);
+
+	// Copy docker-compose override file if it exists.
+	const dockerComposeOverrideFile = environment.appHomeDirectory + '/docker-compose.custom.yml';
+	if (fs.existsSync(dockerComposeOverrideFile)) {
+		fs.copySync(dockerComposeOverrideFile, environment.runDirectory + '/docker-compose.override.yml');
+	}
 }
 
 /**
