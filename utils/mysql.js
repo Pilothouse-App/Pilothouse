@@ -1,5 +1,6 @@
 const config = require('./config'),
       environment = require('./environment'),
+      sleep = require('system-sleep')
       utils = require('./general');
 
 module.exports = {

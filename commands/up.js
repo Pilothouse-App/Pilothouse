@@ -1,5 +1,4 @@
 const mysqlUtils = require('../utils/mysql'),
-      sleep = require('system-sleep'),
       utils = require('../utils/general');
 
 const upCommand = function() {
