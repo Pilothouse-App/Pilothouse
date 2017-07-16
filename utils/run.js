@@ -3,7 +3,8 @@ const commands = require('./commands'),
       environment = require('./environment'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
-      sites = require('./sites');
+      sites = require('./sites'),
+      sleep = require('system-sleep');
 
 module.exports = {
 	buildRunFiles: buildRunFiles,
