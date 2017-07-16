@@ -1,8 +1,15 @@
 const environment = require('./environment'),
+      fs = require('fs-extra'),
       helpers = require('./helpers');
 
 let config = helpers.readYamlConfig(environment.appHomeDirectory + '/config.yml', getDefaultConfig());
 config.composeVariables = getComposeVariables();
+
+fs.ensureDirSync(config.sites_dir);
+if (!fs.existsSync(config.sites_dir)) {
+	console.error('The sites directory ' + config.sites_dir + ' does not exist. Please create it before starting Pilothouse.');
+	process.exit(1);
+}
 
 module.exports = config;
 
