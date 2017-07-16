@@ -36,7 +36,7 @@ function getComposeVariables() {
 function getDefaultConfig() {
 	let defaults = {
 		default_php_version: '7.0',
-		sites_dir: environment.homeDirectory + '/sites'
+		sites_dir: environment.homeDirectory + '/Sites'
 	};
 
 	defaults.default_php_container = 'php' + defaults.default_php_version.replace(/\./g, '');
