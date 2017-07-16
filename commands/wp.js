@@ -1,6 +1,6 @@
-const config = require('../utils/config'),
-      environment = require('../utils/environment'),
-      utils = require('../utils/general');
+const commands = require('../utils/commands'),
+      config = require('../utils/config'),
+      environment = require('../utils/environment');
 
 const wpCommand = function(argv) {
 	const commandString = environment.subCommandArgs.join(' ');
@@ -16,7 +16,7 @@ const wpCommand = function(argv) {
 		phpContainer += '-xdebug';
 	}
 
-	utils.wpCommand(commandString, phpContainer);
+	commands.wpCommand(commandString, phpContainer);
 };
 
 exports.command = 'wp [command]';

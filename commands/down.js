@@ -1,7 +1,7 @@
-const utils = require('../utils/general');
+const commands = require('../utils/commands');
 
 const downCommand = function() {
-	utils.composeCommand(['stop']);
+	commands.composeCommand(['stop']);
 };
 
 exports.command = 'down';

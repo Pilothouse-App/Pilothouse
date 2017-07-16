@@ -1,11 +1,11 @@
-const mysqlUtils = require('../utils/mysql'),
-      utils = require('../utils/general');
+const commands = require('../utils/commands'),
+      run = require('../utils/run');
 
 const upCommand = function() {
-	utils.buildRunFiles();
-	utils.composeCommand(['up', '-d']);
-	mysqlUtils.waitForMysql();
-	mysqlUtils.mysqlCommand(
+	run.buildRunFiles();
+	commands.composeCommand(['up', '-d']);
+	run.waitForMysql();
+	commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"
 		+ " GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%';"
 		+ " FLUSH PRIVILEGES;"

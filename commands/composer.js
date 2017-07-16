@@ -1,6 +1,6 @@
-const config = require('../utils/config'),
-      environment = require('../utils/environment'),
-      utils = require('../utils/general');
+const commands = require('../utils/commands'),
+      config = require('../utils/config'),
+      environment = require('../utils/environment');
 
 const composerCommand = function(argv) {
 
@@ -26,7 +26,7 @@ const composerCommand = function(argv) {
 		shellCommand
 	];
 
-	utils.composeCommand(composeArgs);
+	commands.composeCommand(composeArgs);
 };
 
 exports.command = 'composer [command]';

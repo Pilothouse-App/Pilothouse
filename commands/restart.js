@@ -1,10 +1,10 @@
-const systemUp = require('./up'),
-      systemDown = require('./down'),
-      utils = require('../utils/general');
+const commands = require('../utils/commands'),
+      systemUp = require('./up'),
+      systemDown = require('./down');
 
 const restartCommand = function(argv) {
 	if (argv.container) {
-		utils.composeCommand(['restart', argv.container]);
+		commands.composeCommand(['restart', argv.container]);
 	} else {
 		systemDown.handler();
 		systemUp.handler();

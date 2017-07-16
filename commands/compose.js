@@ -1,8 +1,8 @@
-const environment = require('../utils/environment'),
-      utils = require('../utils/general');
+const commands = require('../utils/commands'),
+      environment = require('../utils/environment');
 
 const composeCommand = function(argv) {
-	utils.composeCommand(environment.subCommandArgs);
+	commands.composeCommand(environment.subCommandArgs);
 };
 
 exports.command = 'compose [command]';
