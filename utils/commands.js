@@ -1,5 +1,6 @@
 const config = require('./config'),
       environment = require('./environment'),
+      shellEscape = require('shell-escape'),
       spawn = require('child_process').spawnSync;
 
 module.exports = {
@@ -81,7 +82,7 @@ function wpCommand(commandString, container = null) {
 	if (currentSiteName) {
 		shellCommandString = 'cd /var/www/html/' + currentSiteName + '/' + environment.currentPathInSite
 			+ ' && wp --path=/var/www/html/' + currentSiteName + '/htdocs'
-			+ ' ' + commandString;
+			+ ' ' + shellEscape( commandString );
 
 	} else if ('--info' === commandString) {
 		shellCommandString = 'cd /var/www/html && wp --info';

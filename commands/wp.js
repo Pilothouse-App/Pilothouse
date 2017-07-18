@@ -3,8 +3,7 @@ const commands = require('../utils/commands'),
       environment = require('../utils/environment');
 
 const wpCommand = function(argv) {
-	const commandString = environment.subCommandArgs.join(' ');
-    let   phpContainer;
+    let phpContainer;
 
 	if (argv.php) {
 		phpContainer = 'php' + argv.php.toString().replace(/\./g, '');
@@ -16,7 +15,7 @@ const wpCommand = function(argv) {
 		phpContainer += '-xdebug';
 	}
 
-	commands.wpCommand(commandString, phpContainer);
+	commands.wpCommand(environment.subCommandArgs, phpContainer);
 };
 
 exports.command = 'wp [command]';
