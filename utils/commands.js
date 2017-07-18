@@ -68,7 +68,7 @@ function shellCommand(cwd, command, args, captureOutput = false) {
 /**
  * Runs a WP-CLI command in the specified container.
  *
- * @param {String} commandString The command to run.
+ * @param {Array}  commandString The command to run.
  * @param {String} container     The container in which to run the command. Will use the default PHP container if none is specified.
  */
 function wpCommand(commandString, container = null) {

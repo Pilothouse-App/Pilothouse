@@ -43,7 +43,9 @@ function getComposeVariables() {
 function getDefaultConfig() {
 	let defaults = {
 		default_php_version: '7.0',
-		sites_dir: environment.homeDirectory + '/Sites'
+		sites_dir: environment.homeDirectory + '/Sites',
+		wp_default_username: 'admin',
+		wp_default_password: 'password'
 	};
 
 	defaults.default_php_container = 'php' + defaults.default_php_version.replace(/\./g, '');

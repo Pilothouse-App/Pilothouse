@@ -1,11 +1,15 @@
-const config = require('./config'),
+const chalk = require('chalk'),
+      commands = require('./commands'),
+      config = require('./config'),
       environment = require('./environment'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
-      path = require('path');
+      path = require('path'),
+      request = require('sync-request');
 
 module.exports = {
-	compileSitesNginxConfig: compileSitesNginxConfig
+	compileSitesNginxConfig: compileSitesNginxConfig,
+	createSite: createSite
 };
 
 /**
@@ -65,6 +69,103 @@ function compileSitesNginxConfig() {
 	});
 
 	return nginxCompiledConfig;
+}
+
+/**
+ * Creates a new local site.
+ *
+ * @param {Object} siteConfig The site configuration data.
+ */
+function createSite(siteConfig) {
+
+	fs.ensureDirSync(path.join(config.sites_dir, siteConfig.name, 'htdocs'));
+
+	if ('php' !== siteConfig.type || siteConfig.create_database) {
+		commands.mysqlCommand('CREATE DATABASE IF NOT EXISTS `' + siteConfig.name + '`;');
+	}
+
+	environment.currentPathInSite = 'htdocs';
+	environment.currentSiteName = siteConfig.name;
+	environment.currentSiteRootDirectory = path.join(config.sites_dir, siteConfig.name);
+
+	if ('wordpress' === siteConfig.type) {
+
+		// Download WP core files.
+		commands.wpCommand([
+			'core',
+			'download'
+		]);
+
+		// Generate wp-config.php
+		commands.wpCommand([
+			'core',
+			'config',
+			'--dbhost=mysql',
+			'--dbname=' + siteConfig.name,
+			'--dbuser=pilothouse',
+			'--dbpass=pilothouse'
+		]);
+
+		// Install WordPress.
+		commands.wpCommand([
+			'core',
+			'install',
+			'--url=' + siteConfig.domain,
+			'--title=' + siteConfig.name,
+			'--admin_user=' + config.wp_default_username,
+			'--admin_password=' + config.wp_default_password,
+			'--admin_email=' + config.wp_default_username + '@' + siteConfig.domain,
+			'--skip-email'
+		]);
+
+		// Clone wp-content repo, if applicable.
+		if (siteConfig.wp_content_repo_url) {
+
+			commands.shellCommand(
+				path.join(environment.currentSiteRootDirectory, 'htdocs'),
+				'git',
+				['clone', siteConfig.wp_content_repo_url, 'wp-content.tmp'],
+				true
+			);
+
+			if (fs.existsSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content.tmp'))) {
+				fs.moveSync(
+					path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content.tmp'),
+					path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content'),
+					{overwrite: true}
+				);
+			} else {
+				console.log(chalk.red('Could not clone the Git repository for wp-content.'));
+			}
+		}
+
+		// Add object cache dropin.
+		const objectCacheDropinRequest = request(
+			'GET',
+			'https://raw.githubusercontent.com/pantheon-systems/wp-redis/master/object-cache.php'
+		);
+		const objectCacheContent = objectCacheDropinRequest.getBody().toString();
+		fs.writeFileSync(
+			path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content/object-cache.php'),
+			objectCacheContent
+		);
+
+		// Update wp-config.php with additional directives.
+		let wpConfigAdditionsFile = path.join(environment.appDirectory, '/config/wordpress/wp-config.php.inc');
+		if (fs.existsSync(path.join(environment.appHomeDirectory, 'config/wordpress/wp-config.php.inc'))) {
+			wpConfigAdditionsFile = path.join(environment.appHomeDirectory, 'config/wordpress/wp-config.php.inc');
+		}
+		let wpConfigAdditionsContent = fs.readFileSync(wpConfigAdditionsFile, 'UTF-8');
+		wpConfigAdditionsContent = helpers.populateTemplate(wpConfigAdditionsContent, {site_name: environment.currentSiteName});
+		let wpConfigContent = fs.readFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), 'UTF-8');
+		wpConfigContent = wpConfigContent.replace(/\n\n\/\* That's all/, wpConfigAdditionsContent + "\n\n/* That's all");
+		fs.writeFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), wpConfigContent);
+	}
+
+	// @todo resolve duplicated code in run.js
+	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
+
+	commands.composeCommand(['restart', 'nginx']);
 }
 
 /**

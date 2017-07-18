@@ -1,4 +1,5 @@
-const findUp = require('find-up'),
+const commandExists = require('command-exists').sync,
+      findUp = require('find-up'),
       path = require('path');
 
 module.exports = {
@@ -7,6 +8,7 @@ module.exports = {
 	currentPathInSite: getCurrentPathInSite(),
 	currentSiteName: getCurrentSiteName(),
 	currentSiteRootDirectory: getCurrentSiteRootDirectory(),
+	gitCommandExists: commandExists('git'),
 	homeDirectory: getHomeDirectory(),
 	runDirectory: getRunDirectory(),
 	subCommandArgs: getSubCommandArgs()

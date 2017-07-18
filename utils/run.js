@@ -43,6 +43,7 @@ function buildRunFiles() {
 	}
 
 	// Generate Nginx config
+	// @todo resolve duplicated code in sites.js
 	fs.outputFileSync(runDirectory + '/nginx-compiled-sites.conf', sites.compileSitesNginxConfig());
 }
 
