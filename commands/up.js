@@ -1,9 +1,10 @@
-const commands = require('../utils/commands'),
+const chalk = require('chalk'),
+      commands = require('../utils/commands'),
       figlet = require('figlet'),
       run = require('../utils/run');
 
 const upCommand = function() {
-	console.log(figlet.textSync('Pilothouse', {font: 'slant'}));
+	console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
 	run.buildRunFiles();
 	commands.composeCommand(['up', '-d']);
 	run.waitForMysql();

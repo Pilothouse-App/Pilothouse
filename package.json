@@ -9,6 +9,7 @@
     "pilothouse": "./bin/pilothouse.js"
   },
   "dependencies": {
+    "chalk": "^2.0.1",
     "figlet": "^1.2.0",
     "find-up": "^2.1.0",
     "fs-extra": "^3.0.1",
