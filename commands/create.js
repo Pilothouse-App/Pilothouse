@@ -1,4 +1,5 @@
-const config = require('../utils/config'),
+const chalk = require('chalk'),
+      config = require('../utils/config'),
       environment = require('../utils/environment'),
       fs = require('fs-extra'),
       inquirer = require('inquirer'),
@@ -39,6 +40,9 @@ const createCommand = function(argv) {
 				return validator.matches(answer, /[^A-Za-z0-9-._]/, 'g') ? 'Please enter a valid local site directory name.' : true;
 			}
 		});
+	} else if (fs.existsSync(path.join(config.sites_dir, argv.site))) {
+		console.log(chalk.red('The site directory "' + argv.site + '" already exists.'));
+		process.exit(1);
 	}
 
 	inquirer.prompt(basicQuestions).then(function(basicAnswers) {
