@@ -6,7 +6,7 @@ const config = require('../utils/config'),
       sites = require('../utils/sites'),
       validator = require('validator');
 
-const createCommand = function() {
+const createCommand = function(argv) {
 
 	const basicQuestions = [
 		{
@@ -19,8 +19,11 @@ const createCommand = function() {
 				{ name: 'WordPress', value: 'wordpress', short: 'WordPress' }
 			],
 			default: 'php'
-		},
-		{
+		}
+	];
+
+	if (!argv.site) {
+		basicQuestions.push({
 			name: 'name',
 			type: 'input',
 			message: 'Name of local site directory:',
@@ -35,10 +38,12 @@ const createCommand = function() {
 
 				return validator.matches(answer, /[^A-Za-z0-9-._]/, 'g') ? 'Please enter a valid local site directory name.' : true;
 			}
-		}
-	];
+		});
+	}
 
 	inquirer.prompt(basicQuestions).then(function(basicAnswers) {
+
+		const siteToCreate = argv.site || basicAnswers.name;
 
 		const domainQuestions = [
 			{
@@ -46,7 +51,7 @@ const createCommand = function() {
 				type: 'input',
 				message: 'Local domain name to use:',
 				default: function() {
-					return (basicAnswers.name + '.dev').replace('_', '-').toLowerCase();
+					return (siteToCreate + '.dev').replace('_', '-').toLowerCase();
 				},
 				validate: function(answer) {
 					if (validator.isEmpty(answer)) {
@@ -61,7 +66,7 @@ const createCommand = function() {
 
 			let config = {
 				domain: domainAnswers.domain,
-				name: basicAnswers.name,
+				name: siteToCreate,
 				type: basicAnswers.type
 			};
 
