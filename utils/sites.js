@@ -9,7 +9,9 @@ const chalk = require('chalk'),
 
 module.exports = {
 	compileSitesNginxConfig: compileSitesNginxConfig,
-	createSite: createSite
+	createSite: createSite,
+	deleteSite: deleteSite,
+	getSites: getSites
 };
 
 /**
@@ -166,6 +168,22 @@ function createSite(siteConfig) {
 	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
 
 	commands.composeCommand(['restart', 'nginx']);
+	console.log(chalk.green('Local site ' + siteConfig.name + ' at ' + siteConfig.domain + ' created.'));
+}
+
+/**
+ * Deletes a local site.
+ *
+ * @param site The site to delete.
+ */
+function deleteSite(site) {
+	fs.removeSync(path.join(config.sites_dir, site));
+
+	// @todo resolve duplicated code in run.js
+	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
+
+	commands.composeCommand(['restart', 'nginx']);
+	console.log(chalk.green('Local site ' + site + ' deleted.'));
 }
 
 /**
