@@ -1,10 +1,27 @@
 {
   "name": "pilothouse",
-  "version": "1.0.0",
-  "description": "A lightweight command-line app for managing a Docker-based local development environment",
-  "author": "Philip Newcomer <contact@philipnewcomer.net> (http://philipnewcomer.net)",
+  "version": "0.1.0",
+  "description": "A lightweight command-line app for managing a Docker-based LEMP local development environment",
+  "author": {
+    "name": "Philip Newcomer",
+    "email": "contact@philipnewcomer.net",
+    "url": "http://philipnewcomer.net"
+  },
+  "bugs": "https://github.com/Pilothouse-App/pilothouse/issues",
+  "homepage": "http://pilothouse-app.org",
+  "keywords": [
+    "composer",
+    "docker",
+    "laravel",
+    "lemp",
+    "local",
+    "mysql",
+    "nginx",
+    "php",
+    "wordpress"
+  ],
   "license": "GPL-2.0",
-  "preferGlobal": true,
+  "repository": "https://github.com/Pilothouse-App/pilothouse",
   "bin": {
     "pilothouse": "./bin/pilothouse.js",
     "composer": "./bin/composer",
