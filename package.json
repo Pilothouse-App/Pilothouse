@@ -6,7 +6,9 @@
   "license": "GPL-2.0",
   "preferGlobal": true,
   "bin": {
-    "pilothouse": "./bin/pilothouse.js"
+    "pilothouse": "./bin/pilothouse.js",
+    "composer": "./bin/composer",
+    "wp": "./bin/wp"
   },
   "scripts": {
     "hostile": "hostile"
