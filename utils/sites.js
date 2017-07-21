@@ -70,7 +70,16 @@ function createSite(siteConfig) {
 	environment.currentSiteName = siteConfig.name;
 	environment.currentSiteRootDirectory = path.join(config.sites_dir, siteConfig.name);
 
-	if ('wordpress' === siteConfig.type) {
+	if ('laravel' === siteConfig.type) {
+
+		commands.shellCommand(environment.currentSiteRootDirectory, 'composer', [
+			'create-project',
+			'--prefer-dist',
+			'laravel/laravel',
+			'htdocs'
+		]);
+
+	} else if ('wordpress' === siteConfig.type) {
 
 		// Download WP core files.
 		commands.wpCommand([
@@ -106,8 +115,7 @@ function createSite(siteConfig) {
 			commands.shellCommand(
 				path.join(environment.currentSiteRootDirectory, 'htdocs'),
 				'git',
-				['clone', siteConfig.wp_content_repo_url, 'wp-content.tmp'],
-				true
+				['clone', siteConfig.wp_content_repo_url, 'wp-content.tmp']
 			);
 
 			if (fs.existsSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content.tmp'))) {
