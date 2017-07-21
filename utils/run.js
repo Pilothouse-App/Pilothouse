@@ -95,6 +95,6 @@ function waitForMysql() {
 	}
 
 	if (iteration >= 4) {
-		console.info('done.');
+		console.info('Mysql is ready.');
 	}
 }
