@@ -1,6 +1,12 @@
-const commandExists = require('command-exists').sync,
+const chalk = require('chalk'),
+      commandExists = require('command-exists').sync,
       findUp = require('find-up'),
       path = require('path');
+
+if (!commandExists('docker-compose')) {
+	console.log(chalk.red('Docker Compose does not appear to be installed. Please install Docker and rerun Pilothouse.'));
+	process.exit(1);
+}
 
 module.exports = {
 	appDirectory: getAppDirectory(),
