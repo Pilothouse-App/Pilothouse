@@ -11,7 +11,8 @@ module.exports = {
 	compileSitesNginxConfig: compileSitesNginxConfig,
 	createSite: createSite,
 	deleteSite: deleteSite,
-	getSites: getSites
+	getHosts: getHosts,
+	getSites: getSites,
 };
 
 /**
@@ -38,7 +39,6 @@ function buildNginxConfigForSite(site) {
 	const templateVars = {
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
-		ssl_config: "\t# SSL not configured for site",
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
 	};
 
@@ -46,12 +46,6 @@ function buildNginxConfigForSite(site) {
 	if (siteSettings.wp_uploads_proxy_url) {
 		const wpUploadsProxyTemplate = fs.readFileSync(path.join(environment.appDirectory, '/templates/nginx/wp-uploads-proxy.conf'), 'UTF-8');
 		templateVars.wp_uploads_proxy_config = helpers.populateTemplate(wpUploadsProxyTemplate, {wp_uploads_proxy_url: siteSettings.wp_uploads_proxy_url});
-	}
-
-	// Add SSL configuration if applicable.
-	if (fs.existsSync(path.join(config.sites_dir, site, site + '.cert')) && fs.existsSync(path.join(config.sites_dir, site, site + '.key'))) {
-		const sslConfigTemplate = fs.readFileSync(path.join(environment.appDirectory, '/templates/nginx/ssl-config.conf'), 'UTF-8');
-		templateVars.ssl_config = helpers.populateTemplate(sslConfigTemplate, {site_name: site});
 	}
 
 	return helpers.populateTemplate(templateData, templateVars);
@@ -167,6 +161,7 @@ function createSite(siteConfig) {
 	// @todo resolve duplicated code in run.js
 	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
 
+	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + siteConfig.name + ' at ' + siteConfig.domain + ' created.'));
 }
@@ -182,8 +177,23 @@ function deleteSite(site) {
 	// @todo resolve duplicated code in run.js
 	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
 
+	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + site + ' deleted.'));
+}
+
+/**
+ * Builds a list of all valid local hostnames.
+ *
+ * @returns {Array}
+ */
+function getHosts() {
+	let hosts = [];
+	getSites().forEach(function(site) {
+		const siteSettings = getSiteSettings(site);
+		hosts = hosts.concat(siteSettings.hosts);
+	});
+	return hosts;
 }
 
 /**

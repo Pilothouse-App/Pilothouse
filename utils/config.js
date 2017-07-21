@@ -22,6 +22,8 @@ function getComposeVariables() {
 	const appDirectory = environment.appDirectory;
 
 	return {
+		'HTTPS_CERTIFICATE_CERT': environment.httpsCertificateCertPath,
+		'HTTPS_CERTIFICATE_KEY': environment.httpsCertificateKeyPath,
 		'MYSQL_CONFIG_FILE': appDirectory + '/config/mysql/mysql.conf',
 		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
 		'NGINX_CONFIG_FILE': appDirectory + '/config/nginx/nginx.conf',

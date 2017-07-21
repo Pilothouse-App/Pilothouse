@@ -1,11 +1,14 @@
 const config = require('./config'),
       environment = require('./environment'),
+      fs = require('fs-extra'),
+      selfsigned = require('selfsigned'),
       shellEscape = require('shell-escape'),
       spawn = require('child_process').spawnSync;
 
 module.exports = {
 	composeCommand: composeCommand,
 	mysqlCommand: mysqlCommand,
+	regenerateHTTPSCertificate: regenerateHTTPSCertificate,
 	shellCommand: shellCommand,
 	wpCommand: wpCommand
 };
@@ -41,6 +44,66 @@ function mysqlCommand(sql) {
 		'--password=root',
 		'-e',
 		sql
+	]);
+}
+
+/**
+ * Regenerates the HTTPS certificate.
+ *
+ * @param {Array} hosts The hosts to include in the certificate.
+ */
+function regenerateHTTPSCertificate(hosts = []) {
+
+	shellCommand(environment.appHomeDirectory, 'sudo', [
+		'security',
+		'delete-certificate',
+		'-c', 'pilothouse.dev',
+		'/Library/Keychains/System.keychain'
+	]);
+
+	let altNames = [];
+	hosts.forEach(function(host) {
+		altNames.push({
+			type: 2,
+			value: host
+		});
+	});
+
+	const attrs = [
+		{
+			name: 'commonName',
+			value: 'pilothouse.dev'
+		}
+	];
+
+	const options = {
+		algorithm: 'sha256',
+		days: 3650,
+		extensions: [
+			{
+				name: 'basicConstraints',
+				cA: true
+			},
+			{
+				name: 'subjectAltName',
+				altNames: altNames
+			}
+		],
+		keySize: 2048
+	};
+
+	const pems = selfsigned.generate(attrs, options);
+
+	fs.writeFileSync(environment.httpsCertificateCertPath, pems.cert);
+	fs.writeFileSync(environment.httpsCertificateKeyPath, pems.private);
+
+	shellCommand(environment.appHomeDirectory, 'sudo', [
+		'security',
+		'add-trusted-cert',
+		'-d',
+		'-r', 'trustRoot',
+		'-k', '/Library/Keychains/System.keychain',
+		environment.httpsCertificateCertPath
 	]);
 }
 

@@ -8,6 +8,8 @@ module.exports = {
 	currentPathInSite: getCurrentPathInSite(),
 	currentSiteName: getCurrentSiteName(),
 	currentSiteRootDirectory: getCurrentSiteRootDirectory(),
+	httpsCertificateCertPath: getHTTPSCertificateCertPath(),
+	httpsCertificateKeyPath: getHTTPSCertificateKeyPath(),
 	gitCommandExists: commandExists('git'),
 	homeDirectory: getHomeDirectory(),
 	runDirectory: getRunDirectory(),
@@ -92,6 +94,24 @@ function getCurrentSiteRootDirectory() {
  */
 function getHomeDirectory() {
 	return process.env.APPDATA || process.env.HOME;
+}
+
+/**
+ * Gets the HTTPS certificate cert path.
+ *
+ * @returns {String}
+ */
+function getHTTPSCertificateCertPath() {
+	return path.join(getAppHomeDirectory(), 'https-certificate.cert');
+}
+
+/**
+ * Gets the HTTPS certificate key path.
+ *
+ * @returns {String}
+ */
+function getHTTPSCertificateKeyPath() {
+	return path.join(getAppHomeDirectory(), 'https-certificate.key');
 }
 
 /**

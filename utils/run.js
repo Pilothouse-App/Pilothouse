@@ -45,6 +45,12 @@ function buildRunFiles() {
 	// Generate Nginx config
 	// @todo resolve duplicated code in sites.js
 	fs.outputFileSync(runDirectory + '/nginx-compiled-sites.conf', sites.compileSitesNginxConfig());
+
+	// Generate the HTTPS certificate if it does not exist.
+	if (!fs.existsSync(environment.httpsCertificateCertPath) || !fs.existsSync(environment.httpsCertificateKeyPath)) {
+		console.log('Generating global SSL certificate...');
+		commands.regenerateHTTPSCertificate(sites.getHosts());
+	}
 }
 
 /**
