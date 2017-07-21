@@ -9,7 +9,7 @@ services:
   mysql:
     environment:
       MYSQL_ROOT_PASSWORD: root
-    image: mariadb:10.1
+    image: mariadb:latest
     ports:
       - 3306:3306
     volumes:
@@ -17,7 +17,7 @@ services:
       - "mysqldata:/var/lib/mysql"
 
   nginx:
-    image: nginx:1.11-alpine
+    image: nginx:mainline-alpine
     ports:
       - 80:80
       - 443:443
