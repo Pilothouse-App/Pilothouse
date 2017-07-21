@@ -167,6 +167,7 @@ function createSite(siteConfig) {
 function deleteSite(site) {
 	fs.removeSync(path.join(config.sites_dir, site));
 	updateSitesNginxConfig();
+	commands.mysqlCommand('DROP DATABASE IF EXISTS `' + site + '`;');
 
 	getSiteSettings(site).hosts.forEach(function(host) {
 		hostsRemoveOne(host);
