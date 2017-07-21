@@ -1,49 +1,73 @@
-# Pilothouse App
+# Pilothouse
 
-An open-source local LEMP development stack using Docker. Comes with a set of Bash scripts for starting and stopping the stack, creating and deleting WordPress installs, keeping the hosts file updated, and running WP-CLI commands, among other useful features.
+*A LEMP local development environment based on Docker.*
 
-Pilothouse supports multiple local sites, Xdebug, multiple versions of PHP, and running WP-CLI commands directly from the host. Pilothouse is tailored to WordPress projects, but can be used for general PHP projects as well.
+Pilothouse is a command line app that automates the process of managing a complete Docker-based local development environment.
 
-### What's Inside
+Pilothouse is completely free and open source, and features:
+ * Unlimited local sites
+ * Laravel and WordPress support built-in
+ * Seamless Composer and WP-CLI integration
+ * Multiple PHP versions, configurable on a per-site basis
+ * Automated hosts file management
+ * SSL automatically available for all local sites
+ * Remote PHP debugging using Xdebug
+
+...and much more!
+
+## What's Inside
 
 - Nginx
 - PHP 5.6, 7.0, and 7.1
 - MariaDB
-- Memcached
+- Redis
 - Xdebug
+- Composer
 - WP-CLI
 - MailCatcher
 
-### Quick Start
+## Getting Started
 
-1. Install [Docker](https://www.docker.com/products/docker#/mac).
-2. Once installed, open Docker on your computer and run through the initial configuration settings.
-3. Clone the repo to your computer.
-4. Run `composer install`.
-5. Add the `bin` path in the repo to your shell include path ([more info](https://github.com/Pilothouse-App/pilothouse/wiki/Shell-Include-Path-Configuration)).
-6. Run `pilothouse up` to build the containers and boot up the system. *On the first run, this will take quite a while as the Docker containers are downloaded and built.*
-7. Create a new site by running `pilothouse create`.
+Pilothouse is a NodeJS script which manages a Docker-based stack. Thus, you will need to have [Docker Community Edition](https://www.docker.com/community-edition) and [NodeJS](https://nodejs.org/) installed. If you're a web developer, there's a pretty good chance you already have Node.
 
-### Notes
+Once you have Docker and Node on your system, install Pilothouse with:
 
-- See the [Wiki](https://github.com/Pilothouse-App/pilothouse/wiki) for instructions on using [WP-CLI](https://github.com/Pilothouse-App/pilothouse/wiki/Using-WP-CLI), [Xdebug](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Xdebug), [Mailcatcher](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Mailcatcher), etc.
-- Local WordPress sites are located in the `sites` directory. [This can be changed](https://github.com/Pilothouse-App/pilothouse/wiki/Changing-the-Location-of-the-%22sites%22-Directory).
-- The default WordPress username and password is `admin`/`password`.
-- The Bash scripts have only been tested on macOS; your mileage on other OSes will vary.
-- The master branch should be relatively stable, except for major releases. The develop branch should be considered "beta" and is subject to non-backwards-compatible changes.
+```
+npm install -g pilothouse
+```
+Then, start up the system using `pilothouse up`. The first time you start Pilothouse, your system will need to download the Docker containers, which may take quite a while, depending on the speed of your internet connection.
 
-### Commands
+Once initial startup is complete, create a new local site by running `pilothouse create`.
+
+Local sites are by default located in the `Sites` directory of your user home directory, but you can [use a different location](https://github.com/Pilothouse-App/pilothouse/wiki/Changing-the-Location-of-the-%22sites%22-Directory) if you prefer.
+
+See below for the full list of available commands, and be sure to take a look at the [Wiki](https://github.com/Pilothouse-App/pilothouse/wiki) for advanced usage.
+
+## Commands
+
+*Run `pilothouse --help` for inline usage instructions at any time.*
+
+### System Commands
 
 - `pilothouse up`: Boots up the Docker containers, and adds all necessary site entries to the host's hosts file.
 - `pilothouse down`: Halts the Docker containers, removing all site entries from the host's hosts file.
 - `pilothouse restart [container]`: Restarts the specified Docker container (`nginx`, `memcached`, etc.), or the entire system if no container is specified.
+
+### Site Commands
 - `pilothouse create [site]`: Creates a new local site.
 - `pilothouse delete [site]`: Deletes an existing local site.
-- `pilothouse generate-ssl [site]`: Generates, installs, and trusts a self-signed SSL certificate for the specified site.
-- `pilothouse mysql [command]`: Runs the provided MySQL command. The command will be run on the database of the current site, or with no database selected if not run from within a site directory.
-- `pilothouse wp [command]`: Runs a WP-CLI command in the Docker container against the current site.
-- `pilothouse compose [command]`: Runs a `docker-compose` command with required environment variables set.
 
-### License
+### Utility Commands
+- `pilothouse compose [command]`: Runs a [Docker Compose](https://docs.docker.com/compose/) command against the stack.
+- `pilothouse logs [container]`: Tails the logs for the specified container, or the entire stack if no container is specified.
+- `pilothouse mysql [query]`: Runs the provided MySQL query. The command will be run on the database of the current site, or with no database selected if not run from within a local site directory.
 
-Pilothouse is open source software licensed under the GPLv2. Pilothouse is authored by [Philip Newcomer](https://github.com/philipnewcomer), along with help from [these awesome contributors](https://github.com/Pilothouse-App/pilothouse/graphs/contributors).
+## Notes
+
+- See the [Wiki](https://github.com/Pilothouse-App/pilothouse/wiki) for instructions on using [WP-CLI](https://github.com/Pilothouse-App/pilothouse/wiki/Using-WP-CLI), [Xdebug](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Xdebug), [Mailcatcher](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Mailcatcher), etc.
+- You can connect to MySQL remotely using the host `127.0.0.1`, the username `pilothouse`, and the password `pilothouse`.
+- The default WordPress username and password is `admin`/`password`.
+
+## Meta
+
+Pilothouse is open source software licensed under the GPLv2. Pilothouse was created and is maintained by [Philip Newcomer](https://philipnewcomer.net). Props to [these awesome contributors](https://github.com/Pilothouse-App/pilothouse/graphs/contributors)!
