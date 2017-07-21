@@ -1,7 +1,9 @@
-const commands = require('../utils/commands');
+const commands = require('../utils/commands'),
+      sites = require('../utils/sites');
 
 const downCommand = function() {
 	commands.composeCommand(['stop']);
+	sites.hostsRemoveAll();
 };
 
 exports.command = 'down';

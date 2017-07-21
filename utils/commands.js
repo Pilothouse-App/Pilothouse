@@ -60,6 +60,7 @@ function regenerateHTTPSCertificate(hosts = []) {
 		'-c', 'pilothouse.dev',
 		'/Library/Keychains/System.keychain'
 	]);
+	hosts.unshift('localhost');
 
 	let altNames = [];
 	hosts.forEach(function(host) {

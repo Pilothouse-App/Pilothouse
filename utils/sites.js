@@ -12,6 +12,8 @@ module.exports = {
 	deleteSite: deleteSite,
 	getHosts: getHosts,
 	getSites: getSites,
+	hostsAllAdd: hostsAddAll,
+	hostsRemoveAll: hostsRemoveAll,
 	updateSitesNginxConfig: updateSitesNginxConfig
 };
 
@@ -142,6 +144,7 @@ function createSite(siteConfig) {
 		fs.writeFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), wpConfigContent);
 	}
 
+	hostsAddOne(siteConfig.domain);
 	updateSitesNginxConfig();
 	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
@@ -156,6 +159,11 @@ function createSite(siteConfig) {
 function deleteSite(site) {
 	fs.removeSync(path.join(config.sites_dir, site));
 	updateSitesNginxConfig();
+
+	getSiteSettings(site).hosts.forEach(function(host) {
+		hostsRemoveOne(host);
+	});
+
 	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + site + ' deleted.'));
@@ -207,6 +215,59 @@ function getSiteSettings(site) {
 	}
 
 	return helpers.readYamlConfig(configFile, defaults);
+}
+
+/**
+ * Adds all local site hostnames to the hosts file.
+ */
+function hostsAddAll() {
+	commands.shellCommand(environment.appDirectory, 'sudo', [
+		'npm',
+		'run',
+		'hostile',
+		'load',
+		environment.runDirectory + '/hosts.txt'
+	], true);
+}
+
+/**
+ * Adds one local site hostname to the hosts file.
+ */
+function hostsAddOne(host) {
+	commands.shellCommand(environment.appDirectory, 'sudo', [
+		'npm',
+		'run',
+		'hostile',
+		'set',
+		'127.0.0.1',
+		host
+	], true);
+}
+
+/**
+ * Removes all local site hostnames from the hosts file.
+ */
+function hostsRemoveAll() {
+	commands.shellCommand(environment.appDirectory, 'sudo', [
+		'npm',
+		'run',
+		'hostile',
+		'unload',
+		environment.runDirectory + '/hosts.txt'
+	], true);
+}
+
+/**
+ * Removes one local site hostname to the hosts file.
+ */
+function hostsRemoveOne(host) {
+	commands.shellCommand(environment.appDirectory, 'sudo', [
+		'npm',
+		'run',
+		'hostile',
+		'remove',
+		host
+	], true);
 }
 
 /**

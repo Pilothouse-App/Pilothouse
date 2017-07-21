@@ -1,11 +1,13 @@
 const chalk = require('chalk'),
       commands = require('../utils/commands'),
       figlet = require('figlet'),
-      run = require('../utils/run');
+      run = require('../utils/run'),
+      sites = require('../utils/sites');
 
 const upCommand = function() {
 	console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
 	run.buildRunFiles();
+	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d']);
 	run.waitForMysql();
 	commands.mysqlCommand(

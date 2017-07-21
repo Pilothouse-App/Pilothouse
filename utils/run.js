@@ -16,8 +16,9 @@ module.exports = {
  */
 function buildRunFiles() {
 	const appDirectory = environment.appDirectory,
-		appHomeDirectory = environment.appHomeDirectory,
-		runDirectory = environment.runDirectory;
+	      appHomeDirectory = environment.appHomeDirectory,
+	      hosts = sites.getHosts(),
+	      runDirectory = environment.runDirectory;
 
 	// Create directories if they do not already exist.
 	fs.ensureDirSync(appHomeDirectory);
@@ -45,10 +46,17 @@ function buildRunFiles() {
 	// Update Nginx config.
 	sites.updateSitesNginxConfig();
 
+	// Generate hosts.
+	let hostsContent = '';
+	hosts.forEach(function(host) {
+		hostsContent += '127.0.0.1 ' + host + "\n";
+	});
+	fs.outputFileSync(environment.runDirectory + '/hosts.txt', hostsContent);
+
 	// Generate the HTTPS certificate if it does not exist.
 	if (!fs.existsSync(environment.httpsCertificateCertPath) || !fs.existsSync(environment.httpsCertificateKeyPath)) {
 		console.log('Generating global SSL certificate...');
-		commands.regenerateHTTPSCertificate(sites.getHosts());
+		commands.regenerateHTTPSCertificate(hosts);
 	}
 }
 
