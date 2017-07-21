@@ -141,9 +141,9 @@ function createSite(siteConfig) {
 		);
 
 		// Update wp-config.php with additional directives.
-		let wpConfigAdditionsFile = path.join(environment.appDirectory, '/config/wordpress/wp-config.php.inc');
-		if (fs.existsSync(path.join(environment.appHomeDirectory, 'config/wordpress/wp-config.php.inc'))) {
-			wpConfigAdditionsFile = path.join(environment.appHomeDirectory, 'config/wordpress/wp-config.php.inc');
+		let wpConfigAdditionsFile = path.join(environment.appDirectory, 'config/wp-config.php.inc');
+		if (fs.existsSync(path.join(environment.appHomeDirectory, 'wp-config.php.inc'))) {
+			wpConfigAdditionsFile = path.join(environment.appHomeDirectory, 'wp-config.php.inc');
 		}
 		let wpConfigAdditionsContent = fs.readFileSync(wpConfigAdditionsFile, 'UTF-8');
 		wpConfigAdditionsContent = helpers.populateTemplate(wpConfigAdditionsContent, {site_name: environment.currentSiteName});
