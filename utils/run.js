@@ -42,9 +42,8 @@ function buildRunFiles() {
 		fs.copySync(dockerComposeOverrideFile, environment.runDirectory + '/docker-compose.override.yml');
 	}
 
-	// Generate Nginx config
-	// @todo resolve duplicated code in sites.js
-	fs.outputFileSync(runDirectory + '/nginx-compiled-sites.conf', sites.compileSitesNginxConfig());
+	// Update Nginx config.
+	sites.updateSitesNginxConfig();
 
 	// Generate the HTTPS certificate if it does not exist.
 	if (!fs.existsSync(environment.httpsCertificateCertPath) || !fs.existsSync(environment.httpsCertificateKeyPath)) {

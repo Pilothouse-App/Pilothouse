@@ -8,11 +8,11 @@ const chalk = require('chalk'),
       request = require('sync-request');
 
 module.exports = {
-	compileSitesNginxConfig: compileSitesNginxConfig,
 	createSite: createSite,
 	deleteSite: deleteSite,
 	getHosts: getHosts,
 	getSites: getSites,
+	updateSitesNginxConfig: updateSitesNginxConfig
 };
 
 /**
@@ -49,22 +49,6 @@ function buildNginxConfigForSite(site) {
 	}
 
 	return helpers.populateTemplate(templateData, templateVars);
-}
-
-/**
- * Compiles the aggregated sites Nginx configuration.
- *
- * @returns {String}
- */
-function compileSitesNginxConfig() {
-	const sites = getSites();
-	let nginxCompiledConfig = '';
-
-	sites.forEach(function(site) {
-		nginxCompiledConfig += buildNginxConfigForSite(site) + "\n";
-	});
-
-	return nginxCompiledConfig;
 }
 
 /**
@@ -158,9 +142,7 @@ function createSite(siteConfig) {
 		fs.writeFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), wpConfigContent);
 	}
 
-	// @todo resolve duplicated code in run.js
-	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
-
+	updateSitesNginxConfig();
 	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + siteConfig.name + ' at ' + siteConfig.domain + ' created.'));
@@ -173,10 +155,7 @@ function createSite(siteConfig) {
  */
 function deleteSite(site) {
 	fs.removeSync(path.join(config.sites_dir, site));
-
-	// @todo resolve duplicated code in run.js
-	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', compileSitesNginxConfig());
-
+	updateSitesNginxConfig();
 	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + site + ' deleted.'));
@@ -251,4 +230,18 @@ function isValidSite(item) {
 	}
 
 	return true;
+}
+
+/**
+ * Compiles and updates the aggregated sites Nginx configuration.
+ */
+function updateSitesNginxConfig() {
+	const sites = getSites();
+	let nginxCompiledConfig = '';
+
+	sites.forEach(function(site) {
+		nginxCompiledConfig += buildNginxConfigForSite(site) + "\n";
+	});
+
+	fs.outputFileSync(environment.runDirectory + '/nginx-compiled-sites.conf', nginxCompiledConfig);
 }
