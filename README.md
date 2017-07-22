@@ -39,7 +39,7 @@ Then, start up the system using `pilothouse up`. The first time you start Piloth
 
 Once initial startup is complete, create a new local site by running `pilothouse create`.
 
-Local sites are by default located in the `Sites` directory of your user home directory, but you can [use a different location](https://github.com/Pilothouse-App/pilothouse/wiki/Changing-the-Location-of-the-%22sites%22-Directory) if you prefer.
+Local sites are by default located in the `Sites` directory of your user home directory, but you can [use a different location](https://github.com/Pilothouse-App/pilothouse/wiki/Configuring-Pilothouse-Settings) if you prefer.
 
 See below for the full list of available commands, and be sure to take a look at the [Wiki](https://github.com/Pilothouse-App/pilothouse/wiki) for advanced usage.
 
