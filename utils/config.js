@@ -6,9 +6,9 @@ const environment = require('./environment'),
 let config = helpers.readYamlConfig(environment.appHomeDirectory + '/config.yml', getDefaultConfig());
 config.composeVariables = getComposeVariables();
 
-fs.ensureDirSync(config.sites_dir);
-if (!fs.existsSync(config.sites_dir)) {
-	console.error('The sites directory ' + config.sites_dir + ' does not exist. Please create it before starting Pilothouse.');
+fs.ensureDirSync(config.sites_directory);
+if (!fs.existsSync(config.sites_directory)) {
+	console.error('The sites directory ' + config.sites_directory + ' does not exist. Please create it before starting Pilothouse.');
 	process.exit(1);
 }
 
@@ -30,7 +30,7 @@ function getComposeVariables() {
 		'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
 		'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
 		'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
-		'SITES_DIR': config.sites_dir,
+		'SITES_DIRECTORY': config.sites_directory,
 		'SSMTP_CONFIG_FILE': getConfigFilePath('ssmtp.conf')
 	}
 }
@@ -61,7 +61,7 @@ function getConfigFilePath(filename) {
 function getDefaultConfig() {
 	let defaults = {
 		default_php_version: '7.0',
-		sites_dir: environment.homeDirectory + '/Sites',
+		sites_directory: environment.homeDirectory + '/Sites',
 		wp_default_username: 'admin',
 		wp_default_password: 'password'
 	};

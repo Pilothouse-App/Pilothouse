@@ -33,14 +33,14 @@ const createCommand = function(argv) {
 					return false;
 				}
 
-				if (fs.existsSync(path.join(config.sites_dir, answer))) {
+				if (fs.existsSync(path.join(config.sites_directory, answer))) {
 					return 'The site directory "' + answer + '" already exists.';
 				}
 
 				return validator.matches(answer, /[^A-Za-z0-9-._]/, 'g') ? 'Please enter a valid local site directory name.' : true;
 			}
 		});
-	} else if (fs.existsSync(path.join(config.sites_dir, argv.site))) {
+	} else if (fs.existsSync(path.join(config.sites_directory, argv.site))) {
 		console.log(chalk.red('The site directory "' + argv.site + '" already exists.'));
 		process.exit(1);
 	}

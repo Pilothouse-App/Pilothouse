@@ -28,7 +28,7 @@ function buildNginxConfigForSite(site) {
 
 	// Check for nginx.conf override file in the site directory; if it exists, use it instead of programmatically
 	// generating one.
-	const nginxOverrideFile = path.join(config.sites_dir, site, 'nginx.conf');
+	const nginxOverrideFile = path.join(config.sites_directory, site, 'nginx.conf');
 	if (fs.existsSync(nginxOverrideFile)) {
 		return fs.readFileSync(nginxOverrideFile, 'UTF-8');
 	}
@@ -60,7 +60,7 @@ function buildNginxConfigForSite(site) {
  */
 function createSite(siteConfig) {
 
-	fs.ensureDirSync(path.join(config.sites_dir, siteConfig.name, 'htdocs'));
+	fs.ensureDirSync(path.join(config.sites_directory, siteConfig.name, 'htdocs'));
 
 	if ('php' !== siteConfig.type || siteConfig.create_database) {
 		commands.mysqlCommand('CREATE DATABASE IF NOT EXISTS `' + siteConfig.name + '`;');
@@ -68,7 +68,7 @@ function createSite(siteConfig) {
 
 	environment.currentPathInSite = 'htdocs';
 	environment.currentSiteName = siteConfig.name;
-	environment.currentSiteRootDirectory = path.join(config.sites_dir, siteConfig.name);
+	environment.currentSiteRootDirectory = path.join(config.sites_directory, siteConfig.name);
 
 	if ('laravel' === siteConfig.type) {
 
@@ -165,7 +165,7 @@ function createSite(siteConfig) {
  * @param site The site to delete.
  */
 function deleteSite(site) {
-	fs.removeSync(path.join(config.sites_dir, site));
+	fs.removeSync(path.join(config.sites_directory, site));
 	updateSitesNginxConfig();
 	commands.mysqlCommand('DROP DATABASE IF EXISTS `' + site + '`;');
 
@@ -198,7 +198,7 @@ function getHosts() {
  * @returns {Array}
  */
 function getSites() {
-	return fs.readdirSync(config.sites_dir).filter(isValidSite);
+	return fs.readdirSync(config.sites_directory).filter(isValidSite);
 }
 
 /**
@@ -209,17 +209,17 @@ function getSites() {
  * @returns {Object}
  */
 function getSiteSettings(site) {
-	const configFile = path.join(config.sites_dir, site, 'config.yml');
+	const configFile = path.join(config.sites_directory, site, 'config.yml');
 	const defaults = {
 		hosts: [site + '.dev'],
 		type: 'php',
 		wp_uploads_proxy_url: null,
 	};
 
-	if (fs.existsSync(path.join(config.sites_dir, site, 'htdocs/artisan'))) {
+	if (fs.existsSync(path.join(config.sites_directory, site, 'htdocs/artisan'))) {
 		defaults.type = 'laravel';
 	}
-	else if (fs.existsSync(path.join(config.sites_dir, site, 'htdocs/wp-config.php'))) {
+	else if (fs.existsSync(path.join(config.sites_directory, site, 'htdocs/wp-config.php'))) {
 		defaults.type = 'wordpress';
 	}
 
@@ -287,7 +287,7 @@ function hostsRemoveOne(host) {
  * @returns {Boolean}
  */
 function isValidSite(item) {
-	const fullPath = path.join(config.sites_dir, item);
+	const fullPath = path.join(config.sites_directory, item);
 
 	// Return false if this is not a directory.
 	if (!fs.lstatSync(fullPath).isDirectory()) {
