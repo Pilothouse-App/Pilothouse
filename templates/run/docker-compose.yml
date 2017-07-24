@@ -67,6 +67,16 @@ services:
     extends:
       service: php56
 
+  phpmyadmin:
+    environment:
+      - PMA_HOST=mysql
+      - MYSQL_ROOT_PASSWORD=root
+      - PMA_USER=pilothouse
+      - PMA_PASSWORD=pilothouse
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - 8080:80
+
   redis:
     image: redis:3-alpine
     ports:

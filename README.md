@@ -20,6 +20,7 @@ Pilothouse is completely free and open source, and features:
 - Nginx
 - PHP 5.6, 7.0, and 7.1
 - MariaDB
+- phpMyAdmin
 - Redis
 - Xdebug
 - Composer
@@ -66,6 +67,7 @@ See below for the full list of available commands, and be sure to take a look at
 ## Notes
 
 - See the [Wiki](https://github.com/Pilothouse-App/pilothouse/wiki) for instructions on using [WP-CLI](https://github.com/Pilothouse-App/pilothouse/wiki/Using-WP-CLI), [Xdebug](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Xdebug), [Mailcatcher](https://github.com/Pilothouse-App/pilothouse/wiki/Using-Mailcatcher), etc.
+- phpMyAdmin is accessible at http://localhost:8080/.
 - You can connect to MySQL remotely using the host `127.0.0.1`, the username `pilothouse`, and the password `pilothouse`.
 - The default WordPress username and password is `admin`/`password`.
 
