@@ -31,6 +31,9 @@ function buildRunFiles() {
 	// Copy .env
 	fs.copySync(appDirectory + '/templates/run/.env', runDirectory + '/.env');
 
+	// Copy config files
+	fs.copySync(appDirectory + '/config', runDirectory + '/config');
+
 	// Generate docker-compose.yml
 	const composeTemplate = appDirectory + '/templates/run/docker-compose.yml';
 	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');

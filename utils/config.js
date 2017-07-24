@@ -50,7 +50,7 @@ function getConfigFilePath(filename) {
 		return path.join(environment.appHomeDirectory, filename);
 	}
 
-	return path.join(environment.appDirectory, 'config', filename);
+	return path.join(environment.runDirectory, 'config', filename);
 }
 
 /**
