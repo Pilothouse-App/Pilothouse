@@ -85,9 +85,9 @@ function waitForMysql() {
 			console.info('Waiting for MySQL...');
 		}
 
-		if (iteration >= 60) {
+		if (iteration >= 30) {
 			console.error('Error: MySQL could not be started.');
-			exit(1);
+			process.exit(1);
 		}
 
 		sleep(1000);
