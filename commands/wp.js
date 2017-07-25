@@ -1,14 +1,16 @@
 const commands = require('../utils/commands'),
       config = require('../utils/config'),
-      environment = require('../utils/environment');
+      environment = require('../utils/environment'),
+      sites = require('../utils/sites');
 
 const wpCommand = function(argv) {
+	const siteSettings = sites.getSiteSettings(environment.currentSiteName);
     let phpContainer;
 
 	if (argv.php) {
 		phpContainer = 'php' + argv.php.toString().replace(/\./g, '');
 	} else {
-		phpContainer = config.default_php_container;
+		phpContainer = 'php' + siteSettings.default_php_version.toString().replace(/\./g, '');
 	}
 
 	if (argv.xdebug) {

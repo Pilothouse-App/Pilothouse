@@ -12,6 +12,7 @@ module.exports = {
 	deleteSite: deleteSite,
 	getHosts: getHosts,
 	getSites: getSites,
+	getSiteSettings: getSiteSettings,
 	hostsAllAdd: hostsAddAll,
 	hostsRemoveAll: hostsRemoveAll,
 	updateSitesNginxConfig: updateSitesNginxConfig

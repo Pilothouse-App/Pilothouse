@@ -1,14 +1,15 @@
 const commands = require('../utils/commands'),
       config = require('../utils/config'),
-      environment = require('../utils/environment');
+      environment = require('../utils/environment'),
+      sites = require('../utils/sites');
 
 const composerCommand = function(argv) {
-
-	let phpVersion = config.default_php_version.toString();
+    const siteSettings = sites.getSiteSettings(environment.currentSiteName);
+	let phpVersion = siteSettings.default_php_version;
 	if (argv.php) {
-		phpVersion = argv.php.toString();
+		phpVersion = argv.php;
 	}
-	const phpContainer = 'php' + phpVersion.replace(/\./g, '');
+	const phpContainer = 'php' + phpVersion.toString().replace(/\./g, '');
 
 	let workDir = '/var/www/html';
 	if (environment.currentSiteName) {
