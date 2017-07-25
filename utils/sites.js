@@ -39,6 +39,7 @@ function buildNginxConfigForSite(site) {
 	let templateData = fs.readFileSync(configFileTemplate, 'UTF-8');
 
 	const templateVars = {
+		php_backend: '$backend_' + siteSettings.default_php_version.toString().replace(/\./g, '') + '_default',
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
@@ -211,6 +212,7 @@ function getSites() {
 function getSiteSettings(site) {
 	const configFile = path.join(config.sites_directory, site, 'config.yml');
 	const defaults = {
+		default_php_version: config.default_php_version,
 		hosts: [site + '.dev'],
 		type: 'php',
 		wp_uploads_proxy_url: null,
