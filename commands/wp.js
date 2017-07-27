@@ -5,13 +5,12 @@ const commands = require('../utils/commands'),
 
 const wpCommand = function(argv) {
 	const siteSettings = sites.getSiteSettings(environment.currentSiteName);
-    let phpContainer;
 
-	if (argv.php) {
-		phpContainer = 'php' + argv.php.toString().replace(/\./g, '');
-	} else {
-		phpContainer = 'php' + siteSettings.default_php_version.toString().replace(/\./g, '');
-	}
+    let phpVersion = siteSettings.default_php_version;
+    if (argv.php) {
+        phpVersion = argv.php;
+    }
+    let phpContainer = 'php' + phpVersion.toString().replace(/\./g, '');
 
 	if (argv.xdebug) {
 		phpContainer += '-xdebug';
