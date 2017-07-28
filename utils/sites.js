@@ -58,19 +58,34 @@ function buildNginxConfigForSite(site) {
 /**
  * Creates a new local site.
  *
+ * @param {String} siteName   The name of the site to create.
  * @param {Object} siteConfig The site configuration data.
  */
-function createSite(siteConfig) {
+function createSite(siteName, siteConfig) {
 
-	fs.ensureDirSync(path.join(config.sites_directory, siteConfig.name, 'htdocs'));
+	let configFileSettings = {};
 
-	if ('php' !== siteConfig.type || siteConfig.create_database) {
-		commands.mysqlCommand('CREATE DATABASE IF NOT EXISTS `' + siteConfig.name + '`;');
+    if ('globalDefault' !== siteConfig.default_php_version) {
+        configFileSettings.default_php_version = siteConfig.default_php_version;
+    }
+
+	if (siteName + '.dev' !== siteConfig.domain) {
+		configFileSettings.hosts = [siteConfig.domain];
+	}
+
+	if (siteConfig.wp_uploads_proxy_url) {
+    	configFileSettings.wp_uploads_proxy_url = siteConfig.wp_uploads_proxy_url;
+	}
+
+	fs.ensureDirSync(path.join(config.sites_directory, siteName, 'htdocs'));
+
+	if ('laravel' === siteConfig.type || 'wordpress' === siteConfig.type || siteConfig.create_database) {
+		commands.mysqlCommand('CREATE DATABASE IF NOT EXISTS `' + siteName + '`;');
 	}
 
 	environment.currentPathInSite = 'htdocs';
-	environment.currentSiteName = siteConfig.name;
-	environment.currentSiteRootDirectory = path.join(config.sites_directory, siteConfig.name);
+	environment.currentSiteName = siteName;
+	environment.currentSiteRootDirectory = path.join(config.sites_directory, siteName);
 
 	if ('laravel' === siteConfig.type) {
 
@@ -94,7 +109,7 @@ function createSite(siteConfig) {
 			'core',
 			'config',
 			'--dbhost=mysql',
-			'--dbname=' + siteConfig.name,
+			'--dbname=' + siteName,
 			'--dbuser=pilothouse',
 			'--dbpass=pilothouse'
 		]);
@@ -104,7 +119,7 @@ function createSite(siteConfig) {
 			'core',
 			'install',
 			'--url=' + siteConfig.domain,
-			'--title=' + siteConfig.name,
+			'--title=' + siteName,
 			'--admin_user=' + config.wp_default_username,
 			'--admin_password=' + config.wp_default_password,
 			'--admin_email=' + config.wp_default_username + '@' + siteConfig.domain,
@@ -152,13 +167,22 @@ function createSite(siteConfig) {
 		let wpConfigContent = fs.readFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), 'UTF-8');
 		wpConfigContent = wpConfigContent.replace(/\n\n\/\* That's all/, wpConfigAdditionsContent + "\n\n/* That's all");
 		fs.writeFileSync(path.join(environment.currentSiteRootDirectory, 'htdocs/wp-config.php'), wpConfigContent);
+
+		// Register uploads proxy URL in config.
+		if (siteConfig.uploadsProxyUrl) {
+			configFileOverrides.wp_uploads_proxy_url = siteConfig.uploadsProxyUrl;
+		}
 	}
+
+	if (Object.keys(configFileSettings).length) {
+        saveSiteSettings(siteName, configFileSettings);
+    }
 
 	hostsAddOne(siteConfig.domain);
 	updateSitesNginxConfig();
 	commands.regenerateHTTPSCertificate(getHosts());
 	commands.composeCommand(['restart', 'nginx']);
-	console.log(chalk.green('Local site ' + siteConfig.name + ' at ' + siteConfig.domain + ' created.'));
+	console.log(chalk.green('Local site ' + siteName + ' at ' + siteConfig.domain + ' created.'));
 }
 
 /**
@@ -303,6 +327,17 @@ function isValidSite(item) {
 	}
 
 	return true;
+}
+
+/**
+ * Saves the site-specific settings for an individual site.
+ *
+ * @param {String} site
+ * @param {Object} siteConfig
+ */
+function saveSiteSettings(site, siteConfig) {
+    const configFile = path.join(config.sites_directory, site, 'config.yml');
+    helpers.writeYamlConfig(configFile, siteConfig);
 }
 
 /**

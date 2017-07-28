@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 module.exports = {
 	populateTemplate: populateTemplate,
 	readYamlConfig: readYamlConfig,
+    writeYamlConfig: writeYamlConfig,
 };
 
 /**
@@ -40,4 +41,15 @@ function readYamlConfig(configFile, defaults = {}) {
 	}
 
 	return Object.assign({}, defaults, config);
+}
+
+/**
+ * Writes configuration variables to the specified YAML config file.
+ *
+ * @param {String} configFile The configuration file to write.
+ * @param {Object} data       The data to write.
+ */
+function writeYamlConfig(configFile, data) {
+	const yamlData = yaml.safeDump(data);
+	fs.writeFileSync(configFile, yamlData);
 }

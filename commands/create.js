@@ -20,7 +20,19 @@ const createCommand = function(argv) {
 				{ name: 'WordPress', value: 'wordpress', short: 'WordPress' }
 			],
 			default: 'php'
-		}
+		},
+        {
+            name: 'phpVersion',
+            type: 'list',
+            message: 'PHP version:',
+            choices: [
+                { name: 'Global default', value: 'globalDefault', short: 'Global default' },
+                { name: '5.6', value: '5.6', short: '5.6' },
+                { name: '7.0', value: '7.0', short: '7.0' },
+                { name: '7.1', value: '7.1', short: '7.1' }
+            ],
+            default: 'globalDefault'
+        }
 	];
 
 	if (!argv.site) {
@@ -69,8 +81,8 @@ const createCommand = function(argv) {
 		inquirer.prompt(domainQuestions).then(function(domainAnswers) {
 
 			let config = {
+				default_php_version: basicAnswers.phpVersion,
 				domain: domainAnswers.domain,
-				name: siteToCreate,
 				type: basicAnswers.type
 			};
 
@@ -105,7 +117,7 @@ const createCommand = function(argv) {
 					config.wp_uploads_proxy_url = validator.trim(wpAnswers.uploadsProxyUrl, '/');
 					config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
 
-					sites.createSite(config);
+					sites.createSite(siteToCreate, config);
 				});
 			} else if ('php' === basicAnswers.type) {
 
@@ -122,10 +134,10 @@ const createCommand = function(argv) {
 
 					config.create_database = phpAnswers.createDatabase;
 
-					sites.createSite(config);
+					sites.createSite(siteToCreate, config);
 				});
 			} else {
-				sites.createSite(config);
+				sites.createSite(siteToCreate, config);
 			}
 		});
 	});
