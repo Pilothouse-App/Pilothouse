@@ -6,12 +6,46 @@ const config = require('./config'),
       spawn = require('child_process').spawnSync;
 
 module.exports = {
+	artisanCommand: artisanCommand,
 	composeCommand: composeCommand,
 	mysqlCommand: mysqlCommand,
 	regenerateHTTPSCertificate: regenerateHTTPSCertificate,
 	shellCommand: shellCommand,
 	wpCommand: wpCommand
 };
+
+/**
+ * Runs a Laravel Artisan command in the specified container.
+ *
+ * @param {Array}  commandString The command to run.
+ * @param {String} container     The container in which to run the command. Will use the default PHP container if none is specified.
+ */
+function artisanCommand(commandString, container = null) {
+    const currentSiteName = environment.currentSiteName;
+    let   shellCommandString;
+
+    if (!container) {
+        container = config.default_php_container;
+    }
+
+    if (currentSiteName) {
+        shellCommandString = 'cd /var/www/html/' + currentSiteName + '/htdocs && php artisan ' + shellEscape(commandString);
+    } else {
+        console.error('This command must be run from within a site directory.');
+        process.exit(1);
+    }
+
+    const composeArgs = [
+        'exec',
+        '--user=www-data',
+        container,
+        '/bin/sh',
+        '-c',
+        shellCommandString
+    ];
+
+    composeCommand(composeArgs);
+}
 
 /**
  * Runs a docker-compose command

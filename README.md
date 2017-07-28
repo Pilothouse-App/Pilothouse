@@ -55,10 +55,18 @@ See below for the full list of available commands, and be sure to take a look at
 - `pilothouse restart [container]`: Restarts the specified Docker container (`nginx`, `memcached`, etc.), or the entire system if no container is specified.
 
 ### Site Commands
+
 - `pilothouse create [site]`: Creates a new local site.
 - `pilothouse delete [site]`: Deletes an existing local site.
 
+### Third-party Software Commands
+
+- `artisan [command]`: Runs Laravel Artisan in the Docker container against the current site.
+- `composer [command]`: Runs a Composer command in the Docker container against the current site.
+- `wp [command]`: Runs a WP-CLI command in the Docker container against the current site.
+
 ### Utility Commands
+
 - `pilothouse compose [command]`: Runs a [Docker Compose](https://docs.docker.com/compose/) command against the stack.
 - `pilothouse logs [container]`: Tails the logs for the specified container, or the entire stack if no container is specified.
 - `pilothouse mysql [query]`: Runs the provided MySQL query. The command will be run on the database of the current site, or with no database selected if not run from within a local site directory.

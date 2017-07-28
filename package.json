@@ -24,6 +24,7 @@
   "repository": "https://github.com/Pilothouse-App/pilothouse",
   "bin": {
     "pilothouse": "./bin/pilothouse.js",
+    "artisan": "./bin/artisan",
     "composer": "./bin/composer",
     "wp": "./bin/wp"
   },
