@@ -3,6 +3,7 @@
 *A LEMP local development environment based on Docker.*
 
 Pilothouse is a command line app that automates the process of managing a complete Docker-based local development environment.
+Pilothouse is currently only supported on macOS, but support for Linux and Windows will be coming soon!
 
 Pilothouse is completely free and open source, and features:
  * Unlimited local sites
