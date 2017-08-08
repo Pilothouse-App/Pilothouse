@@ -1,10 +1,14 @@
 const commands = require('../utils/commands'),
       config = require('../utils/config'),
       environment = require('../utils/environment'),
+      run = require('../utils/run'),
       sites = require('../utils/sites');
 
 const composerCommand = function(argv) {
     const siteSettings = sites.getSiteSettings(environment.currentSiteName);
+
+	run.requireSystemUp();
+
 	let phpVersion = siteSettings.default_php_version;
 	if (argv.php) {
 		phpVersion = argv.php;

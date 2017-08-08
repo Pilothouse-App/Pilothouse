@@ -4,10 +4,13 @@ const chalk = require('chalk'),
       fs = require('fs-extra'),
       inquirer = require('inquirer'),
       path = require('path'),
+      run = require('../utils/run')
       sites = require('../utils/sites'),
       validator = require('validator');
 
 const createCommand = function(argv) {
+
+	run.requireSystemUp();
 
 	const basicQuestions = [
 		{

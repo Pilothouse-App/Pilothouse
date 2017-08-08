@@ -1,4 +1,5 @@
-const commands = require('./commands'),
+const chalk = require('chalk'),
+      commands = require('./commands'),
       config = require('./config'),
       environment = require('./environment'),
       fs = require('fs-extra'),
@@ -9,6 +10,7 @@ const commands = require('./commands'),
 module.exports = {
 	buildRunFiles: buildRunFiles,
 	isSystemUp: isSystemUp,
+	requireSystemUp: requireSystemUp,
 	waitForMysql: waitForMysql
 };
 
@@ -79,6 +81,19 @@ function isSystemUp() {
 	], true);
 
 	return 'Running' === status;
+}
+
+/**
+ * Checks whether the Docker containers are up and running, and aborts the process if they are not.
+ */
+function requireSystemUp() {
+
+	if (isSystemUp()) {
+		return;
+	}
+
+	console.log(chalk.red('Pilothouse is not running. Please run ') + chalk.grey('pilothouse up') + chalk.red(' first.'));
+	process.exit(1);
 }
 
 /**

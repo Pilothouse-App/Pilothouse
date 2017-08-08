@@ -1,8 +1,11 @@
 const inquirer = require('inquirer'),
+      run = require('../utils/run'),
       sites = require('../utils/sites'),
       validator = require('validator');
 
 const deleteCommand = function(argv) {
+
+	run.requireSystemUp();
 
 	let siteQuestions = [];
 

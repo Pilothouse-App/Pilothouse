@@ -1,6 +1,10 @@
-const commands = require('../utils/commands');
+const commands = require('../utils/commands'),
+      run = require('../utils/run');
 
 const logsCommand = function(argv) {
+
+	run.requireSystemUp();
+
 	let args = [
 		'logs',
 		'-f',

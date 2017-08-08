@@ -1,6 +1,8 @@
-const commands = require('../utils/commands');
+const commands = require('../utils/commands'),
+      run = require('../utils/run');
 
 const mysqlCommand = function(argv) {
+	run.requireSystemUp();
 	commands.mysqlCommand(argv.sql);
 };
 
