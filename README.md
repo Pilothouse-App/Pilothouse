@@ -72,6 +72,7 @@ See below for the full list of available commands, and be sure to take a look at
 - `pilothouse logs [container]`: Tails the logs for the specified container, or the entire stack if no container is specified.
 - `pilothouse mysql [query]`: Runs the provided MySQL query. The command will be run on the database of the current site, or with no database selected if not run from within a local site directory.
 - `pilothouse shell <container>`: Opens a command line shell in the specified container.
+- `pilothouse status`: Displays Pilothouse's status.
 - `pilothouse update-containers`: Updates the Docker containers to the latest versions.
 
 ## Notes

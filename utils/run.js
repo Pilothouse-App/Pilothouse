@@ -8,6 +8,7 @@ const commands = require('./commands'),
 
 module.exports = {
 	buildRunFiles: buildRunFiles,
+	isSystemUp: isSystemUp,
 	waitForMysql: waitForMysql
 };
 
@@ -61,6 +62,23 @@ function buildRunFiles() {
 		console.log('Generating global SSL certificate...');
 		commands.regenerateHTTPSCertificate(hosts);
 	}
+}
+
+/**
+ * Determines whether the Docker containers are up and running.
+ *
+ * Currently only the default PHP container is checked, which is assumed to be representative of the rest of the stack.
+ */
+function isSystemUp() {
+	const status = commands.composeCommand([
+		'exec',
+		'-T',
+		config.default_php_container,
+		'/bin/sh',
+		'-c', 'echo "Running"'
+	], true);
+
+	return 'Running' === status;
 }
 
 /**
