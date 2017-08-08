@@ -5,8 +5,10 @@ const chalk = require('chalk'),
       run = require('../utils/run'),
       sites = require('../utils/sites');
 
-const upCommand = function() {
-	console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
+const upCommand = function(displayFiglet = true) {
+	if (displayFiglet) {
+		console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
+	}
 	run.buildRunFiles();
 	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d']);

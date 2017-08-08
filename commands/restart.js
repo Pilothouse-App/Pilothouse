@@ -7,7 +7,7 @@ const restartCommand = function(argv) {
 		commands.composeCommand(['restart', argv.container]);
 	} else {
 		systemDown.handler();
-		systemUp.handler();
+		systemUp.handler(false);
 	}
 };
 
