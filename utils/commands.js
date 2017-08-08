@@ -182,7 +182,7 @@ function wpCommand(commandString, container = null) {
 			+ ' && wp --path=/var/www/html/' + currentSiteName + '/htdocs'
 			+ ' ' + shellEscape( commandString );
 
-	} else if ('--info' === commandString) {
+	} else if (1 === commandString.length && '--info' === commandString[0]) {
 		shellCommandString = 'cd /var/www/html && wp --info';
 	} else {
 		console.error('This command must be run from within a site directory.');

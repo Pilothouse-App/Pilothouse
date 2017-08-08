@@ -5,11 +5,15 @@ const commands = require('../utils/commands'),
       sites = require('../utils/sites');
 
 const wpCommand = function(argv) {
-	const siteSettings = sites.getSiteSettings(environment.currentSiteName);
 
 	run.requireSystemUp();
 
-    let phpVersion = siteSettings.default_php_version;
+	let phpVersion = config.default_php_version;
+	if (environment.currentSiteName) {
+		const siteSettings = sites.getSiteSettings(environment.currentSiteName);
+		phpVersion = siteSettings.default_php_version;
+	}
+
     if (argv.php) {
         phpVersion = argv.php;
     }
