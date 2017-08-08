@@ -1,5 +1,6 @@
 const chalk = require('chalk'),
       commands = require('../utils/commands'),
+      environment = require('../utils/environment'),
       figlet = require('figlet'),
       run = require('../utils/run'),
       sites = require('../utils/sites');
@@ -13,7 +14,8 @@ const upCommand = function() {
 	commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"
 		+ " GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%';"
-		+ " FLUSH PRIVILEGES;"
+		+ " FLUSH PRIVILEGES;",
+		false
 	);
 };
 

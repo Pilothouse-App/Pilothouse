@@ -62,10 +62,11 @@ function composeCommand(command, captureOutput = false) {
 /**
  * Runs a MySQL command.
  *
- * @param {String} sql The SQL to run.
+ * @param {String}  sql            The SQL to run.
+ * @param {Boolean} selectDatabase Whether to select the database of the current site before running the command.
  */
-function mysqlCommand(sql) {
-	if (environment.currentSiteName) {
+function mysqlCommand(sql, selectDatabase = true) {
+	if (selectDatabase && environment.currentSiteName) {
 		sql = 'USE "' + environment.currentSiteName + '"; ' + sql;
 	}
 
