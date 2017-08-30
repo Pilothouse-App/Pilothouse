@@ -1,0 +1,26 @@
+body {
+	background-color: #fcfcfc;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	padding-top: 2rem;
+	text-align: center;
+}
+
+p {
+	margin: 0 0 2rem;
+}
+
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: #4f5d73;
+	text-decoration: none;
+}
+
+a:focus,
+a:hover {
+	text-decoration: underline;
+}

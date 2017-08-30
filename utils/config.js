@@ -27,6 +27,7 @@ function getComposeVariables() {
 		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
 		'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
 		'NGINX_DEFAULT_SITE_CONFIG_FILE': getConfigFilePath('nginx-default-site.conf'),
+		'NGINX_DEFAULT_SITE_DIRECTORY': environment.appDirectory + '/nginx-default-site/',
 		'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
 		'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
 		'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
