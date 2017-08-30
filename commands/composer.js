@@ -19,7 +19,7 @@ const composerCommand = function(argv) {
 	}
 	const phpContainer = 'php' + phpVersion.toString().replace(/\./g, '');
 
-	let workDir = '/var/www/html';
+	let workDir = '/var/www/html/sites';
 	if (environment.currentSiteName) {
 		workDir += '/' + environment.currentSiteName + '/' + environment.currentPathInSite;
 	}

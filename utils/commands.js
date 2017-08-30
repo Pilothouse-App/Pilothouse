@@ -29,7 +29,7 @@ function artisanCommand(commandString, container = null) {
     }
 
     if (currentSiteName) {
-        shellCommandString = 'cd /var/www/html/' + currentSiteName + '/htdocs && php artisan ' + shellEscape(commandString);
+        shellCommandString = 'cd /var/www/html/sites/' + currentSiteName + '/htdocs && php artisan ' + shellEscape(commandString);
     } else {
         console.error('This command must be run from within a site directory.');
         process.exit(1);
@@ -179,12 +179,12 @@ function wpCommand(commandString, container = null) {
 	}
 
 	if (currentSiteName) {
-		shellCommandString = 'cd /var/www/html/' + currentSiteName + '/' + environment.currentPathInSite
-			+ ' && wp --path=/var/www/html/' + currentSiteName + '/htdocs'
+		shellCommandString = 'cd /var/www/html/sites/' + currentSiteName + '/' + environment.currentPathInSite
+			+ ' && wp --path=/var/www/html/sites/' + currentSiteName + '/htdocs'
 			+ ' ' + shellEscape( commandString );
 
 	} else if (1 === commandString.length && '--info' === commandString[0]) {
-		shellCommandString = 'cd /var/www/html && wp --info';
+		shellCommandString = 'cd /var/www/html/sites && wp --info';
 	} else {
 		console.error('This command must be run from within a site directory.');
 		process.exit(1);
