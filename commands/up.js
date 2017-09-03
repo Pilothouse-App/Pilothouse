@@ -1,6 +1,5 @@
 const chalk = require('chalk'),
       commands = require('../utils/commands'),
-      environment = require('../utils/environment'),
       figlet = require('figlet'),
       run = require('../utils/run'),
       sites = require('../utils/sites');
