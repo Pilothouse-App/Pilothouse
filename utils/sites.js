@@ -103,6 +103,8 @@ function createSite(siteName, siteConfig) {
 			DB_DATABASE: siteName,
 			DB_USERNAME: 'pilothouse',
 			DB_PASSWORD: 'pilothouse',
+			MAIL_HOST: 'mailcatcher',
+			MAIL_PORT: '1025',
 			REDIS_HOST: 'redis'
 		};
 		let laravelDotEnvContent = fs.readFileSync(laravelDotEnvConfigPath, 'UTF-8');
