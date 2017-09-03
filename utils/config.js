@@ -4,6 +4,10 @@ const environment = require('./environment'),
       path = require('path');
 
 let config = helpers.readYamlConfig(environment.appHomeDirectory + '/config.yml', getDefaultConfig());
+
+config.default_php_container = 'php' + config.default_php_version.toString().replace(/\./g, '');
+config.default_php_backend = '$backend_' + config.default_php_container + '_default';
+
 config.composeVariables = getComposeVariables();
 
 fs.ensureDirSync(config.sites_directory);
@@ -26,7 +30,6 @@ function getComposeVariables() {
 		'MYSQL_CONFIG_FILE': getConfigFilePath('mysql.conf'),
 		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
 		'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
-		'NGINX_DEFAULT_SITE_CONFIG_FILE': getConfigFilePath('nginx-default-site.conf'),
 		'NGINX_DEFAULT_SITE_DIRECTORY': environment.appDirectory + '/nginx-default-site/',
 		'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
 		'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
@@ -60,14 +63,10 @@ function getConfigFilePath(filename) {
  * @returns {Object}
  */
 function getDefaultConfig() {
-	let defaults = {
+	return {
 		default_php_version: '7.0',
 		sites_directory: environment.homeDirectory + '/Sites',
 		wp_default_username: 'admin',
 		wp_default_password: 'password'
 	};
-
-	defaults.default_php_container = 'php' + defaults.default_php_version.replace(/\./g, '');
-
-	return defaults;
 }

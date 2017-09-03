@@ -40,7 +40,7 @@ function buildNginxConfigForSite(site) {
 	let templateData = fs.readFileSync(configFileTemplate, 'UTF-8');
 
 	const templateVars = {
-		php_backend: '$backend_' + siteSettings.default_php_version.toString().replace(/\./g, '') + '_default',
+		php_backend: config.default_php_backend,
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
@@ -362,6 +362,9 @@ function saveSiteSettings(site, siteConfig) {
 function updateSitesNginxConfig() {
 	const sites = getSites();
 	let nginxCompiledConfig = '';
+
+	const defaultSiteNginxConfig = fs.readFileSync(path.join(environment.appDirectory, 'config', 'nginx-default-site.conf'), 'UTF-8');
+	nginxCompiledConfig += helpers.populateTemplate(defaultSiteNginxConfig, {php_backend: config.default_php_backend});
 
 	sites.forEach(function(site) {
 		nginxCompiledConfig += buildNginxConfigForSite(site) + "\n";
