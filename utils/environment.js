@@ -14,10 +14,11 @@ module.exports = {
 	currentPathInSite: getCurrentPathInSite(),
 	currentSiteName: getCurrentSiteName(),
 	currentSiteRootDirectory: getCurrentSiteRootDirectory(),
-	httpsCertificateCertPath: getHTTPSCertificateCertPath(),
-	httpsCertificateKeyPath: getHTTPSCertificateKeyPath(),
 	gitCommandExists: commandExists('git'),
 	homeDirectory: getHomeDirectory(),
+	httpsCertificateCertPath: getHTTPSCertificateCertPath(),
+	httpsCertificateKeyPath: getHTTPSCertificateKeyPath(),
+	isThirdPartyCommand: isThirdPartyCommand(),
 	runDirectory: getRunDirectory(),
 	subCommandArgs: getSubCommandArgs()
 };
@@ -151,4 +152,18 @@ function getSubCommandArgs() {
 	});
 
 	return commandArgs;
+}
+
+/**
+ * Determines whether the current command is a third-party helper command.
+ */
+function isThirdPartyCommand() {
+	const thirdPartyCommands = ['artisan', 'composer', 'wp'];
+	const args = JSON.parse(JSON.stringify(process.argv));
+
+	args.shift();
+	args.shift();
+	const currentCommand = args[0];
+
+	return thirdPartyCommands.includes(currentCommand);
 }

@@ -1,12 +1,17 @@
 #!/usr/bin/env node
+const environment = require('../utils/environment'),
+      yargs = require('yargs');
 
-const yargs = require('yargs');
+if (!environment.isThirdPartyCommand) {
+	yargs
+		.demandCommand(1)
+		.help()
+		.version();
+}
 
-const program = yargs
+yargs
 	.commandDir('../commands/')
 	.epilogue('See http://pilothouse-app.org/ for complete documentation and usage instructions.')
-	.help()
 	.usage('$0 <command> [args]')
-	.version()
 	.wrap(yargs.terminalWidth())
 	.argv;
