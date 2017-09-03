@@ -16,8 +16,7 @@ const upCommand = function(displayFiglet = true) {
 	commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"
 		+ " GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%';"
-		+ " FLUSH PRIVILEGES;",
-		false
+		+ " FLUSH PRIVILEGES;"
 	);
 };
 

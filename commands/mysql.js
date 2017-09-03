@@ -3,7 +3,7 @@ const commands = require('../utils/commands'),
 
 const mysqlCommand = function(argv) {
 	run.requireSystemUp();
-	commands.mysqlCommand(argv.sql);
+	commands.mysqlCommand(argv.sql, true);
 };
 
 exports.command = 'mysql <sql>';
