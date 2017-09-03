@@ -96,6 +96,22 @@ function createSite(siteName, siteConfig) {
 			'htdocs'
 		]);
 
+		const laravelDotEnvConfigPath = path.join(environment.currentSiteRootDirectory, 'htdocs', '.env');
+		const laravelDotEnvConfigDirectives = {
+			APP_URL: 'https://' + siteConfig.domain,
+			DB_HOST: 'mysql',
+			DB_DATABASE: siteName,
+			DB_USERNAME: 'pilothouse',
+			DB_PASSWORD: 'pilothouse',
+			REDIS_HOST: 'redis'
+		};
+		let laravelDotEnvContent = fs.readFileSync(laravelDotEnvConfigPath, 'UTF-8');
+		for (key in laravelDotEnvConfigDirectives) {
+			let regex = new RegExp(key + '=.*?$', 'm');
+			laravelDotEnvContent = laravelDotEnvContent.replace(regex, key + '=' + laravelDotEnvConfigDirectives[key]);
+		}
+		fs.writeFileSync(laravelDotEnvConfigPath, laravelDotEnvContent);
+
 	} else if ('wordpress' === siteConfig.type) {
 
 		// Download WP core files.
