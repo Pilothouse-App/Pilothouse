@@ -157,8 +157,8 @@ function shellCommand(cwd, command, args, captureOutput = false) {
 	const result = spawn(command, args, {cwd: cwd, stdio: captureOutput ? 'pipe' : 'inherit'});
 
 	if (captureOutput) {
-		const stderr = result.stderr.toString();
-		const stdout = result.stdout.toString();
+		const stderr = result.stderr ? result.stderr.toString() : '';
+		const stdout = result.stdout ? result.stdout.toString() : '';
 
 		return stdout.length ? stdout.trim() : stderr.trim();
 	}
