@@ -1,6 +1,6 @@
 {
   "name": "pilothouse",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A lightweight command-line app for managing a Docker-based LEMP local development environment",
   "author": {
     "name": "Philip Newcomer",
