@@ -49,8 +49,8 @@ function buildRunFiles() {
 		fs.copySync(dockerComposeOverrideFile, environment.runDirectory + '/docker-compose.override.yml');
 	}
 
-	// Symlink Nginx default site directory
-	fs.ensureSymlinkSync(appDirectory + '/nginx-default-site', runDirectory + '/nginx-default-site');
+	// Copy Nginx default site directory
+	fs.copySync(appDirectory + '/nginx-default-site', runDirectory + '/nginx-default-site');
 
 	// Update Nginx config.
 	sites.updateSitesNginxConfig();
