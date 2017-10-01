@@ -14,7 +14,7 @@ services:
       - 3306:3306
     volumes:
       - "{{MYSQL_CONFIG_FILE}}:/etc/mysql/conf.d/pilothouse.cnf"
-      - "mysqldata:/var/lib/mysql"
+      - "mysqldata:/usr/local/bin/mysql"
 
   nginx:
     image: nginx:mainline-alpine
