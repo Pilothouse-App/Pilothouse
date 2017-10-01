@@ -12,8 +12,8 @@ config.composeVariables = getComposeVariables();
 
 fs.ensureDirSync(config.sites_directory);
 if (!fs.existsSync(config.sites_directory)) {
-  console.error('The sites directory ' + config.sites_directory + ' does not exist. Please create it before starting Pilothouse.');
-  process.exit(1);
+	console.error('The sites directory ' + config.sites_directory + ' does not exist. Please create it before starting Pilothouse.');
+	process.exit(1);
 }
 
 module.exports = config;
@@ -24,20 +24,20 @@ module.exports = config;
  * @returns {Object}
  */
 function getComposeVariables() {
-  return {
-    'HTTPS_CERTIFICATE_CERT': environment.httpsCertificateCertPath,
-    'HTTPS_CERTIFICATE_KEY': environment.httpsCertificateKeyPath,
-    'MYSQL_CONFIG_FILE': getConfigFilePath('mysql.conf'),
-    'MYSQL_DIRECTORY': config.mysql_directory,
-    'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
-    'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
-    'NGINX_DEFAULT_SITE_DIRECTORY': environment.runDirectory + '/nginx-default-site/',
-    'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
-    'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
-    'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
-    'SITES_DIRECTORY': config.sites_directory,
-    'SSMTP_CONFIG_FILE': getConfigFilePath('ssmtp.conf')
-  }
+	return {
+		'HTTPS_CERTIFICATE_CERT': environment.httpsCertificateCertPath,
+		'HTTPS_CERTIFICATE_KEY': environment.httpsCertificateKeyPath,
+		'MYSQL_CONFIG_FILE': getConfigFilePath('mysql.conf'),
+		'MYSQL_DIRECTORY': config.mysql_directory,
+		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
+		'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
+		'NGINX_DEFAULT_SITE_DIRECTORY': environment.runDirectory + '/nginx-default-site/',
+		'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
+		'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
+		'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
+		'SITES_DIRECTORY': config.sites_directory,
+		'SSMTP_CONFIG_FILE': getConfigFilePath('ssmtp.conf')
+	}
 }
 
 /**
@@ -51,11 +51,11 @@ function getComposeVariables() {
  */
 function getConfigFilePath(filename) {
 
-  if (fs.existsSync(path.join(environment.appHomeDirectory, filename))) {
-    return path.join(environment.appHomeDirectory, filename);
-  }
+	if (fs.existsSync(path.join(environment.appHomeDirectory, filename))) {
+		return path.join(environment.appHomeDirectory, filename);
+	}
 
-  return path.join(environment.runDirectory, 'config', filename);
+	return path.join(environment.runDirectory, 'config', filename);
 }
 
 /**
@@ -64,11 +64,11 @@ function getConfigFilePath(filename) {
  * @returns {Object}
  */
 function getDefaultConfig() {
-  return {
-    default_php_version: '7.0',
-    sites_directory: environment.homeDirectory + '/Sites',
-    mysql_directory: '/var/lib/mysql',
-    wp_default_username: 'admin',
-    wp_default_password: 'password'
-  };
+	return {
+		default_php_version: '7.0',
+		mysql_directory: '/var/lib/mysql',
+		sites_directory: environment.homeDirectory + '/Sites',
+		wp_default_username: 'admin',
+		wp_default_password: 'password'
+	};
 }
