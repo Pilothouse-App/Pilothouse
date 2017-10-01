@@ -28,6 +28,7 @@ function getComposeVariables() {
 		'HTTPS_CERTIFICATE_CERT': environment.httpsCertificateCertPath,
 		'HTTPS_CERTIFICATE_KEY': environment.httpsCertificateKeyPath,
 		'MYSQL_CONFIG_FILE': getConfigFilePath('mysql.conf'),
+		'MYSQL_DIRECTORY': config.mysql_directory,
 		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
 		'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
 		'NGINX_DEFAULT_SITE_DIRECTORY': environment.runDirectory + '/nginx-default-site/',
@@ -65,6 +66,7 @@ function getConfigFilePath(filename) {
 function getDefaultConfig() {
 	return {
 		default_php_version: '7.0',
+		mysql_directory: '/var/lib/mysql',
 		sites_directory: environment.homeDirectory + '/Sites',
 		wp_default_username: 'admin',
 		wp_default_password: 'password'
