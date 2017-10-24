@@ -56,7 +56,7 @@ function buildRunFiles() {
 	sites.updateSitesNginxConfig();
 
 	// Generate hosts.
-	let hostsContent = '';
+	let hostsContent = "127.0.0.1 mysql\n";
 	hosts.forEach(function(host) {
 		hostsContent += '127.0.0.1 ' + host + "\n";
 	});
