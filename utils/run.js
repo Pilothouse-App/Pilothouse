@@ -62,11 +62,8 @@ function buildRunFiles() {
 	});
 	fs.outputFileSync(environment.runDirectory + '/hosts.txt', hostsContent);
 
-	// Generate the HTTPS certificate if it does not exist.
-	if (!fs.existsSync(environment.httpsCertificateCertPath) || !fs.existsSync(environment.httpsCertificateKeyPath)) {
-		console.log('Generating global SSL certificate...');
-		commands.regenerateHTTPSCertificate(hosts);
-	}
+	// (Re)generate the HTTPS certificate.
+	commands.regenerateHTTPSCertificate(hosts);
 }
 
 /**
