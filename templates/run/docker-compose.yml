@@ -24,7 +24,7 @@ services:
     volumes:
       - "{{HTTPS_CERTIFICATE_CERT}}:/etc/nginx/https-certificate.cert"
       - "{{HTTPS_CERTIFICATE_KEY}}:/etc/nginx/https-certificate.key"
-      - "{{NGINX_COMPILED_SITES_CONFIG_FILE}}:/etc/nginx/conf.d/compiled-sites.conf"
+      - "{{NGINX_COMPILED_SITES_CONFIG_FILE}}:/etc/nginx/conf.d/default.conf"
       - "{{NGINX_CONFIG_FILE}}:/etc/nginx/nginx.conf"
       - "{{NGINX_DEFAULT_SITE_DIRECTORY}}:/var/www/html/default-site/"
       - "{{SITES_DIRECTORY}}:/var/www/html/sites/"
