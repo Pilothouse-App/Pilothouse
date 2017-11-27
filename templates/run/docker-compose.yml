@@ -18,6 +18,13 @@ services:
 
   nginx:
     image: nginx:mainline-alpine
+    depends_on:
+      - php56
+      - php56-xdebug
+      - php70
+      - php70-xdebug
+      - php71
+      - php71-xdebug
     ports:
       - 80:80
       - 443:443
