@@ -46,6 +46,11 @@ function buildNginxConfigForSite(site) {
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
 	};
 
+	// Set default PHP version if applicable.
+	if (siteSettings.default_php_version) {
+		templateVars.php_backend = helpers.formatPhpVersionBackend(siteSettings.default_php_version);
+	}
+
 	// Add WP uploads proxy if applicable.
 	if (siteSettings.wp_uploads_proxy_url) {
 		const wpUploadsProxyTemplate = fs.readFileSync(path.join(environment.appDirectory, '/templates/nginx/wp-uploads-proxy.conf'), 'UTF-8');

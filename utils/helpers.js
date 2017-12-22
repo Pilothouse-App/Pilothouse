@@ -2,10 +2,24 @@ const fs = require('fs-extra');
       yaml = require('js-yaml');
 
 module.exports = {
+    formatPhpVersionBackend: formatPhpVersionBackend,
 	populateTemplate: populateTemplate,
 	readYamlConfig: readYamlConfig,
     writeYamlConfig: writeYamlConfig,
 };
+
+/**
+ * Formats a PHP version (e.g. 7.0) for use in Nginx (e.g. 'backend_php70_default')
+ *
+ * Converts to string, removes decimals, and adds trailing zeros if necessary.
+ *
+ * @param {Integer|String} phpVersion
+ *
+ * @return {String}
+ */
+function formatPhpVersionBackend(phpVersion) {
+	return '$backend_php' + phpVersion.toString().replace('.', '').padEnd(2, '0') + '_default';
+}
 
 /**
  * Populates the provided template with the specified variables.
