@@ -18,12 +18,13 @@ const upCommand = function(displayFiglet = true) {
 	run.buildRunFiles();
 	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d']);
-	run.waitForMysql();
-	commands.mysqlCommand(
+    run.waitForMysql();
+    commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"
 		+ " GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%';"
 		+ " FLUSH PRIVILEGES;"
 	);
+    run.generateLocalSiteInteralHosts();
 };
 
 exports.command = 'up';

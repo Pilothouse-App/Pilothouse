@@ -8,6 +8,7 @@ const chalk = require('chalk'),
       sleep = require('system-sleep');
 
 module.exports = {
+    generateLocalSiteInteralHosts: generateLocalSiteInteralHosts,
 	buildRunFiles: buildRunFiles,
 	isSystemUp: isSystemUp,
 	requireSystemUp: requireSystemUp,
@@ -64,6 +65,50 @@ function buildRunFiles() {
 
 	// (Re)generate the HTTPS certificate.
 	commands.regenerateHTTPSCertificate(hosts);
+}
+
+/**
+ * Builds and adds a hosts file entry to the PHP containers pointing all local sites to the Nginx container.
+ */
+function generateLocalSiteInteralHosts() {
+	let hosts = sites.getHosts();
+	if (! hosts.length) {
+		return;
+	}
+
+	let nginxContainerInternalIp = getContainerInternalIp('nginx');
+	if (! nginxContainerInternalIp.length) {
+		console.error('Could not get Nginx container internal IP. Skipping adding local site hosts to PHP containers');
+		return;
+	}
+
+	let hostsString = nginxContainerInternalIp;
+	hosts.forEach(function (host) {
+		hostsString += ' ' + host;
+	});
+
+	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug'].forEach(function(container) {
+		commands.composeCommand([
+			'exec',
+			container,
+			'/bin/sh',
+			'-c',
+			'echo "' + hostsString + '" >> /etc/hosts'
+		]);
+	});
+}
+
+/**
+ * Gets the Docker network IP address of the specified container.
+ *
+ * @returns String
+ */
+function getContainerInternalIp(container) {
+	return commands.shellCommand(environment.runDirectory, 'docker', [
+		'inspect',
+		'--format', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}',
+		'pilothouse_' + container + '_1'
+	], true);
 }
 
 /**

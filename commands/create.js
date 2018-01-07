@@ -4,7 +4,8 @@ const chalk = require('chalk'),
       fs = require('fs-extra'),
       inquirer = require('inquirer'),
       path = require('path'),
-      run = require('../utils/run')
+      systemRestartCommand = require('../commands/restart'),
+      run = require('../utils/run'),
       sites = require('../utils/sites'),
       validator = require('validator');
 
@@ -121,6 +122,7 @@ const createCommand = function(argv) {
 					config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
 
 					sites.createSite(siteToCreate, config);
+					systemRestartCommand.handler();
 				});
 			} else if ('php' === basicAnswers.type) {
 
@@ -138,9 +140,11 @@ const createCommand = function(argv) {
 					config.create_database = phpAnswers.createDatabase;
 
 					sites.createSite(siteToCreate, config);
+					systemRestartCommand.handler();
 				});
 			} else {
 				sites.createSite(siteToCreate, config);
+				systemRestartCommand.handler();
 			}
 		});
 	});

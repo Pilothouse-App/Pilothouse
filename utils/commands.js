@@ -151,7 +151,7 @@ function regenerateHTTPSCertificate(hosts = []) {
  * @param {Array}   args          Arguments to be passed to the command.
  * @param {Boolean} captureOutput Whether to capture and return the output, or pipe it to the console.
  *
- * @returns {Object} The command's result object.
+ * @returns {String} The command's result.
  */
 function shellCommand(cwd, command, args, captureOutput = false) {
 	const result = spawn(command, args, {cwd: cwd, stdio: captureOutput ? 'pipe' : 'inherit'});

@@ -1,7 +1,7 @@
-const inquirer = require('inquirer'),
+const systemRestartCommand = require('../commands/restart'),
+      inquirer = require('inquirer'),
       run = require('../utils/run'),
-      sites = require('../utils/sites'),
-      validator = require('validator');
+      sites = require('../utils/sites');
 
 const deleteCommand = function(argv) {
 
@@ -38,6 +38,7 @@ const deleteCommand = function(argv) {
 			}
 
 			sites.deleteSite(siteToDelete);
+			systemRestartCommand.handler();
 		});
 	});
 };

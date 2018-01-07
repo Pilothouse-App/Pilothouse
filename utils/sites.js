@@ -201,10 +201,6 @@ function createSite(siteName, siteConfig) {
         saveSiteSettings(siteName, configFileSettings);
     }
 
-	hostsAddOne(siteConfig.domain);
-	updateSitesNginxConfig();
-	commands.regenerateHTTPSCertificate(getHosts());
-	commands.composeCommand(['restart', 'nginx']);
 	console.log(chalk.green('Local site ' + siteName + ' at ' + siteConfig.domain + ' created.'));
 }
 
@@ -214,16 +210,14 @@ function createSite(siteName, siteConfig) {
  * @param site The site to delete.
  */
 function deleteSite(site) {
-	fs.removeSync(path.join(config.sites_directory, site));
-	updateSitesNginxConfig();
-	commands.mysqlCommand('DROP DATABASE IF EXISTS `' + site + '`;');
-
 	getSiteSettings(site).hosts.forEach(function(host) {
 		hostsRemoveOne(host);
 	});
 
-	commands.regenerateHTTPSCertificate(getHosts());
-	commands.composeCommand(['restart', 'nginx']);
+	commands.mysqlCommand('DROP DATABASE IF EXISTS `' + site + '`;');
+
+	fs.removeSync(path.join(config.sites_directory, site));
+
 	console.log(chalk.green('Local site ' + site + ' deleted.'));
 }
 
