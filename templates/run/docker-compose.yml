@@ -41,6 +41,7 @@ services:
     environment:
       - TERM=xterm
     volumes:
+      - "{{HTTPS_CERTIFICATE_CERT}}:/usr/local/share/ca-certificates/pilothouse.crt"
       - "{{PHP_CONFIG_FILE}}:/usr/local/etc/php/conf.d/pilothouse.ini"
       - "{{PHP_FPM_CONFIG_FILE}}:/usr/local/etc/php-fpm.d/pilothouse.conf"
       - "{{PHP_XDEBUG_CONFIG_FILE}}:/usr/local/etc/php/conf.d/xdebug.ini"
