@@ -93,8 +93,8 @@ function generateLocalSiteInteralHosts() {
 			container,
 			'/bin/sh',
 			'-c',
-			'echo "' + hostsString + '" >> /etc/hosts'
-		]);
+			'echo "' + hostsString + '" >> /etc/hosts && update-ca-certificates'
+		], true);
 	});
 }
 
