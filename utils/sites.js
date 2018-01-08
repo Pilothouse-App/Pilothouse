@@ -41,6 +41,7 @@ function buildNginxConfigForSite(site) {
 
 	const templateVars = {
 		php_backend: config.default_php_backend,
+		proxy_port: siteSettings.proxy_port,
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
@@ -256,6 +257,7 @@ function getSiteSettings(site) {
 	const defaults = {
 		default_php_version: config.default_php_version,
 		hosts: [site + '.dev'],
+		proxy_port: 80,
 		type: 'php',
 		wp_uploads_proxy_url: null,
 	};
