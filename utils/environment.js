@@ -1,7 +1,14 @@
 const chalk = require('chalk'),
       commandExists = require('command-exists').sync,
       findUp = require('find-up'),
-      path = require('path');
+      packageData = require('../package'),
+      path = require('path'),
+      semver = require('semver');
+
+if (!semver.satisfies(process.version, packageData.engines.node)) {
+	console.log(chalk.red('Pilothouse requires Node ' + packageData.engines.node + '. You are using ' + process.version + '.'));
+	process.exit(1);
+}
 
 if (!commandExists('docker-compose')) {
 	console.log(chalk.red('Docker Compose does not appear to be installed. Please install Docker and rerun Pilothouse.'));
