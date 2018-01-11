@@ -41,6 +41,7 @@ function buildNginxConfigForSite(site) {
 
 	const templateVars = {
 		php_backend: config.default_php_backend,
+		proxy_port: siteSettings.proxy_port,
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
 		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
@@ -70,12 +71,17 @@ function createSite(siteName, siteConfig) {
 
 	let configFileSettings = {};
 
-    if ('globalDefault' !== siteConfig.default_php_version) {
+    if ('globalDefault' !== siteConfig.default_php_version && 'proxy' !== siteConfig.type) {
         configFileSettings.default_php_version = siteConfig.default_php_version;
     }
 
 	if (siteName + '.dev' !== siteConfig.domain) {
 		configFileSettings.hosts = [siteConfig.domain];
+	}
+
+	if ('proxy' === siteConfig.type) {
+		configFileSettings.type = siteConfig.type;
+		configFileSettings.proxy_port = parseInt(siteConfig.proxy_port);
 	}
 
 	if (siteConfig.wp_uploads_proxy_url) {
@@ -256,6 +262,7 @@ function getSiteSettings(site) {
 	const defaults = {
 		default_php_version: config.default_php_version,
 		hosts: [site + '.dev'],
+		proxy_port: 80,
 		type: 'php',
 		wp_uploads_proxy_url: null,
 	};
