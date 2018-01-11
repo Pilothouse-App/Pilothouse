@@ -21,22 +21,11 @@ const createCommand = function(argv) {
 			choices: [
 				{ name: 'Laravel', value: 'laravel', short: 'Laravel' },
 				{ name: 'PHP', value: 'php', short: 'PHP' },
+				{ name: 'Proxy', value: 'proxy', short: 'Proxy' },
 				{ name: 'WordPress', value: 'wordpress', short: 'WordPress' }
 			],
 			default: 'php'
-		},
-        {
-            name: 'phpVersion',
-            type: 'list',
-            message: 'PHP version:',
-            choices: [
-                { name: 'Global default', value: 'globalDefault', short: 'Global default' },
-                { name: '5.6', value: '5.6', short: '5.6' },
-                { name: '7.0', value: '7.0', short: '7.0' },
-                { name: '7.1', value: '7.1', short: '7.1' }
-            ],
-            default: 'globalDefault'
-        }
+		}
 	];
 
 	if (!argv.site) {
@@ -84,67 +73,116 @@ const createCommand = function(argv) {
 
 		inquirer.prompt(domainQuestions).then(function(domainAnswers) {
 
-			let config = {
-				default_php_version: basicAnswers.phpVersion,
-				domain: domainAnswers.domain,
-				type: basicAnswers.type
-			};
+			if ('proxy' === basicAnswers.type) {
 
-			if ('wordpress' === basicAnswers.type) {
-
-				const wpQuestions = [
+				const proxySiteQuestions = [
 					{
-						name: 'uploadsProxyUrl',
+						name: 'proxyPort',
 						type: 'input',
-						message: 'URL to proxy uploads from:',
+						message: 'Proxy port:',
 						validate: function(answer) {
-							if (validator.isEmpty(answer)) {
-								return true;
-							}
-							return validator.isURL(answer, {protocols: ['http', 'https'], require_protocols: true}) ? true : 'Please enter a valid URL.';
+							return validator.isInt(answer, {
+								allow_leading_zeroes: false,
+								gt: 0
+							});
 						}
 					}
 				];
 
-				if (environment.gitCommandExists) {
-					wpQuestions.push(
-						{
-							name: 'wpcontentRepoURL',
-							type: 'input',
-							message: 'Git repository to clone for the wp-content directory:'
-						}
-					);
-				}
+				inquirer.prompt(proxySiteQuestions).then(function(proxySiteAnswers){
 
-				inquirer.prompt(wpQuestions).then(function(wpAnswers) {
-
-					config.wp_uploads_proxy_url = validator.trim(wpAnswers.uploadsProxyUrl, '/');
-					config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
+					let config = {
+						domain: domainAnswers.domain,
+						proxy_port: proxySiteAnswers.proxyPort,
+						type: basicAnswers.type
+					};
 
 					sites.createSite(siteToCreate, config);
 					systemRestartCommand.handler();
 				});
-			} else if ('php' === basicAnswers.type) {
 
-				const phpQuestions = [
-					{
-						name: 'createDatabase',
-						type: 'confirm',
-						message: 'Create a MySQL database?',
-						default: false
-					}
-				];
-
-				inquirer.prompt(phpQuestions).then(function(phpAnswers) {
-
-					config.create_database = phpAnswers.createDatabase;
-
-					sites.createSite(siteToCreate, config);
-					systemRestartCommand.handler();
-				});
 			} else {
-				sites.createSite(siteToCreate, config);
-				systemRestartCommand.handler();
+
+				const phpVersionQuestions = [
+					{
+						name: 'phpVersion',
+						type: 'list',
+						message: 'PHP version:',
+						choices: [
+							{ name: 'Global default', value: 'globalDefault', short: 'Global default' },
+							{ name: '5.6', value: '5.6', short: '5.6' },
+							{ name: '7.0', value: '7.0', short: '7.0' },
+							{ name: '7.1', value: '7.1', short: '7.1' }
+						],
+						default: 'globalDefault'
+					}
+				];
+
+				inquirer.prompt(phpVersionQuestions).then(function(phpVersionAnswers) {
+
+					let config = {
+						default_php_version: phpVersionAnswers.phpVersion,
+						domain: domainAnswers.domain,
+						type: basicAnswers.type
+					};
+
+					if ('wordpress' === basicAnswers.type) {
+
+						const wpQuestions = [
+							{
+								name: 'uploadsProxyUrl',
+								type: 'input',
+								message: 'URL to proxy uploads from:',
+								validate: function(answer) {
+									if (validator.isEmpty(answer)) {
+										return true;
+									}
+									return validator.isURL(answer, {protocols: ['http', 'https'], require_protocols: true}) ? true : 'Please enter a valid URL.';
+								}
+							}
+						];
+
+						if (environment.gitCommandExists) {
+							wpQuestions.push(
+								{
+									name: 'wpcontentRepoURL',
+									type: 'input',
+									message: 'Git repository to clone for the wp-content directory:'
+								}
+							);
+						}
+
+						inquirer.prompt(wpQuestions).then(function(wpAnswers) {
+
+							config.wp_uploads_proxy_url = validator.trim(wpAnswers.uploadsProxyUrl, '/');
+							config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
+
+							sites.createSite(siteToCreate, config);
+							systemRestartCommand.handler();
+						});
+					} else if ('php' === basicAnswers.type) {
+
+						const phpQuestions = [
+							{
+								name: 'createDatabase',
+								type: 'confirm',
+								message: 'Create a MySQL database?',
+								default: false
+							}
+						];
+
+						inquirer.prompt(phpQuestions).then(function(phpAnswers) {
+
+							config.create_database = phpAnswers.createDatabase;
+
+							sites.createSite(siteToCreate, config);
+							systemRestartCommand.handler();
+						});
+					} else {
+						sites.createSite(siteToCreate, config);
+						systemRestartCommand.handler();
+					}
+				});
 			}
 		});
 	});
