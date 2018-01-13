@@ -175,16 +175,18 @@ function createSite(siteName, siteConfig) {
 			}
 		}
 
-		// Add object cache dropin.
-		const objectCacheDropinRequest = request(
-			'GET',
-			'https://raw.githubusercontent.com/pantheon-systems/wp-redis/master/object-cache.php'
-		);
-		const objectCacheContent = objectCacheDropinRequest.getBody().toString();
-		fs.writeFileSync(
-			path.join(environment.currentSiteRootDirectory, 'htdocs/wp-content/object-cache.php'),
-			objectCacheContent
-		);
+		// Add object cache dropin, if applicable.
+		if (siteConfig.enable_object_cache) {
+			const objectCacheDropinRequest = request(
+				'GET',
+				'https://raw.githubusercontent.com/pantheon-systems/wp-redis/master/object-cache.php'
+			);
+			const objectCacheContent = objectCacheDropinRequest.getBody().toString();
+			fs.writeFileSync(
+				path.join( environment.currentSiteRootDirectory, 'htdocs/wp-content/object-cache.php' ),
+				objectCacheContent
+			);
+		}
 
 		// Update wp-config.php with additional directives.
 		let wpConfigAdditionsFile = path.join(environment.appDirectory, 'config/wp-config.php.inc');

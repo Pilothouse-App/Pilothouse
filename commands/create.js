@@ -139,6 +139,12 @@ const createCommand = function(argv) {
 									}
 									return validator.isURL(answer, {protocols: ['http', 'https'], require_protocols: true}) ? true : 'Please enter a valid URL.';
 								}
+							},
+							{
+								name: 'enableObjectCache',
+								type: 'confirm',
+								message: 'Enable Object Cache?',
+								default: false,
 							}
 						];
 
@@ -154,6 +160,7 @@ const createCommand = function(argv) {
 
 						inquirer.prompt(wpQuestions).then(function(wpAnswers) {
 
+							config.enable_object_cache = wpAnswers.enableObjectCache,
 							config.wp_uploads_proxy_url = validator.trim(wpAnswers.uploadsProxyUrl, '/');
 							config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
 
