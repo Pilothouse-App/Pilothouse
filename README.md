@@ -18,7 +18,7 @@ Pilothouse is currently only supported on macOS, but support for Linux and Windo
 ## What's Inside
 
 - Nginx
-- PHP 5.6, 7.0, and 7.1
+- PHP 5.6, 7.0, 7.1, and 7.2
 - MariaDB
 - phpMyAdmin
 - Redis

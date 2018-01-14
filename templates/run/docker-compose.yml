@@ -37,7 +37,7 @@ services:
       - "{{SITES_DIRECTORY}}:/var/www/html/sites/"
 
   php56:
-    image: pilothouseapp/php:5.6-dev
+    {{PHP_IMAGE_56}}
     environment:
       - TERM=xterm
     volumes:
@@ -52,27 +52,37 @@ services:
       - "/home/www-data/.wp-cli"
 
   php56-xdebug:
-    image: pilothouseapp/php:5.6-xdebug-dev
+    {{PHP_IMAGE_56_XDEBUG}}
     extends:
       service: php56
 
   php70:
-    image: pilothouseapp/php:7.0-dev
+    {{PHP_IMAGE_70}}
     extends:
       service: php56
 
   php70-xdebug:
-    image: pilothouseapp/php:7.0-xdebug-dev
+    {{PHP_IMAGE_70_XDEBUG}}
     extends:
       service: php56
 
   php71:
-    image: pilothouseapp/php:7.1-dev
+    {{PHP_IMAGE_71}}
     extends:
       service: php56
 
   php71-xdebug:
-    image: pilothouseapp/php:7.1-xdebug-dev
+    {{PHP_IMAGE_71_XDEBUG}}
+    extends:
+      service: php56
+
+  php72:
+    {{PHP_IMAGE_72}}
+    extends:
+      service: php56
+
+  php72-xdebug:
+    {{PHP_IMAGE_72_XDEBUG}}
     extends:
       service: php56
 
