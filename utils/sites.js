@@ -2,6 +2,7 @@ const chalk = require('chalk'),
       commands = require('./commands'),
       config = require('./config'),
       environment = require('./environment'),
+      escapeStringRegexp = require('escape-string-regexp'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
       path = require('path'),
@@ -44,7 +45,8 @@ function buildNginxConfigForSite(site) {
 		proxy_port: siteSettings.proxy_port,
 		server_name: siteSettings.hosts.join(' '),
 		site_name: site,
-		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site"
+		wp_uploads_proxy_config: "\t# WP uploads proxy not configured for site",
+		wp_uploads_proxy_path: 'wp-content/uploads'
 	};
 
 	// Set default PHP version if applicable.
@@ -55,7 +57,10 @@ function buildNginxConfigForSite(site) {
 	// Add WP uploads proxy if applicable.
 	if (siteSettings.wp_uploads_proxy_url) {
 		const wpUploadsProxyTemplate = fs.readFileSync(path.join(environment.appDirectory, '/templates/nginx/wp-uploads-proxy.conf'), 'UTF-8');
-		templateVars.wp_uploads_proxy_config = helpers.populateTemplate(wpUploadsProxyTemplate, {wp_uploads_proxy_url: siteSettings.wp_uploads_proxy_url});
+		templateVars.wp_uploads_proxy_config = helpers.populateTemplate(wpUploadsProxyTemplate, {
+			wp_uploads_proxy_path: escapeStringRegexp(siteSettings.wp_uploads_proxy_path || templateVars.wp_uploads_proxy_path),
+			wp_uploads_proxy_url: siteSettings.wp_uploads_proxy_url
+		});
 	}
 
 	return helpers.populateTemplate(templateData, templateVars);
