@@ -168,6 +168,27 @@ const createCommand = function(argv) {
 							sites.createSite(siteToCreate, config);
 							systemRestartCommand.handler();
 						});
+					} else if ('laravel' === basicAnswers.type) {
+
+						const laravelQuestions = [];
+
+						if (environment.gitCommandExists) {
+							laravelQuestions.push(
+								{
+									name: 'repoURL',
+									type: 'input',
+									message: 'Git repository to clone:'
+								}
+							);
+						}
+
+						inquirer.prompt(laravelQuestions).then(function (laravelAnswers) {
+							config.repo_url = laravelAnswers.repoURL || null;
+
+							sites.createSite(siteToCreate, config);
+							systemRestartCommand.handler();
+						});
+
 					} else if ('php' === basicAnswers.type) {
 
 						const phpQuestions = [

@@ -104,15 +104,44 @@ function createSite(siteName, siteConfig) {
 	environment.currentSiteRootDirectory = path.join(config.sites_directory, siteName);
 
 	if ('laravel' === siteConfig.type) {
-
-		commands.shellCommand(environment.currentSiteRootDirectory, 'composer', [
-			'create-project',
-			'--prefer-dist',
-			'laravel/laravel',
-			'htdocs'
-		]);
-
 		const laravelDotEnvConfigPath = path.join(environment.currentSiteRootDirectory, 'htdocs', '.env');
+
+		if (siteConfig.repo_url) {
+			fs.removeSync(path.join(environment.currentSiteRootDirectory, 'htdocs'));
+
+			commands.shellCommand(environment.currentSiteRootDirectory,
+				'git', [
+					'clone',
+					siteConfig.repo_url,
+					'htdocs'
+				]
+			);
+
+			fs.copySync(laravelDotEnvConfigPath + '.example', laravelDotEnvConfigPath, {overwrite: false});
+
+			commands.shellCommand(path.join(environment.currentSiteRootDirectory, 'htdocs'),
+				'composer', [
+					'install'
+				]
+			);
+
+			commands.shellCommand(path.join(environment.currentSiteRootDirectory, 'htdocs'),
+				'php', [
+					'artisan',
+					'key:generate'
+				]
+			);
+		} else {
+			commands.shellCommand(environment.currentSiteRootDirectory,
+				'composer', [
+					'create-project',
+					'--prefer-dist',
+					'laravel/laravel',
+					'htdocs'
+				]
+			);
+		}
+
 		const laravelDotEnvConfigDirectives = {
 			APP_URL: 'https://' + siteConfig.domain,
 			DB_HOST: 'mysql',
