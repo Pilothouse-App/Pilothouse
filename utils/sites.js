@@ -41,6 +41,7 @@ function buildNginxConfigForSite(site) {
 	let templateData = fs.readFileSync(configFileTemplate, 'UTF-8');
 
 	const templateVars = {
+		laravel_storage_proxy_config: "\t# Laravel storage proxy not configured for site",
 		php_backend: config.default_php_backend,
 		proxy_port: siteSettings.proxy_port,
 		server_name: siteSettings.hosts.join(' '),
@@ -52,6 +53,14 @@ function buildNginxConfigForSite(site) {
 	// Set default PHP version if applicable.
 	if (siteSettings.default_php_version) {
 		templateVars.php_backend = helpers.formatPhpVersionBackend(siteSettings.default_php_version);
+	}
+
+	// Add Laravel storage proxy if applicable.
+	if (siteSettings.laravel_storage_proxy_url) {
+		const laravelStorageProxyTemplate = fs.readFileSync(path.join(environment.appDirectory, '/templates/nginx/laravel-storage-proxy.conf'), 'UTF-8');
+		templateVars.laravel_storage_proxy_config = helpers.populateTemplate(laravelStorageProxyTemplate, {
+			laravel_storage_proxy_url: siteSettings.laravel_storage_proxy_url
+		});
 	}
 
 	// Add WP uploads proxy if applicable.
@@ -89,9 +98,11 @@ function createSite(siteName, siteConfig) {
 		configFileSettings.proxy_port = parseInt(siteConfig.proxy_port);
 	}
 
-	if (siteConfig.wp_uploads_proxy_url) {
-    	configFileSettings.wp_uploads_proxy_url = siteConfig.wp_uploads_proxy_url;
-	}
+	['laravel_storage_proxy_url', 'wp_uploads_proxy_url'].forEach(function(item) {
+		if (siteConfig[item]) {
+			configFileSettings[item] = siteConfig[item];
+		}
+	});
 
 	fs.ensureDirSync(path.join(config.sites_directory, siteName, 'htdocs'));
 

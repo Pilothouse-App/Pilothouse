@@ -170,7 +170,19 @@ const createCommand = function(argv) {
 						});
 					} else if ('laravel' === basicAnswers.type) {
 
-						const laravelQuestions = [];
+						const laravelQuestions = [
+							{
+								name: 'storageProxyUrl',
+								type: 'input',
+								message: 'URL to proxy storage from:',
+								validate: function(answer) {
+									if (validator.isEmpty(answer)) {
+										return true;
+									}
+									return validator.isURL(answer, {protocols: ['http', 'https'], require_protocols: true}) ? true : 'Please enter a valid URL.';
+								}
+							},
+						];
 
 						if (environment.gitCommandExists) {
 							laravelQuestions.push(
@@ -184,6 +196,7 @@ const createCommand = function(argv) {
 
 						inquirer.prompt(laravelQuestions).then(function (laravelAnswers) {
 							config.repo_url = laravelAnswers.repoURL || null;
+							config.laravel_storage_proxy_url = validator.trim(laravelAnswers.storageProxyUrl, '/');
 
 							sites.createSite(siteToCreate, config);
 							systemRestartCommand.handler();
