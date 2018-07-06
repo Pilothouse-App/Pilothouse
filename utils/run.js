@@ -87,14 +87,14 @@ function generateLocalSiteInteralHosts() {
 		hostsString += ' ' + host;
 	});
 
-	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug'].forEach(function(container) {
+	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug', 'php72', 'php72-xdebug'].forEach(function(container) {
 		commands.composeCommand([
 			'exec',
 			container,
 			'/bin/sh',
 			'-c',
-			'echo "' + hostsString + '" >> /etc/hosts && update-ca-certificates'
-		], true);
+			'echo "' + hostsString + '" >> /etc/hosts && update-ca-certificates &> /dev/null'
+		]);
 	});
 }
 
