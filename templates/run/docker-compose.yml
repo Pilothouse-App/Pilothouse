@@ -9,7 +9,7 @@ services:
   mysql:
     environment:
       MYSQL_ROOT_PASSWORD: root
-    image: mariadb:latest
+    image: mariadb:10.3
     ports:
       - 3306:3306
     volumes:
