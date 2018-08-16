@@ -27,17 +27,16 @@ module.exports = {
  * @returns {String}
  */
 function buildNginxConfigForSite(site) {
+	const siteSettings = getSiteSettings(site);
+	let configFileTemplate = path.join(environment.appDirectory, '/templates/nginx/', siteSettings.type + '-site.conf');
 
 	// Check for nginx.conf override file in the site directory; if it exists, use it instead of programmatically
 	// generating one.
 	const nginxOverrideFile = path.join(config.sites_directory, site, 'nginx.conf');
 	if (fs.existsSync(nginxOverrideFile)) {
-		return fs.readFileSync(nginxOverrideFile, 'UTF-8');
+		configFileTemplate = nginxOverrideFile;
 	}
 
-	const siteSettings = getSiteSettings(site);
-
-	const configFileTemplate = path.join(environment.appDirectory, '/templates/nginx/', siteSettings.type + '-site.conf');
 	let templateData = fs.readFileSync(configFileTemplate, 'UTF-8');
 
 	const templateVars = {
