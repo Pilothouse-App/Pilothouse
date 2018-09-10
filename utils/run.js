@@ -82,9 +82,9 @@ function generateLocalSiteInteralHosts() {
 		return;
 	}
 
-	let hostsString = nginxContainerInternalIp;
+	let hostsString = '';
 	hosts.forEach(function (host) {
-		hostsString += ' ' + host;
+		hostsString += nginxContainerInternalIp + ' ' + host + "\n";
 	});
 
 	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug', 'php72', 'php72-xdebug'].forEach(function(container) {
