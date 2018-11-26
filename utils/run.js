@@ -99,6 +99,21 @@ function generateLocalSiteInteralHosts() {
 }
 
 /**
+ * Returns the full Docker name of the specified container.
+ *
+ * @param {String} container
+ * @returns {String}
+ */
+function getContainerDockerName(container) {
+	return commands.shellCommand(environment.runDirectory, 'docker', [
+		'ps',
+		'-a',
+		'--format', '{{.Names}}',
+		'--filter', `name=pilothouse_${container}_`,
+	], true);
+}
+
+/**
  * Gets the Docker network IP address of the specified container.
  *
  * @returns String
@@ -107,7 +122,7 @@ function getContainerInternalIp(container) {
 	return commands.shellCommand(environment.runDirectory, 'docker', [
 		'inspect',
 		'--format', '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}',
-		'pilothouse_' + container + '_1'
+		getContainerDockerName(container)
 	], true);
 }
 
