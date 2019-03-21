@@ -47,6 +47,8 @@ function getComposeVariables() {
 		'PHP_IMAGE_71_XDEBUG': getPHPImage('7.1-xdebug'),
 		'PHP_IMAGE_72': getPHPImage('7.2'),
 		'PHP_IMAGE_72_XDEBUG': getPHPImage('7.2-xdebug'),
+		'PHP_IMAGE_73': getPHPImage('7.3'),
+		'PHP_IMAGE_73_XDEBUG': getPHPImage('7.3-xdebug'),
 		'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
 		'SITES_DIRECTORY': config.sites_directory,
 		'SSMTP_CONFIG_FILE': getConfigFilePath('ssmtp.conf')

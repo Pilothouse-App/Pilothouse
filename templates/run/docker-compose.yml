@@ -85,6 +85,16 @@ services:
     {{PHP_IMAGE_72_XDEBUG}}
     extends:
       service: php56
+  
+  php73:
+    {{PHP_IMAGE_73}}
+    extends:
+      service: php56
+
+  php73-xdebug:
+    {{PHP_IMAGE_73_XDEBUG}}
+    extends:
+      service: php56
 
   phpmyadmin:
     environment:
