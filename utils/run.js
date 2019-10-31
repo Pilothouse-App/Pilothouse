@@ -87,7 +87,7 @@ function generateLocalSiteInteralHosts() {
 		hostsString += nginxContainerInternalIp + ' ' + host + "\n";
 	});
 
-	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug', 'php72', 'php72-xdebug'].forEach(function(container) {
+	['php56', 'php56-xdebug', 'php70', 'php70-xdebug', 'php71', 'php71-xdebug', 'php72', 'php72-xdebug', 'php73', 'php73-xdebug'].forEach(function(container) {
 		commands.composeCommand([
 			'exec',
 			container,
