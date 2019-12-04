@@ -96,6 +96,16 @@ services:
     extends:
       service: php56
 
+  php74:
+    {{PHP_IMAGE_74}}
+    extends:
+      service: php56
+
+  php74-xdebug:
+    {{PHP_IMAGE_74_XDEBUG}}
+    extends:
+      service: php56
+
   phpmyadmin:
     environment:
       - PMA_HOST=mysql
