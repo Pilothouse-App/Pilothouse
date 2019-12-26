@@ -18,13 +18,6 @@ services:
 
   nginx:
     image: nginx:mainline-alpine
-    depends_on:
-      - php56
-      - php56-xdebug
-      - php70
-      - php70-xdebug
-      - php71
-      - php71-xdebug
     ports:
       - 80:80
       - 443:443
@@ -33,11 +26,11 @@ services:
       - "{{HTTPS_CERTIFICATE_KEY}}:/etc/nginx/https-certificate.key"
       - "{{NGINX_COMPILED_SITES_CONFIG_FILE}}:/etc/nginx/conf.d/default.conf"
       - "{{NGINX_CONFIG_FILE}}:/etc/nginx/nginx.conf"
+      - "{{NGINX_PHP_UPSTREAMS_CONFIG_FILE}}:/etc/nginx/php-upstreams.conf"
       - "{{NGINX_DEFAULT_SITE_DIRECTORY}}:/var/www/html/default-site/"
       - "{{SITES_DIRECTORY}}:/var/www/html/sites/"
 
-  php56:
-    {{PHP_IMAGE_56}}
+  php:
     environment:
       - TERM=xterm
     volumes:
@@ -50,61 +43,6 @@ services:
       - "{{SSMTP_CONFIG_FILE}}:/etc/ssmtp/ssmtp.conf"
       - "/home/www-data/.composer"
       - "/home/www-data/.wp-cli"
-
-  php56-xdebug:
-    {{PHP_IMAGE_56_XDEBUG}}
-    extends:
-      service: php56
-
-  php70:
-    {{PHP_IMAGE_70}}
-    extends:
-      service: php56
-
-  php70-xdebug:
-    {{PHP_IMAGE_70_XDEBUG}}
-    extends:
-      service: php56
-
-  php71:
-    {{PHP_IMAGE_71}}
-    extends:
-      service: php56
-
-  php71-xdebug:
-    {{PHP_IMAGE_71_XDEBUG}}
-    extends:
-      service: php56
-
-  php72:
-    {{PHP_IMAGE_72}}
-    extends:
-      service: php56
-
-  php72-xdebug:
-    {{PHP_IMAGE_72_XDEBUG}}
-    extends:
-      service: php56
-  
-  php73:
-    {{PHP_IMAGE_73}}
-    extends:
-      service: php56
-
-  php73-xdebug:
-    {{PHP_IMAGE_73_XDEBUG}}
-    extends:
-      service: php56
-
-  php74:
-    {{PHP_IMAGE_74}}
-    extends:
-      service: php56
-
-  php74-xdebug:
-    {{PHP_IMAGE_74_XDEBUG}}
-    extends:
-      service: php56
 
   phpmyadmin:
     environment:

@@ -17,7 +17,7 @@ const upCommand = function(displayFiglet = true) {
 
 	run.buildRunFiles();
 	sites.hostsAllAdd();
-	commands.composeCommand(['up', '-d']);
+	commands.composeCommand(['up', '-d', '--remove-orphans']);
     run.waitForMysql();
     commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"

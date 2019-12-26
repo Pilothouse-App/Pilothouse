@@ -108,15 +108,17 @@ const createCommand = function(argv) {
 						name: 'phpVersion',
 						type: 'list',
 						message: 'PHP version:',
-						choices: [
-							{ name: 'Global default', value: 'globalDefault', short: 'Global default' },
-							{ name: '5.6', value: '5.6', short: '5.6' },
-							{ name: '7.0', value: '7.0', short: '7.0' },
-							{ name: '7.1', value: '7.1', short: '7.1' },
-							{ name: '7.2', value: '7.2', short: '7.2' },
-							{ name: '7.3', value: '7.3', short: '7.3' },
-							{ name: '7.4', value: '7.4', short: '7.4' }
-						],
+						choices: () => {
+							let choices = [
+								{ name: `Global default (${config.default_php_version})`, value: 'globalDefault', short: `Global default (${config.default_php_version})` }
+							]
+
+							sites.availablePhpVersions.forEach(availablePhpVersion => {
+								choices.push({ name: availablePhpVersion, value: availablePhpVersion, short: availablePhpVersion })
+							})
+
+							return choices
+						},
 						default: 'globalDefault'
 					}
 				];

@@ -5,7 +5,8 @@ const chalk = require('chalk'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
       sites = require('./sites'),
-      sleep = require('system-sleep');
+      sleep = require('system-sleep'),
+      yaml = require('js-yaml');
 
 module.exports = {
     generateLocalSiteInteralHosts: generateLocalSiteInteralHosts,
@@ -38,11 +39,15 @@ function buildRunFiles() {
 	// Copy config files
 	fs.copySync(appDirectory + '/config', runDirectory + '/config');
 
+	generateNginxPhpUpstreamConfig()
+
 	// Generate docker-compose.yml
 	const composeTemplate = appDirectory + '/templates/run/docker-compose.yml';
 	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
 	composeData = helpers.populateTemplate(composeData, config.composeVariables);
-	fs.outputFileSync(runDirectory + '/docker-compose.yml', composeData);
+	let yamlData = yaml.safeLoad(composeData)
+	populatePhpServices(yamlData)
+	fs.outputFileSync(runDirectory + '/docker-compose.yml', yaml.safeDump(yamlData))
 
 	// Copy docker-compose override file if it exists.
 	const dockerComposeOverrideFile = environment.appHomeDirectory + '/docker-compose.custom.yml';
@@ -68,6 +73,87 @@ function buildRunFiles() {
 }
 
 /**
+ * Populate the given YAML data with the enabled PHP containers.
+ *
+ * @param {Object} yaml
+ * @returns Object
+ */
+function populatePhpServices(yaml) {
+	sites.enabledPhpVersions.forEach(phpVersion => {
+		yaml.services[`php${phpVersion.replace('.', '')}`] = Object.assign(getPHPImage(phpVersion), JSON.parse(JSON.stringify(yaml.services.php)))
+		yaml.services[`php${phpVersion.replace('.', '')}-xdebug`] = Object.assign(getPHPImage(phpVersion + '-xdebug'), JSON.parse(JSON.stringify(yaml.services.php)))
+	})
+
+	delete yaml.services.php
+}
+
+/**
+ * Returns the PHP image name for the specified version.
+ *
+ * If Pilothouse is configured for local PHP images, this function will return the local build path instead.
+ *
+ * @param {String} phpVersion
+ * @returns Object
+ */
+function getPHPImage(phpVersion) {
+	if (config.php_images_local_path) {
+		let phpVersionPath = phpVersion.replace('-xdebug', '/xdebug')
+		return {
+			build: path.join(config.php_images_local_path, phpVersionPath)
+		}
+	} else {
+		return {
+			image: 'pilothouseapp/php:' + phpVersion + '-dev'
+		}
+	}
+}
+
+/**
+ * Generate the Nginx PHP config for the enabled PHP versions.
+ */
+function generateNginxPhpUpstreamConfig() {
+	let nginxPhpUpstreamConfig =
+`
+map $cookie_php $cookie_backend_version {
+	default sitedefault;
+	${sites.enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
+}
+
+map $arg_php $backend_version {
+	default $cookie_backend_version;
+	${sites.enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
+}
+
+`
+
+	nginxPhpUpstreamConfig += sites.enabledPhpVersions.map(phpVersion => {
+		return `map $backend_version $backend_php${phpVersion.replace('.', '')}_default {sitedefault php${phpVersion.replace('.', '')}; default $backend_version;}`
+	}).join('\n\n')
+
+	nginxPhpUpstreamConfig += `
+
+map $cookie_xdebug $xdebug_suffix_cookie {
+	default noxdebug;
+	off     noxdebug;
+	on      xdebug;
+}
+
+map $arg_xdebug $xdebug_suffix {
+	default $xdebug_suffix_cookie;
+	off     noxdebug;
+	on      xdebug;
+}
+
+`
+
+	nginxPhpUpstreamConfig += sites.enabledPhpVersions.map(phpVersion => {
+		return `upstream php${phpVersion.replace('.', '')}-noxdebug {server php${phpVersion.replace('.', '')}:9000;}\nupstream php${phpVersion.replace('.', '')}-xdebug {server php${phpVersion.replace('.', '')}-xdebug:9000;}`
+	}).join('\n\n')
+
+	fs.outputFileSync(environment.runDirectory + '/config/nginx-php-upstreams.conf', nginxPhpUpstreamConfig)
+}
+
+/**
  * Builds and adds a hosts file entry to the PHP containers pointing all local sites to the Nginx container.
  */
 function generateLocalSiteInteralHosts() {
@@ -78,7 +164,7 @@ function generateLocalSiteInteralHosts() {
 
 	let nginxContainerInternalIp = getContainerInternalIp('nginx');
 	if (! nginxContainerInternalIp.length) {
-		console.error('Could not get Nginx container internal IP. Skipping adding local site hosts to PHP containers');
+		console.error('Could not start the Nginx container. Check the Nginx container error log for debugging information.');
 		return;
 	}
 
@@ -87,20 +173,11 @@ function generateLocalSiteInteralHosts() {
 		hostsString += nginxContainerInternalIp + ' ' + host + "\n";
 	});
 
-	let phpContainers = [
-		'php56',
-		'php56-xdebug',
-		'php70',
-		'php70-xdebug',
-		'php71',
-		'php71-xdebug',
-		'php72',
-		'php72-xdebug',
-		'php73',
-		'php73-xdebug',
-		'php74',
-		'php74-xdebug'
-	]
+	let phpContainers = []
+	sites.enabledPhpVersions.forEach(phpVersion => {
+		phpContainers.push('php' + phpVersion.replace('.', ''))
+		phpContainers.push('php' + phpVersion.replace('.', '') + '-xdebug')
+	})
 
 	phpContainers.forEach(function(container) {
 		commands.composeCommand([
@@ -182,7 +259,7 @@ function waitForMysql() {
 		status = commands.composeCommand([
 			'exec',
 			'-T',
-			'php70',
+			'php' + config.default_php_version.toString().replace('.', ''),
 			'/bin/sh',
 			'-c',
 			'mysqladmin ping --no-beep --host=mysql --user=root --password=root'

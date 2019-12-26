@@ -36,21 +36,10 @@ function getComposeVariables() {
 		'MYSQL_CONFIG_FILE': getConfigFilePath('mysql.conf'),
 		'NGINX_COMPILED_SITES_CONFIG_FILE': environment.runDirectory + '/nginx-compiled-sites.conf',
 		'NGINX_CONFIG_FILE': getConfigFilePath('nginx.conf'),
+		'NGINX_PHP_UPSTREAMS_CONFIG_FILE': environment.runDirectory + '/config/nginx-php-upstreams.conf',
 		'NGINX_DEFAULT_SITE_DIRECTORY': environment.runDirectory + '/nginx-default-site/',
 		'PHP_CONFIG_FILE': getConfigFilePath('php.ini'),
 		'PHP_FPM_CONFIG_FILE': getConfigFilePath('php-fpm.conf'),
-		'PHP_IMAGE_56': getPHPImage('5.6'),
-		'PHP_IMAGE_56_XDEBUG': getPHPImage('5.6-xdebug'),
-		'PHP_IMAGE_70': getPHPImage('7.0'),
-		'PHP_IMAGE_70_XDEBUG': getPHPImage('7.0-xdebug'),
-		'PHP_IMAGE_71': getPHPImage('7.1'),
-		'PHP_IMAGE_71_XDEBUG': getPHPImage('7.1-xdebug'),
-		'PHP_IMAGE_72': getPHPImage('7.2'),
-		'PHP_IMAGE_72_XDEBUG': getPHPImage('7.2-xdebug'),
-		'PHP_IMAGE_73': getPHPImage('7.3'),
-		'PHP_IMAGE_73_XDEBUG': getPHPImage('7.3-xdebug'),
-		'PHP_IMAGE_74': getPHPImage('7.4'),
-		'PHP_IMAGE_74_XDEBUG': getPHPImage('7.4-xdebug'),
 		'PHP_XDEBUG_CONFIG_FILE': getConfigFilePath('xdebug.ini'),
 		'SITES_DIRECTORY': config.sites_directory,
 		'SSMTP_CONFIG_FILE': getConfigFilePath('ssmtp.conf')
@@ -87,20 +76,4 @@ function getDefaultConfig() {
 		wp_default_username: 'admin',
 		wp_default_password: 'password'
 	};
-}
-
-/**
- * Returns the PHP image name for the specified version.
- *
- * If Pilothouse is configured for local PHP images, this function will return the local build path instead.
- *
- * @param phpVersion
- */
-function getPHPImage(phpVersion) {
-	if (config.php_images_local_path) {
-		let phpVersionPath = phpVersion.replace('-xdebug', '/xdebug');
-		return 'build: ' + path.join(config.php_images_local_path, phpVersionPath);
-	} else {
-		return 'image: pilothouseapp/php:' + phpVersion + '-dev';
-	}
 }

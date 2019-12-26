@@ -9,6 +9,8 @@ const chalk = require('chalk'),
       request = require('sync-request');
 
 module.exports = {
+	availablePhpVersions: getAvailablePhpVersions(),
+	enabledPhpVersions: getEnabledPhpVersions(),
 	createSite: createSite,
 	deleteSite: deleteSite,
 	getHosts: getHosts,
@@ -271,6 +273,43 @@ function deleteSite(site) {
 	fs.removeSync(path.join(config.sites_directory, site));
 
 	console.log(chalk.green('Local site ' + site + ' deleted.'));
+}
+
+/**
+ * Get the available PHP versions.
+ *
+ * @returns Array
+ */
+function getAvailablePhpVersions() {
+	return [
+		//'5.6',
+		'7.0',
+		'7.1',
+		'7.2',
+		'7.3',
+		'7.4',
+	]
+}
+
+/**
+ * Get the enabled PHP versions.
+ *
+ * @returns Array
+ */
+function getEnabledPhpVersions() {
+	let enabledPhpVersions = [
+		config.default_php_version.toString()
+	]
+
+	getSites().forEach(site => {
+		const sitePhpVersion = getSiteSettings(site).default_php_version.toString()
+
+		if (!enabledPhpVersions.includes(sitePhpVersion)) {
+			enabledPhpVersions.push(sitePhpVersion)
+		}
+	});
+
+	return enabledPhpVersions
 }
 
 /**
