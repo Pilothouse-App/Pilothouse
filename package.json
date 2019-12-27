@@ -26,7 +26,8 @@
     "pilothouse": "./bin/pilothouse.js"
   },
   "scripts": {
-    "hostile": "hostile"
+    "hostile": "hostile",
+    "postinstall": "pilothouse update-containers"
   },
   "dependencies": {
     "chalk": "^2.0.1",

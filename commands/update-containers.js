@@ -1,10 +1,21 @@
 const commands = require('../utils/commands'),
-      systemRestart = require('./restart');
+      run = require('../utils/run')
+      systemDown = require('./down')
+      systemUp = require('./up')
 
 const updateContainersCommand = function() {
-	commands.composeCommand(['pull']);
-	commands.composeCommand(['down']);
-	systemRestart.handler();
+	const isSystemUp = run.isSystemUp()
+
+	if (isSystemUp) {
+		systemDown.handler()
+	}
+
+	run.buildRunFiles()
+	commands.composeCommand(['pull'])
+
+	if (isSystemUp) {
+		systemUp.handler(false)
+	}
 };
 
 exports.command = 'update-containers';
