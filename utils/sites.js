@@ -7,7 +7,8 @@ const chalk = require('chalk'),
       helpers = require('./helpers'),
       path = require('path'),
       request = require('sync-request')
-      validator = require('validator')
+      validator = require('validator'),
+      yaml = require('js-yaml')
 
 module.exports = {
 	availablePhpVersions: getAvailablePhpVersions(),
@@ -255,6 +256,14 @@ function createSite(siteName, siteConfig) {
 	if (Object.keys(configFileSettings).length) {
         saveSiteSettings(siteName, configFileSettings);
     }
+
+	// Create a wp-cli.yml file in the site directory.
+	fs.writeFileSync(
+		path.join(environment.currentSiteRootDirectory, 'wp-cli.yml'),
+		yaml.safeDump({
+			path: 'htdocs'
+		})
+	)
 
 	console.log(chalk.green('Local site ' + siteName + ' at ' + siteConfig.domain + ' created.'));
 }
