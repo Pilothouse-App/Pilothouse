@@ -6,6 +6,7 @@ const chalk = require('chalk'),
       helpers = require('./helpers'),
       sites = require('./sites'),
       sleep = require('system-sleep'),
+      updateNotifier = require('update-notifier')
       yaml = require('js-yaml');
 
 module.exports = {
@@ -13,6 +14,8 @@ module.exports = {
 	buildRunFiles: buildRunFiles,
 	isSystemUp: isSystemUp,
 	requireSystemUp: requireSystemUp,
+	triggerBackgroundUpdateCheck: triggerBackgroundUpdateCheck,
+	maybeShowUpdateNotification: maybeShowUpdateNotification,
 	waitForMysql: waitForMysql
 };
 
@@ -285,4 +288,30 @@ function waitForMysql() {
 	if (iteration >= 4) {
 		console.info('MySQL is ready.');
 	}
+}
+
+/**
+ * Trigger an update check in the background.
+ */
+function triggerBackgroundUpdateCheck() {
+	_getUpdateNotifier().fetchInfo()
+}
+
+/**
+ * Show the update notification if one is available.
+ */
+function maybeShowUpdateNotification() {
+	_getUpdateNotifier().notify({
+		isGlobal: true
+	})
+}
+
+/**
+ * Get a configured update notifier instance.
+ */
+function _getUpdateNotifier() {
+	return updateNotifier({
+		pkg: require('../package'),
+		updateCheckInterval: 0
+	})
 }

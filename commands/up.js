@@ -11,6 +11,8 @@ const upCommand = function(displayFiglet = true) {
 		return;
 	}
 
+	run.triggerBackgroundUpdateCheck()
+
 	if (displayFiglet) {
 		console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
 	}
@@ -25,6 +27,8 @@ const upCommand = function(displayFiglet = true) {
 		+ " FLUSH PRIVILEGES;"
 	);
     run.generateLocalSiteInteralHosts();
+
+  run.maybeShowUpdateNotification()
 };
 
 exports.command = 'up';
