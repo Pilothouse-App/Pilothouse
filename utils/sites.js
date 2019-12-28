@@ -6,7 +6,8 @@ const chalk = require('chalk'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
       path = require('path'),
-      request = require('sync-request');
+      request = require('sync-request')
+      validator = require('validator')
 
 module.exports = {
 	availablePhpVersions: getAvailablePhpVersions(),
@@ -427,6 +428,11 @@ function isValidSite(item) {
 
 	// Return false if this is not a directory.
 	if (!fs.lstatSync(fullPath).isDirectory()) {
+		return false;
+	}
+
+	// Return false if the directory name is invalid.
+	if (!validator.matches(item, /^[a-z0-9-_]+$/)) {
 		return false;
 	}
 
