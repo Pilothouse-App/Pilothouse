@@ -1,5 +1,6 @@
 const chalk = require('chalk'),
       commands = require('../utils/commands'),
+      config = require('../utils/config'),
       figlet = require('figlet'),
       run = require('../utils/run'),
       sites = require('../utils/sites');
@@ -20,13 +21,21 @@ const upCommand = function(displayFiglet = true) {
 	run.buildRunFiles();
 	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d', '--remove-orphans']);
-    run.waitForMysql();
-    commands.mysqlCommand(
+
+	commands.composeCommand([
+		'exec',
+		config.default_php_container,
+		'/bin/sh',
+		'-c',
+		'update-ca-certificates &> /dev/null'
+	]);
+
+	run.waitForMysql();
+	commands.mysqlCommand(
 		"CREATE USER IF NOT EXISTS 'pilothouse'@'%' IDENTIFIED BY 'pilothouse';"
 		+ " GRANT ALL PRIVILEGES ON *.* to 'pilothouse'@'%';"
 		+ " FLUSH PRIVILEGES;"
 	);
-    run.generateLocalSiteInteralHosts();
 
   run.maybeShowUpdateNotification()
 };

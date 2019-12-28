@@ -10,7 +10,6 @@ const chalk = require('chalk'),
       yaml = require('js-yaml');
 
 module.exports = {
-    generateLocalSiteInteralHosts: generateLocalSiteInteralHosts,
 	buildRunFiles: buildRunFiles,
 	isSystemUp: isSystemUp,
 	requireSystemUp: requireSystemUp,
@@ -49,6 +48,7 @@ function buildRunFiles() {
 	let composeData = fs.readFileSync(composeTemplate, 'UTF-8');
 	composeData = helpers.populateTemplate(composeData, config.composeVariables);
 	let yamlData = yaml.safeLoad(composeData)
+	yamlData.services.nginx.networks.main.aliases = sites.getHosts()
 	populatePhpServices(yamlData)
 	fs.outputFileSync(runDirectory + '/docker-compose.yml', yaml.safeDump(yamlData))
 
@@ -154,43 +154,6 @@ map $arg_xdebug $xdebug_suffix {
 	}).join('\n\n')
 
 	fs.outputFileSync(environment.runDirectory + '/config/nginx-php-upstreams.conf', nginxPhpUpstreamConfig)
-}
-
-/**
- * Builds and adds a hosts file entry to the PHP containers pointing all local sites to the Nginx container.
- */
-function generateLocalSiteInteralHosts() {
-	let hosts = sites.getHosts();
-	if (! hosts.length) {
-		return;
-	}
-
-	let nginxContainerInternalIp = getContainerInternalIp('nginx');
-	if (! nginxContainerInternalIp.length) {
-		console.error('Could not start the Nginx container. Check the Nginx container error log for debugging information.');
-		return;
-	}
-
-	let hostsString = '';
-	hosts.forEach(function (host) {
-		hostsString += nginxContainerInternalIp + ' ' + host + "\n";
-	});
-
-	let phpContainers = []
-	sites.enabledPhpVersions.forEach(phpVersion => {
-		phpContainers.push('php' + phpVersion.replace('.', ''))
-		phpContainers.push('php' + phpVersion.replace('.', '') + '-xdebug')
-	})
-
-	phpContainers.forEach(function(container) {
-		commands.composeCommand([
-			'exec',
-			container,
-			'/bin/sh',
-			'-c',
-			'echo "' + hostsString + '" >> /etc/hosts && update-ca-certificates &> /dev/null'
-		]);
-	});
 }
 
 /**
