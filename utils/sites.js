@@ -353,7 +353,14 @@ function getSites() {
  * @returns {Object}
  */
 function getSiteSettings(site) {
-	const configFile = path.join(config.sites_directory, site, 'config.yml');
+	let configFile = path.join(config.sites_directory, site, 'pilothouse.yml')
+	const configFileLegacy = path.join(config.sites_directory, site, 'config.yml')
+
+	// Backwards compatibility with old config.yml
+	if (!fs.existsSync(configFile) && fs.existsSync(configFileLegacy)) {
+		configFile = configFileLegacy
+	}
+
 	const defaults = {
 		default_php_version: config.default_php_version,
 		hosts: [site + '.dev'],
@@ -460,7 +467,7 @@ function isValidSite(item) {
  * @param {Object} siteConfig
  */
 function saveSiteSettings(site, siteConfig) {
-    const configFile = path.join(config.sites_directory, site, 'config.yml');
+    const configFile = path.join(config.sites_directory, site, 'pilothouse.yml');
     helpers.writeYamlConfig(configFile, siteConfig);
 }
 
