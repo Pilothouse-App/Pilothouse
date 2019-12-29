@@ -4,7 +4,7 @@ const chalk = require('chalk'),
       fs = require('fs-extra'),
       inquirer = require('inquirer'),
       path = require('path'),
-      systemRestartCommand = require('../commands/restart'),
+      systemReloadCommand = require('../commands/reload'),
       run = require('../utils/run'),
       sites = require('../utils/sites'),
       validator = require('validator');
@@ -98,7 +98,7 @@ const createCommand = function(argv) {
 					};
 
 					sites.createSite(siteToCreate, config);
-					systemRestartCommand.handler();
+					systemReloadCommand.handler();
 				});
 
 			} else {
@@ -162,7 +162,7 @@ const createCommand = function(argv) {
 							config.wp_content_repo_url = wpAnswers.wpcontentRepoURL || null;
 
 							sites.createSite(siteToCreate, config);
-							systemRestartCommand.handler();
+							systemReloadCommand.handler();
 						});
 					} else if ('laravel' === basicAnswers.type) {
 
@@ -195,7 +195,7 @@ const createCommand = function(argv) {
 							config.laravel_storage_proxy_url = validator.trim(laravelAnswers.storageProxyUrl, '/');
 
 							sites.createSite(siteToCreate, config);
-							systemRestartCommand.handler();
+							systemReloadCommand.handler();
 						});
 
 					} else if ('php' === basicAnswers.type) {
@@ -214,11 +214,11 @@ const createCommand = function(argv) {
 							config.create_database = phpAnswers.createDatabase;
 
 							sites.createSite(siteToCreate, config);
-							systemRestartCommand.handler();
+							systemReloadCommand.handler();
 						});
 					} else {
 						sites.createSite(siteToCreate, config);
-						systemRestartCommand.handler();
+						systemReloadCommand.handler();
 					}
 				});
 			}
