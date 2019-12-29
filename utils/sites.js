@@ -247,17 +247,17 @@ function createSite(siteName, siteConfig) {
 		if (siteConfig.uploadsProxyUrl) {
 			configFileOverrides.wp_uploads_proxy_url = siteConfig.uploadsProxyUrl;
 		}
+
+		// Create a wp-cli.yml file in the site directory.
+		fs.writeFileSync(
+			path.join(environment.currentSiteRootDirectory, 'wp-cli.yml'),
+			yaml.safeDump({
+				path: 'htdocs'
+			})
+		)
 	}
 
 	saveSiteSettings(siteName, configFileSettings);
-
-	// Create a wp-cli.yml file in the site directory.
-	fs.writeFileSync(
-		path.join(environment.currentSiteRootDirectory, 'wp-cli.yml'),
-		yaml.safeDump({
-			path: 'htdocs'
-		})
-	)
 
 	console.log(chalk.green('Local site ' + siteName + ' at ' + siteConfig.domain + ' created.'));
 }
