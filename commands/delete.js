@@ -1,4 +1,4 @@
-const systemRestartCommand = require('../commands/restart'),
+const systemReloadCommand = require('../commands/reload'),
       inquirer = require('inquirer'),
       run = require('../utils/run'),
       sites = require('../utils/sites');
@@ -38,7 +38,7 @@ const deleteCommand = function(argv) {
 			}
 
 			sites.deleteSite(siteToDelete);
-			systemRestartCommand.handler();
+			systemReloadCommand.handler();
 		});
 	});
 };
