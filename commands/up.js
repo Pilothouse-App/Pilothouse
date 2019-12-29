@@ -22,13 +22,7 @@ const upCommand = function(displayFiglet = true) {
 	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d', '--remove-orphans']);
 
-	commands.composeCommand([
-		'exec',
-		config.default_php_container,
-		'/bin/sh',
-		'-c',
-		'update-ca-certificates &> /dev/null'
-	]);
+	run.updateCaCertificates()
 
 	run.waitForMysql();
 	commands.mysqlCommand(

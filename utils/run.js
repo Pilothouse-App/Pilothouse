@@ -15,6 +15,7 @@ module.exports = {
 	requireSystemUp: requireSystemUp,
 	triggerBackgroundUpdateCheck: triggerBackgroundUpdateCheck,
 	maybeShowUpdateNotification: maybeShowUpdateNotification,
+	updateCaCertificates: updateCaCertificates,
 	waitForMysql: waitForMysql
 };
 
@@ -277,4 +278,17 @@ function _getUpdateNotifier() {
 		pkg: require('../package'),
 		updateCheckInterval: 0
 	})
+}
+
+/**
+ * Updates the CA certificates in the PHP containers.
+ */
+function updateCaCertificates() {
+	commands.composeCommand([
+		'exec',
+		config.default_php_container,
+		'/bin/sh',
+		'-c',
+		'update-ca-certificates &> /dev/null'
+	]);
 }

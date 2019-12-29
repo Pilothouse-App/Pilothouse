@@ -4,6 +4,7 @@ const commands = require('../utils/commands'),
 
 const reloadCommand = function() {
 	run.buildRunFiles()
+	run.updateCaCertificates()
 	sites.hostsAllAdd()
 	commands.composeCommand(['up', '-d', '--remove-orphans']);
 };
