@@ -108,18 +108,10 @@ const createCommand = function(argv) {
 						name: 'phpVersion',
 						type: 'list',
 						message: 'PHP version:',
-						choices: () => {
-							let choices = [
-								{ name: `Global default (${config.default_php_version})`, value: 'globalDefault', short: `Global default (${config.default_php_version})` }
-							]
-
-							sites.availablePhpVersions.forEach(availablePhpVersion => {
-								choices.push({ name: availablePhpVersion, value: availablePhpVersion, short: availablePhpVersion })
-							})
-
-							return choices
-						},
-						default: 'globalDefault'
+						choices: sites.availablePhpVersions.map(availablePhpVersion => {
+							return { name: availablePhpVersion, value: availablePhpVersion.toString(), short: availablePhpVersion }
+						}),
+						default: config.default_php_version.toString()
 					}
 				];
 

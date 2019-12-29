@@ -86,19 +86,15 @@ function buildNginxConfigForSite(site) {
  */
 function createSite(siteName, siteConfig) {
 
-	let configFileSettings = {};
-
-    if ('globalDefault' !== siteConfig.default_php_version && 'proxy' !== siteConfig.type) {
-        configFileSettings.default_php_version = siteConfig.default_php_version;
-    }
-
-	if (siteName + '.dev' !== siteConfig.domain) {
-		configFileSettings.hosts = [siteConfig.domain];
+	let configFileSettings = {
+		hosts: [siteConfig.domain]
 	}
 
 	if ('proxy' === siteConfig.type) {
-		configFileSettings.type = siteConfig.type;
-		configFileSettings.proxy_port = parseInt(siteConfig.proxy_port);
+		configFileSettings.type = siteConfig.type
+		configFileSettings.proxy_port = parseInt(siteConfig.proxy_port)
+	} else {
+		configFileSettings.default_php_version = siteConfig.default_php_version
 	}
 
 	['laravel_storage_proxy_url', 'wp_uploads_proxy_url'].forEach(function(item) {
@@ -253,9 +249,7 @@ function createSite(siteName, siteConfig) {
 		}
 	}
 
-	if (Object.keys(configFileSettings).length) {
-        saveSiteSettings(siteName, configFileSettings);
-    }
+	saveSiteSettings(siteName, configFileSettings);
 
 	// Create a wp-cli.yml file in the site directory.
 	fs.writeFileSync(
@@ -292,7 +286,7 @@ function deleteSite(site) {
  */
 function getAvailablePhpVersions() {
 	return [
-		//'5.6',
+		'5.6',
 		'7.0',
 		'7.1',
 		'7.2',
