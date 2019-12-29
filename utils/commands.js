@@ -94,7 +94,7 @@ function regenerateHTTPSCertificate(hosts = []) {
 		'delete-certificate',
 		'-c', 'pilothouse.dev',
 		'/Library/Keychains/System.keychain'
-	]);
+	], true);
 	hosts.unshift('localhost');
 
 	let altNames = [];
