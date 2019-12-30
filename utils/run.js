@@ -4,6 +4,7 @@ const chalk = require('chalk'),
       environment = require('./environment'),
       fs = require('fs-extra'),
       helpers = require('./helpers'),
+      path = require('path'),
       sites = require('./sites'),
       sleep = require('system-sleep'),
       updateNotifier = require('update-notifier')
