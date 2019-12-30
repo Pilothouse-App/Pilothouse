@@ -16,7 +16,7 @@ module.exports = {
 	requireSystemUp: requireSystemUp,
 	triggerBackgroundUpdateCheck: triggerBackgroundUpdateCheck,
 	maybeShowUpdateNotification: maybeShowUpdateNotification,
-	updateCaCertificates: updateCaCertificates,
+	triggerUpdateCaCertificates: triggerUpdateCaCertificates,
 	waitForMysql: waitForMysql
 };
 
@@ -282,14 +282,24 @@ function _getUpdateNotifier() {
 }
 
 /**
- * Updates the CA certificates in the PHP containers.
+ * Triggers asynchronous updates of the CA certificates in the PHP containers.
  */
-function updateCaCertificates() {
-	commands.composeCommand([
-		'exec',
-		config.default_php_container,
-		'/bin/sh',
-		'-c',
-		'update-ca-certificates &> /dev/null'
-	]);
+function triggerUpdateCaCertificates() {
+	sites.enabledPhpVersions.forEach(enabledPhpVersion => {
+		commands.composeCommand([
+			'exec',
+			`php${enabledPhpVersion.toString().replace('.', '')}`,
+			'/bin/sh',
+			'-c',
+			'update-ca-certificates &> /dev/null'
+		], false, true);
+
+		commands.composeCommand([
+			'exec',
+			`php${enabledPhpVersion.toString().replace('.', '')}-xdebug`,
+			'/bin/sh',
+			'-c',
+			'update-ca-certificates &> /dev/null'
+		], false, true);
+	})
 }

@@ -54,7 +54,6 @@ services:
       - "{{NGINX_DEFAULT_SITE_DIRECTORY}}:/var/www/html/default-site/"
       - "{{SITES_DIRECTORY}}:/var/www/html/sites/"
       - "{{SSMTP_CONFIG_FILE}}:/etc/ssmtp/ssmtp.conf"
-      - "cacerts:/etc/ssl/certs"
       - "/home/www-data/.composer"
       - "/home/www-data/.wp-cli"
 
@@ -78,5 +77,4 @@ services:
       - 6379:6379
 
 volumes:
-  cacerts:
   mysqldata:
