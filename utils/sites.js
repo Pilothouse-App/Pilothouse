@@ -12,7 +12,7 @@ const chalk = require('chalk'),
 
 module.exports = {
 	availablePhpVersions: getAvailablePhpVersions(),
-	enabledPhpVersions: getEnabledPhpVersions(),
+	getEnabledPhpVersions: getEnabledPhpVersions,
 	createSite: createSite,
 	deleteSite: deleteSite,
 	getHosts: getHosts,

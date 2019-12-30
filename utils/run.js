@@ -84,7 +84,7 @@ function buildRunFiles() {
  * @returns Object
  */
 function populatePhpServices(yaml) {
-	sites.enabledPhpVersions.forEach(phpVersion => {
+	sites.getEnabledPhpVersions().forEach(phpVersion => {
 		yaml.services[`php${phpVersion.replace('.', '')}`] = Object.assign(getPHPImage(phpVersion), JSON.parse(JSON.stringify(yaml.services.php)))
 		yaml.services[`php${phpVersion.replace('.', '')}-xdebug`] = Object.assign(getPHPImage(phpVersion + '-xdebug'), JSON.parse(JSON.stringify(yaml.services.php)))
 	})
@@ -117,21 +117,22 @@ function getPHPImage(phpVersion) {
  * Generate the Nginx PHP config for the enabled PHP versions.
  */
 function generateNginxPhpUpstreamConfig() {
+	let enabledPhpVersions = sites.getEnabledPhpVersions()
 	let nginxPhpUpstreamConfig =
 `
 map $cookie_php $cookie_backend_version {
 	default sitedefault;
-	${sites.enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
+	${enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
 }
 
 map $arg_php $backend_version {
 	default $cookie_backend_version;
-	${sites.enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
+	${enabledPhpVersions.map(phpVersion => `${phpVersion}     php${phpVersion.replace('.', '')};`).join('\n\t')}
 }
 
 `
 
-	nginxPhpUpstreamConfig += sites.enabledPhpVersions.map(phpVersion => {
+	nginxPhpUpstreamConfig += enabledPhpVersions.map(phpVersion => {
 		return `map $backend_version $backend_php${phpVersion.replace('.', '')}_default {sitedefault php${phpVersion.replace('.', '')}; default $backend_version;}`
 	}).join('\n\n')
 
@@ -151,7 +152,7 @@ map $arg_xdebug $xdebug_suffix {
 
 `
 
-	nginxPhpUpstreamConfig += sites.enabledPhpVersions.map(phpVersion => {
+	nginxPhpUpstreamConfig += enabledPhpVersions.map(phpVersion => {
 		return `upstream php${phpVersion.replace('.', '')}-noxdebug {server php${phpVersion.replace('.', '')}:9000;}\nupstream php${phpVersion.replace('.', '')}-xdebug {server php${phpVersion.replace('.', '')}-xdebug:9000;}`
 	}).join('\n\n')
 
@@ -285,7 +286,7 @@ function _getUpdateNotifier() {
  * Triggers asynchronous updates of the CA certificates in the PHP containers.
  */
 function triggerUpdateCaCertificates() {
-	sites.enabledPhpVersions.forEach(enabledPhpVersion => {
+	sites.getEnabledPhpVersions().forEach(enabledPhpVersion => {
 		commands.composeCommand([
 			'exec',
 			`php${enabledPhpVersion.toString().replace('.', '')}`,
