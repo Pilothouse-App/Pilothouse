@@ -6,7 +6,8 @@ const chalk = require('chalk'),
 
 let config = helpers.readYamlConfig(environment.appHomeDirectory + '/config.yml', getDefaultConfig());
 
-config.default_php_container = 'php' + config.default_php_version.toString().replace(/\./g, '');
+config.default_php_version = config.default_php_version.toString()
+config.default_php_container = 'php' + config.default_php_version.replace(/\./g, '');
 config.default_php_backend = '$backend_' + config.default_php_container + '_default';
 
 config.composeVariables = getComposeVariables();
@@ -72,6 +73,7 @@ function getConfigFilePath(filename) {
 function getDefaultConfig() {
 	return {
 		default_php_version: '7.0',
+		additional_php_versions: [],
 		sites_directory: environment.homeDirectory + '/Sites',
 		wp_default_username: 'admin',
 		wp_default_password: 'password'

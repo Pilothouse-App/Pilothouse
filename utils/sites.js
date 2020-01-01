@@ -302,8 +302,18 @@ function getAvailablePhpVersions() {
  */
 function getEnabledPhpVersions() {
 	let enabledPhpVersions = [
-		config.default_php_version.toString()
+		config.default_php_version
 	]
+
+	if (Array.isArray(config.additional_php_versions)) {
+		config.additional_php_versions.forEach(additionalPhpVersion => {
+			additionalPhpVersion = additionalPhpVersion.toString()
+
+			if (! enabledPhpVersions.includes(additionalPhpVersion)) {
+				enabledPhpVersions.push(additionalPhpVersion)
+			}
+		})
+	}
 
 	getSites().forEach(site => {
 		const sitePhpVersion = getSiteSettings(site).default_php_version.toString()

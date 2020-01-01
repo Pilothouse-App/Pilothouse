@@ -289,7 +289,7 @@ function triggerUpdateCaCertificates() {
 	sites.getEnabledPhpVersions().forEach(enabledPhpVersion => {
 		commands.composeCommand([
 			'exec',
-			`php${enabledPhpVersion.toString().replace('.', '')}`,
+			`php${enabledPhpVersion.replace('.', '')}`,
 			'/bin/sh',
 			'-c',
 			'update-ca-certificates &> /dev/null'
@@ -297,7 +297,7 @@ function triggerUpdateCaCertificates() {
 
 		commands.composeCommand([
 			'exec',
-			`php${enabledPhpVersion.toString().replace('.', '')}-xdebug`,
+			`php${enabledPhpVersion.replace('.', '')}-xdebug`,
 			'/bin/sh',
 			'-c',
 			'update-ca-certificates &> /dev/null'
