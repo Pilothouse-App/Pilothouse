@@ -10,6 +10,7 @@ services:
       - main
     ports:
       - 1080:1080
+    restart: unless-stopped
 
   mysql:
     environment:
@@ -19,6 +20,7 @@ services:
       - main
     ports:
       - 3306:3306
+    restart: unless-stopped
     volumes:
       - "{{MYSQL_CONFIG_FILE}}:/etc/mysql/conf.d/pilothouse.cnf"
       - "mysqldata:/var/lib/mysql"
@@ -32,6 +34,7 @@ services:
     ports:
       - 80:80
       - 443:443
+    restart: unless-stopped
     volumes:
       - "{{HTTPS_CERTIFICATE_CERT}}:/etc/nginx/https-certificate.cert"
       - "{{HTTPS_CERTIFICATE_KEY}}:/etc/nginx/https-certificate.key"
@@ -46,6 +49,7 @@ services:
       - TERM=xterm
     networks:
       - main
+    restart: unless-stopped
     volumes:
       - "{{HTTPS_CERTIFICATE_CERT}}:/usr/local/share/ca-certificates/pilothouse.crt"
       - "{{PHP_CONFIG_FILE}}:/usr/local/etc/php/conf.d/pilothouse.ini"
@@ -68,6 +72,7 @@ services:
       - main
     ports:
       - 8080:80
+    restart: unless-stopped
 
   redis:
     image: redis:3-alpine
@@ -75,6 +80,7 @@ services:
       - main
     ports:
       - 6379:6379
+    restart: unless-stopped
 
 volumes:
   mysqldata:
