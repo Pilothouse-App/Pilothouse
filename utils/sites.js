@@ -316,7 +316,7 @@ function getEnabledPhpVersions() {
 	}
 
 	getSites().forEach(site => {
-		const sitePhpVersion = getSiteSettings(site).default_php_version.toString()
+		const sitePhpVersion = getSiteSettings(site).default_php_version
 
 		if (!enabledPhpVersions.includes(sitePhpVersion)) {
 			enabledPhpVersions.push(sitePhpVersion)
@@ -380,7 +380,14 @@ function getSiteSettings(site) {
 		defaults.type = 'wordpress';
 	}
 
-	return helpers.readYamlConfig(configFile, defaults);
+	const siteSettings = helpers.readYamlConfig(configFile, defaults)
+
+	siteSettings.default_php_version = siteSettings.default_php_version.toString()
+	if (1 === siteSettings.default_php_version.length) {
+		siteSettings.default_php_version += '.0'
+	}
+
+	return siteSettings
 }
 
 /**

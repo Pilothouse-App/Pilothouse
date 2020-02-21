@@ -15,9 +15,9 @@ const composerCommand = function(argv) {
 	}
 
 	if (argv.php) {
-		phpVersion = argv.php;
+		phpVersion = argv.php.toString();
 	}
-	const phpContainer = 'php' + phpVersion.toString().replace(/\./g, '');
+	const phpContainer = 'php' + phpVersion.replace(/\./g, '');
 
 	let workDir = '/var/www/html/sites';
 	if (environment.currentSiteName) {

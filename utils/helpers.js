@@ -18,7 +18,7 @@ module.exports = {
  * @return {String}
  */
 function formatPhpVersionBackend(phpVersion) {
-	return '$backend_php' + phpVersion.toString().replace('.', '').padEnd(2, '0') + '_default';
+	return '$backend_php' + phpVersion.replace('.', '').padEnd(2, '0') + '_default';
 }
 
 /**

@@ -15,9 +15,9 @@ const wpCommand = function(argv) {
 	}
 
     if (argv.php) {
-        phpVersion = argv.php;
+        phpVersion = argv.php.toString();
     }
-    let phpContainer = 'php' + phpVersion.toString().replace(/\./g, '');
+    let phpContainer = 'php' + phpVersion.replace(/\./g, '');
 
 	if (argv.xdebug) {
 		phpContainer += '-xdebug';
