@@ -15,7 +15,7 @@ const upCommand = function(displayFiglet = true) {
 	run.triggerBackgroundUpdateCheck()
 
 	if (displayFiglet) {
-		console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'slant'})));
+		console.log(chalk.blue(figlet.textSync('Pilothouse', {font: 'Slant'})));
 	}
 
 	run.buildRunFiles();
