@@ -16,7 +16,7 @@ module.exports = {
 	requireSystemUp: requireSystemUp,
 	triggerBackgroundUpdateCheck: triggerBackgroundUpdateCheck,
 	maybeShowUpdateNotification: maybeShowUpdateNotification,
-	triggerUpdateCaCertificates: triggerUpdateCaCertificates,
+	updateCaCertificates: updateCaCertificates,
 	waitForMysql: waitForMysql
 };
 
@@ -283,24 +283,36 @@ function _getUpdateNotifier() {
 }
 
 /**
- * Triggers asynchronous updates of the CA certificates in the PHP containers.
+ * Updates the CA certificates in the PHP containers.
  */
-function triggerUpdateCaCertificates() {
-	sites.getEnabledPhpVersions().forEach(enabledPhpVersion => {
-		commands.composeCommand([
-			'exec',
-			`php${enabledPhpVersion.replace('.', '')}`,
-			'/bin/sh',
-			'-c',
-			'update-ca-certificates &> /dev/null'
-		], false, true);
+async function updateCaCertificates() {
+	const processes = []
 
-		commands.composeCommand([
-			'exec',
-			`php${enabledPhpVersion.replace('.', '')}-xdebug`,
-			'/bin/sh',
-			'-c',
-			'update-ca-certificates &> /dev/null'
-		], false, true);
+	sites.getEnabledPhpVersions().forEach(enabledPhpVersion => {
+		processes.push(new Promise(resolve => {
+			commands.composeCommand([
+				'exec',
+				`php${enabledPhpVersion.replace('.', '')}`,
+				'/bin/sh',
+				'-c',
+				'update-ca-certificates &> /dev/null'
+			], false);
+
+			resolve()
+		}))
+
+		processes.push(new Promise(resolve => {
+			commands.composeCommand([
+				'exec',
+				`php${enabledPhpVersion.replace('.', '')}-xdebug`,
+				'/bin/sh',
+				'-c',
+				'update-ca-certificates &> /dev/null'
+			], false);
+
+			resolve()
+		}))
 	})
+
+	await Promise.all(processes)
 }

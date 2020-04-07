@@ -52,12 +52,11 @@ function artisanCommand(commandString, container = null) {
  *
  * @param {Array}   command       The command to run.
  * @param {Boolean} captureOutput Whether to capture and return the output, or pipe it to the console.
- * @param {Boolean} async         Whether the command should be run asynchronously.
  *
  * @returns {Object} The command's result object.
  */
-function composeCommand(command, captureOutput = false, async = false) {
-	return shellCommand(environment.runDirectory, 'docker-compose', command, captureOutput, async)
+function composeCommand(command, captureOutput = false) {
+	return shellCommand(environment.runDirectory, 'docker-compose', command, captureOutput)
 }
 
 /**
@@ -151,14 +150,11 @@ function regenerateHTTPSCertificate(hosts = []) {
  * @param {String}  command       The command to run.
  * @param {Array}   args          Arguments to be passed to the command.
  * @param {Boolean} captureOutput Whether to capture and return the output, or pipe it to the console.
- * @param {Boolean} async         Whether to run the command asynchronously.
  *
  * @returns {String} The command's result.
  */
-function shellCommand(cwd, command, args, captureOutput = false, async = false) {
-	const result = async
-		? childProcess.spawn(command, args, {cwd: cwd})
-		: childProcess.spawnSync(command, args, {cwd: cwd, stdio: captureOutput ? 'pipe' : 'inherit'});
+function shellCommand(cwd, command, args, captureOutput = false) {
+	const result = childProcess.spawnSync(command, args, {cwd: cwd, stdio: captureOutput ? 'pipe' : 'inherit'});
 
 	if (captureOutput) {
 		const stderr = result.stderr ? result.stderr.toString() : '';

@@ -6,7 +6,7 @@ const reloadCommand = function() {
 	run.buildRunFiles()
 	sites.hostsAllAdd()
 	commands.composeCommand(['up', '-d', '--remove-orphans']);
-	run.triggerUpdateCaCertificates()
+	run.updateCaCertificates()
 };
 
 exports.command = 'reload';

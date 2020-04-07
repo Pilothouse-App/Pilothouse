@@ -21,7 +21,7 @@ const upCommand = function(displayFiglet = true) {
 	run.buildRunFiles();
 	sites.hostsAllAdd();
 	commands.composeCommand(['up', '-d', '--remove-orphans']);
-	run.triggerUpdateCaCertificates()
+	run.updateCaCertificates()
 
 	run.waitForMysql();
 	commands.mysqlCommand(
