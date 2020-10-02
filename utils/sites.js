@@ -459,7 +459,7 @@ function isValidSite(item) {
 	}
 
 	// Return false if the directory name is invalid.
-	if (!validator.matches(item, /^[a-z0-9-_]+$/)) {
+	if (!validator.matches(item, /^[a-z0-9-_.]+$/)) {
 		return false;
 	}
 
